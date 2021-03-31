@@ -1,38 +1,139 @@
-.App {
-  text-align: center;
+#components-layout-demo-custom-trigger .trigger {
+  padding: 0 24px;
+  font-size: 18px;
+  line-height: 64px;
+  cursor: pointer;
+  transition: color 0.3s;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+#components-layout-demo-custom-trigger .trigger:hover {
+  color: #1890ff;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* #components-layout-demo-custom-trigger .logo {
+  height: 32px;
+  margin: 16px;
+  background: rgba(255, 255, 255, 0.3);
+  
+} */
+
+.site-layout .site-layout-background {
+  background: #fff;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+h1 {
+  font-size: x-large;
 }
 
-.App-link {
-  color: #61dafb;
+/* Hamburger in Phone */
+.hamburger-menu .ant-btn-danger {
+  border-radius: 12px;
+  background-color: #e9eaed;
+  border-color: #1f1f1f;
+  width: 40px;
+}
+/* Hamburger in Phone */
+
+.ant-btn-primary {
+  border-radius: 8px;
+  background-color: #1f1f1f;
+  border-color: aliceblue;
+  width: 'auto';
+  margin-right: 4px;
+}
+.ant-btn-primary:hover {
+  border-radius: 8px;
+  background-color: #f0f2f5;
+  border-color: #1f1f1f;
+  color: #1f1f1f;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+.ant-btn-primary:focus {
+  border-radius: 8px;
+  background-color: #f0f2f5;
+  border-color: #1f1f1f;
+  color: #1f1f1f;
+}
+
+.ant-btn-danger {
+  width: 85px;
+  border-radius: 8px;
+  background-color: red;
+  border-color: aliceblue;
+}
+.ant-btn-danger:hover {
+  width: 80px;
+  border-radius: 8px;
+  background-color: #f0f2f5;
+  border-color: red;
+  color: red;
+  width: 90px;
+}
+
+.ant-btn-sm {
+  border-radius: 8px;
+}
+
+.btnLogin .ant-btn-primary:hover {
+  width: 100%;
+  border-radius: 8px;
+  background-color: #d94b4a;
+  border-color: aliceblue;
+  color: #fff;
+}
+
+.btnLogin .ant-btn-primary {
+  width: 100%;
+  border-radius: 8px;
+  background-color: #1f1f1f;
+  border-color: aliceblue;
+}
+
+.ant-input:hover,
+.ant-picker:hover,
+.ant-select-selector:hover,
+.ant-select:not(.ant-select-customize-input) .ant-select-selector:hover {
+  border-color: grey;
+  border-right-width: 1px !important;
+  border-radius: 5px;
+}
+
+.ant-radio-button-wrapper:first-child:hover,
+.ant-radio-button-wrapper:last-child:hover {
+  color: #d94b4a;
+}
+
+.ant-input:focus {
+  border-color: grey;
+}
+
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled),
+.ant-radio-button-wrapper-checked:not([class*=' ant-radio-button-wrapper-disabled']).ant-radio-button-wrapper:first-child,
+.ant-radio-button-wrapper-checked:not([class*=' ant-radio-button-wrapper-disabled']).ant-radio-button-wrapper:last-child,
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):first-child {
+  color: #d94b4a;
+  border-color: #d94b4a;
+}
+
+.ant-input,
+.ant-picker,
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  border-radius: 5px;
+  width: 100%;
+}
+
+.ant-radio-button-wrapper {
+  border-radius: 10px;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=PT+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+.myContent {
+  font-family: 'Varela Round', sans-serif;
+}
+
+@media (max-width: 575px) {
+  .addEmployee {
+    margin-left: -90px;
   }
 }

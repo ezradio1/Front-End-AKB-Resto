@@ -1,0 +1,43 @@
+.menuOutline {
+  margin-left: 20px;
+}
+
+.sider-menu {
+  display: none;
+}
+
+.ant-btn-danger {
+  background-color: #f0f2f5;
+  border-color: #001529;
+  border-radius: 10px;
+}
+
+.ant-btn-danger .site-layout-background {
+  background-color: #f0f2f5;
+  border-color: #001529;
+  border-radius: 10px;
+  width: 100px;
+}
+
+.backGround {
+  background-color: #f0f2f5;
+  background-image: url('https://www.transparenttextures.com/patterns/diagmonds-light.png');
+  /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+}
+
+@media (min-width: 992px) {
+  .menuOutline {
+    display: none;
+    margin-left: 100px;
+  }
+
+  .sider-menu {
+    display: block;
+  }
+
+  .ant-btn-danger {
+    background-color: #f0f2f5;
+    border-color: #001529;
+    border-radius: 10px;
+  }
+}

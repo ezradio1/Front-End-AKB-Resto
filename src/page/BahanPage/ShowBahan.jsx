@@ -1,0 +1,474 @@
+import React, { Component } from 'react';
+import ResizableAntdTable from 'resizable-antd-table';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import {
+  Input,
+  Table,
+  Button,
+  Space,
+  Popconfirm,
+  message,
+  Modal,
+  Checkbox,
+  InputNumber,
+} from 'antd';
+import { Link } from 'react-router-dom';
+
+import { SearchOutlined, DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
+import { UserContext } from '../../context/UserContext';
+import myAxios from '../../myAxios';
+import LogoModal from '../../asset/icon/logo modal.png';
+
+const layout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};
+const tailLayout = {
+  wrapperCol: { offset: 8, span: 16 },
+};
+
+class ShowBahan extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      modalVisible: false,
+      bahan: null,
+      filteredInfo: null,
+      sortedInfo: null,
+      idEdit: null,
+      token: null,
+      searchText: '',
+      searchedColumn: '',
+      judulModal: '',
+      buttonModal: '',
+      loading: false,
+      validated: false,
+
+      nama_bahan: '',
+      unit: '',
+    };
+  }
+
+  openModal = () => {
+    this.setState({
+      modalVisible: true,
+      buttonModal: 'Tambah Bahan',
+      judulModal: 'Tambah Data Bahan',
+      nama_bahan: '',
+      unit: '',
+    });
+    console.log(this.state.modalVisible);
+  };
+
+  onFinish = (values) => {
+    console.log('Success:', values.curr);
+    console.log('Masuk On Finish');
+
+    this.setState({ modalVisible: false });
+  };
+
+  onFinishFailed = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
+
+  handleChangeInput = (evt) => {
+    console.log(evt.target.value);
+    this.setState({
+      [evt.target.name]: evt.target.value,
+    });
+  };
+
+  handleCancel = () => {
+    this.setState({ modalVisible: false });
+  };
+
+  editBahan = (modalVisible, index) => {
+    console.log('id handle  = ' + index);
+    this.setState({
+      nama_bahan: '',
+      unit: '',
+      idEdit: index,
+    });
+    myAxios
+      .get(`showBahan/${index}`, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token'),
+        },
+      })
+      .then((res) => {
+        const data = res.data.data;
+        this.setState({
+          modalVisible,
+          judulModal: 'Edit Data Bahan',
+          buttonModal: 'Edit Bahan',
+          nama_bahan: data.nama_bahan,
+          unit: data.unit,
+        });
+        console.log('Data Bahan = ');
+        console.log(res.data.data);
+      });
+
+    console.log('ID Edit Adalah : ' + this.state.nama_bahan);
+  };
+
+  static contextType = UserContext;
+
+  handleChange = (pagination, filters, sorter) => {
+    console.log('Various parameters', pagination, filters, sorter);
+    this.setState({
+      filteredInfo: filters,
+      sortedInfo: null,
+      sortDirection: 'asc',
+      searchText: '',
+      searchedColumn: '',
+    });
+  };
+
+  clearFilters = () => {
+    this.setState({ filteredInfo: null });
+  };
+
+  clearAll = () => {
+    this.setState({
+      filteredInfo: null,
+      sortedInfo: null,
+    });
+  };
+
+  getBahan = () => {
+    myAxios
+      .get(`showBahan`, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token'),
+        },
+      })
+      .then((res) => {
+        const data = res.data.data;
+        this.setState({
+          bahan: data,
+        });
+        console.log('Data Bahan = ');
+        console.log(res.data.data);
+      });
+
+    console.log(this.state.bahan);
+  };
+
+  componentDidMount() {
+    const user = this.context;
+    if (this.state.bahan === null) {
+      this.getBahan();
+    }
+  }
+
+  DeleteItem(param) {
+    const mytoken = localStorage.getItem('token');
+    console.log('Delete Item ' + param + mytoken);
+    let newObj = {};
+    myAxios
+      .put(`deleteBahan/${param}`, newObj, {
+        headers: {
+          Authorization: 'Bearer ' + mytoken,
+        },
+      })
+      .then((res) => {
+        let filter = this.state.bahan.filter((el) => {
+          return el.id !== param;
+        });
+        this.setState({ bahan: filter });
+        console.log(res);
+        message.success(res.data.data.nama_bahan + ' berhasil dihapus!');
+      })
+      .catch((err) => {
+        message.error('Gagal Menghapus : ' + err);
+      });
+  }
+
+  getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={(node) => {
+            this.searchInput = node;
+          }}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() =>
+            this.handleSearch(selectedKeys, confirm, dataIndex)
+          }
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type='primary'
+            onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size='small'
+            style={{ width: 90 }}>
+            Search
+          </Button>
+          <Button
+            onClick={() => this.handleReset(clearFilters)}
+            size='small'
+            style={{ width: 90 }}>
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        ? record[dataIndex]
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
+        : '',
+    onFilterDropdownVisibleChange: (visible) => {
+      if (visible) {
+        setTimeout(() => this.searchInput.select(), 100);
+      }
+    },
+  });
+
+  handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    console.log(
+      'data:' +
+        selectedKeys[0] +
+        'confirmnya : ' +
+        confirm +
+        'datin :' +
+        dataIndex
+    );
+    this.setState({
+      searchText: selectedKeys[0],
+      searchedColumn: dataIndex,
+    });
+  };
+
+  handleReset = (clearFilters) => {
+    clearFilters();
+    this.setState({ searchText: '' });
+  };
+
+  handleSubmit = (event) => {
+    event.preventDefault();
+    console.log('Id = ' + this.state.idEdit);
+    if (this.state.nama_bahan === '' || this.state.unit === '') {
+      message.error('Masukan input yang valid!');
+    } else {
+      if (this.state.idEdit === null) {
+        this.setState({ loading: true });
+        console.log('MASUK TAMBAH MENU');
+        console.log('Handle Submit + ' + this.state.nama_bahan);
+        let newObj = {
+          nama_bahan: this.state.nama_bahan,
+          jumlah: 0,
+          unit: this.state.unit,
+        };
+        myAxios
+          .post(`bahan`, newObj, {
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('token'),
+            },
+          })
+          .then((res) => {
+            message.success(newObj.nama_bahan + ' berhasil ditambahkan!');
+            let data = res.data.data;
+            this.setState({
+              modalVisible: false,
+              nama_bahan: '',
+              unit: '',
+              loading: false,
+              bahan: [...this.state.bahan, data],
+            });
+          })
+          .catch((err) => {
+            message.error('Tambah Bahan Gagal : ' + err.response.data.message);
+          });
+      } else {
+        console.log('MASUK EDIT MENU');
+        this.setState({ loading: true });
+        let newObj = {
+          nama_bahan: this.state.nama_bahan,
+          unit: this.state.unit,
+        };
+        myAxios
+          .put(`editBahan/${this.state.idEdit}`, newObj, {
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('token'),
+            },
+          })
+          .then((res) => {
+            message.success(newObj.nama_bahan + ' berhasil diubah!');
+            let data = res.data.data;
+            const temp = this.state.bahan.filter((i) => {
+              return i.id !== data.id;
+            });
+            this.setState({
+              modalVisible: false,
+              nama_bahan: '',
+              unit: '',
+              idEdit: null,
+              loading: false,
+            });
+            this.getBahan();
+          })
+          .catch((err) => {
+            message.error('Ubah Bahan Gagal : ' + err.response.data.message);
+          });
+      }
+    }
+  };
+
+  render() {
+    let { sortedInfo, filteredInfo } = this.state;
+    sortedInfo = sortedInfo || {};
+    filteredInfo = filteredInfo || {};
+    const columns = [
+      {
+        title: 'Nama Bahan',
+        dataIndex: 'nama_bahan',
+        key: 'nama_bahan',
+        ...this.getColumnSearchProps('nama_bahan'),
+        filteredValue: filteredInfo.nama_bahan || null,
+        sorter: (a, b) => a.nama_bahan.length - b.nama_bahan.length,
+        ellipsis: true,
+      },
+      {
+        title: 'Jumlah Stok',
+        dataIndex: 'jumlah',
+        key: 'jumlah',
+        sorter: (a, b) => a.jumlah.length - b.jumlah.length,
+        ellipsis: true,
+      },
+      {
+        title: 'Unit',
+        dataIndex: 'unit',
+        key: 'unit',
+        filters: [
+          { text: 'Gram', value: 'gram' },
+          { text: 'Mililiter', value: 'ml' },
+          { text: 'Botol', value: 'botol' },
+        ],
+        filteredValue: filteredInfo.unit || null,
+        onFilter: (value, record) => record.unit.includes(value),
+        sorter: (a, b) => a.unit.length - b.unit.length,
+      },
+      {
+        align: 'center',
+        title: 'Action',
+        dataIndex: 'id',
+        key: 'id',
+
+        render: (dataIndex) => (
+          <div>
+            <EditTwoTone
+              twoToneColor='#d94a4b'
+              style={{ marginRight: '5px' }}
+              onClick={() => this.editBahan(true, dataIndex)}
+            />
+            <Popconfirm
+              placement='left'
+              title={'Apakah anda yakin ingin menghapus ?'}
+              onConfirm={() => this.DeleteItem(dataIndex)}
+              okText='Yes'
+              cancelText='No'>
+              <DeleteTwoTone twoToneColor='#d94a4b' />
+            </Popconfirm>
+          </div>
+        ),
+      },
+    ];
+
+    return (
+      <div style={{ padding: '25px 30px' }}>
+        <Modal
+          visible={this.state.modalVisible}
+          title={this.state.judulModal}
+          onCancel={this.handleCancel}
+          footer={[]}>
+          <form onSubmit={this.handleSubmit}>
+            <label>Nama Bahan</label>
+            <Input
+              placeholder='Nama Bahan'
+              name='nama_bahan'
+              value={this.state.nama_bahan}
+              onChange={this.handleChangeInput}
+              autoComplete='off'
+            />
+            <label style={{ marginTop: '15px' }}>Unit Bahan</label>
+            <Input
+              placeholder='Unit'
+              name='unit'
+              value={this.state.unit}
+              onChange={this.handleChangeInput}
+              autoComplete='off'
+            />
+            <Button
+              loading={this.state.loading}
+              type='primary'
+              style={{ marginTop: '20px', width: '100%' }}>
+              <button
+                style={{
+                  width: '100%',
+                  border: 'transparent',
+                  backgroundColor: 'transparent',
+                }}>
+                {this.state.buttonModal}
+              </button>
+            </Button>
+          </form>
+        </Modal>
+
+        <h1
+          style={{
+            fontSize: 'x-large',
+            color: '#001529',
+            textTransform: 'uppercase',
+          }}>
+          <strong>data bahan</strong>
+        </h1>
+        <div
+          style={{
+            border: '1px solid #8C98AD',
+            marginTop: '-10px',
+            marginBottom: '15px',
+          }}></div>
+        <Space style={{ marginBottom: 16 }}>
+          <Button
+            type='primary'
+            style={{ width: 'auto', borderRadius: '7px' }}
+            onClick={this.clearFilters}>
+            Hapus Filter
+          </Button>
+          <Button
+            style={{ width: 'auto', borderRadius: '7px' }}
+            type='primary'
+            onClick={this.openModal}>
+            Tambah Bahan
+          </Button>
+        </Space>
+        <Table
+          scroll={{ x: 900, y: 1000 }}
+          columns={columns}
+          dataSource={this.state.bahan}
+          onChange={this.handleChange}
+        />
+      </div>
+    );
+  }
+}
+
+export default ShowBahan;

@@ -1,0 +1,17 @@
+/* .ant-btn-primary {
+  width: 375px;
+  border-radius: 15px;
+  color: blueviolet;
+}
+
+.ant-btn-primary:hover {
+  width: 375px;
+  border-radius: 15px;
+  color: azure;
+} */
+
+.backGroundLogin {
+  background-color: #1f1f1f;
+  background-image: url('https://www.transparenttextures.com/patterns/black-linen.png');
+  /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+}
