@@ -25,6 +25,7 @@ import LogoAkbFull from '../asset/logo/logo-nav-1.png';
 
 import axios from 'axios';
 import './Layout.css';
+import myAxios from '../myAxios';
 
 const { Header, Content, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -47,8 +48,8 @@ const LayoutCustom = () => {
     const mytoken = localStorage.getItem('token');
     let newObj;
     console.log(mytoken);
-    axios
-      .post('https://dbakbresto.ezraaudivano.com/api/logout', newObj, {
+    myAxios
+      .post('logout', newObj, {
         headers: {
           Authorization: 'Bearer ' + mytoken,
         },
