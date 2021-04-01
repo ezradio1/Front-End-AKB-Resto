@@ -43,7 +43,6 @@ const LayoutCustom = () => {
   });
 
   const Logout = () => {
-    setUser(null);
     const mytoken = localStorage.getItem('token');
     let newObj;
     myAxios
@@ -53,6 +52,7 @@ const LayoutCustom = () => {
         },
       })
       .then((res) => {
+        setUser(null);
         // var user = res.data.user;
         // var token = res.data.access_token;
         // var jabatan = res.data.user.jabatan;

@@ -9,12 +9,18 @@ import {
   Popconfirm,
   message,
   Modal,
+  Spin,
   Checkbox,
   InputNumber,
 } from 'antd';
 import { Link } from 'react-router-dom';
 
-import { SearchOutlined, DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  DeleteTwoTone,
+  EditTwoTone,
+  LoadingOutlined,
+} from '@ant-design/icons';
 import { UserContext } from '../../context/UserContext';
 import myAxios from '../../myAxios';
 import LogoModal from '../../asset/icon/logo modal.png';
@@ -26,6 +32,8 @@ const layout = {
 const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
+
+const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 class ShowBahan extends Component {
   constructor(props) {
@@ -146,6 +154,7 @@ class ShowBahan extends Component {
         const data = res.data.data;
         this.setState({
           bahan: data,
+          loading: false,
         });
         console.log('Data Bahan = ');
         console.log(res.data.data);
@@ -155,6 +164,7 @@ class ShowBahan extends Component {
   };
 
   componentDidMount() {
+    this.setState({ loading: true });
     const user = this.context;
     if (this.state.bahan === null) {
       this.getBahan();
@@ -461,6 +471,8 @@ class ShowBahan extends Component {
           </Button>
         </Space>
         <Table
+          loading={this.state.loading}
+          loadingIndicator={antIcon}
           scroll={{ x: 900, y: 1000 }}
           columns={columns}
           dataSource={this.state.bahan}

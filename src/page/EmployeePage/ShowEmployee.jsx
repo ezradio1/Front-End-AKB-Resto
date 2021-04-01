@@ -1,11 +1,25 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Table, Button, Space, Popconfirm, Input, message, Tag } from 'antd';
+import {
+  Table,
+  Button,
+  Space,
+  Popconfirm,
+  Input,
+  message,
+  Tag,
+  Spin,
+} from 'antd';
 import { Link } from 'react-router-dom';
 
-import { SearchOutlined, DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  LoadingOutlined,
+  EditTwoTone,
+} from '@ant-design/icons';
 import { UserContext } from '../../context/UserContext';
 import myAxios from '../../myAxios';
+const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 class ShowEmployee extends Component {
   constructor(props) {
@@ -18,6 +32,7 @@ class ShowEmployee extends Component {
       token: null,
       searchText: '',
       searchedColumn: '',
+      loading: false,
     };
   }
   static contextType = UserContext;
@@ -56,7 +71,7 @@ class ShowEmployee extends Component {
   componentDidMount() {
     const user = this.context;
     console.log('CEK ' + user.object);
-    this.setState({ token: localStorage.getItem('token') });
+    this.setState({ token: localStorage.getItem('token'), loading: true });
     console.log('SYALALA : ' + localStorage.getItem('token'));
     if (this.state.karyawan === null) {
       myAxios
@@ -69,11 +84,15 @@ class ShowEmployee extends Component {
           const data = res.data.data;
           this.setState({
             karyawan: data,
+            loading: false,
           });
           console.log('Data Karyawan = ');
           console.log(res.data.data);
         })
         .catch((err) => {
+          this.setState({
+            loading: false,
+          });
           message.error('Gagal Ambil : ' + err);
           console.log('error  : ' + err);
         });
@@ -311,6 +330,8 @@ class ShowEmployee extends Component {
           </Button>
         </Space>
         <Table
+          loading={this.state.loading}
+          loadingIndicator={antIcon}
           scroll={{ x: 900, y: 1000 }}
           columns={columns}
           dataSource={this.state.karyawan}

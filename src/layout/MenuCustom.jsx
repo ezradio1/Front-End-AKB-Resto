@@ -68,7 +68,7 @@ class MenuCustom extends Component {
           <Menu.Item
             key='3'
             icon={<UserOutlined />}
-            style={{ margin: '0', backgroundColor: '#141414' }}>
+            style={{ margin: '0', backgroundColor: '#1F1F1F' }}>
             <Link className='link' to='/addCustomer'>
               Customer
             </Link>

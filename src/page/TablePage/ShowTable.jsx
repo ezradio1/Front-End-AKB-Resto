@@ -12,6 +12,7 @@ import {
   Menu,
   Empty,
   Dropdown,
+  Spin,
 } from 'antd';
 import './style.css';
 import { DownOutlined } from '@ant-design/icons';
@@ -40,6 +41,7 @@ const ShowTable = () => {
   const [buttonModal, setbuttonModal] = useState(null);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [spin, setSpin] = useState(false);
   let history = useHistory();
   const [form] = Form.useForm();
   const mytoken = localStorage.getItem('token');
@@ -82,7 +84,13 @@ const ShowTable = () => {
         },
       })
       .then((res) => {
-        const data = res.data.data;
+        var data = res.data.data;
+        // var nomor_meja;
+        // data.map((val, index) => {
+        //   valNoMeja.nomor_meja.sort();
+        // });
+        console.log('CUS');
+        // console.log(nomor_meja);
         setMeja(data);
         settempMeja(data);
       });
@@ -94,7 +102,7 @@ const ShowTable = () => {
 
   const onFinish = (values) => {
     console.log('Success:', values.nomor_meja);
-
+    setLoading(true);
     if (judulModal === 'Tambah Data Meja') {
       console.log('TAMBAH DATA MEJA');
 
@@ -255,6 +263,7 @@ const ShowTable = () => {
           marginTop: '-10px',
           marginBottom: '5px',
         }}></div>
+
       <Row align='middle' justify='center' style={{ width: '100%' }}>
         <Col xs={24} md={4}>
           <Button
@@ -338,6 +347,18 @@ const ShowTable = () => {
       </Modal>
       {search && <Empty style={{ marginTop: '35px' }} />}
       <showEmpty />
+      {!meja && (
+        <h1
+          style={{
+            marginTop: '25px',
+            textAlign: 'center',
+          }}>
+          <Spin />
+          <p style={{ color: 'grey', fontSize: '15px' }}>
+            Mengambil data meja...
+          </p>
+        </h1>
+      )}
       {meja && (
         <Row justify='start'>
           {meja.map((val, index) => {
@@ -357,11 +378,9 @@ const ShowTable = () => {
                     <div className='flip-card-back'>
                       <div style={{ marginTop: '25%' }} className='myButton'>
                         <Button
+                          type='primary'
                           style={{
-                            borderRadius: '10px',
                             width: '125px',
-                            backgroundColor: '#141414',
-                            color: 'white',
                           }}
                           onClick={() => EditMeja(val.nomor_meja, val.id)}
                           loading={loading}>
@@ -371,7 +390,6 @@ const ShowTable = () => {
                         <Button
                           type='danger'
                           style={{
-                            borderRadius: '10px',
                             width: '125px',
                             marginTop: '10px',
                           }}
