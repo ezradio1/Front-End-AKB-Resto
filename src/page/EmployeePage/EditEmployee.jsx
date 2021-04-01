@@ -18,6 +18,7 @@ import {
   message,
   Card,
   Popconfirm,
+  Alert,
 } from 'antd';
 import { useParams, useForm, useHistory } from 'react-router-dom';
 const { Meta } = Card;
@@ -62,7 +63,7 @@ const EditEmployee = () => {
         .then((res) => {
           const data = res.data.data;
           setKaryawan(data);
-          console.log('Data Karywan = ' + data.status);
+          console.log(data);
           setStatus(data.status);
 
           tanggal = Moment(data.tanggal_bergabung, 'YYYY-MM-DD');
@@ -74,7 +75,6 @@ const EditEmployee = () => {
             jabatan: data.jabatan,
             telepon: data.telepon.slice(1),
             tanggal_bergabung: tanggal,
-            password: data.telepon,
             status: data.status,
           });
         });
@@ -102,6 +102,7 @@ const EditEmployee = () => {
       })
       .then((res) => {
         setLoading(false);
+
         message.success(newObj.nama + ' berhasil di edit!');
         history.push('/showEmployee');
       })
@@ -252,31 +253,43 @@ const EditEmployee = () => {
         align='top'
         style={{ minHeight: '100vh' }}>
         <Form
-          style={{ width: '1000px', padding: '10px 35px' }}
           {...layout}
           form={form}
-          name='nest-messages'
+          basic
+          name='basic'
           onFinish={onFinish}
+          style={{ width: '1000px', padding: '10px 35px' }}
           validateMessages={validateMessages}>
           <Form.Item
             name='nama'
             label='Nama'
             labelAlign='left'
-            rules={[{ required: true }]}>
-            <Input />
+            rules={[
+              {
+                required: true,
+                message: 'Masukan Nama Karyawan!',
+              },
+            ]}>
+            <Input autoComplete='off' />
           </Form.Item>
           <Form.Item
             name='email'
             label='Email'
             labelAlign='left'
-            rules={[{ required: true, type: 'email' }]}>
+            rules={[
+              {
+                required: true,
+                message: 'Masukan Email Karyawan!',
+                type: 'email',
+              },
+            ]}>
             <Input />
           </Form.Item>
           <Form.Item
             name='jabatan'
             label='Jabatan'
             labelAlign='left'
-            rules={[{ required: true }]}>
+            rules={[{ required: true, message: 'Masukan Jabatan Karyawan!' }]}>
             <Select>
               <Select.Option value='Owner'>Owner</Select.Option>
               <Select.Option value='Operational Manager'>
@@ -289,9 +302,11 @@ const EditEmployee = () => {
           </Form.Item>
           <Form.Item
             name='jenisKelamin'
-            label='Gender'
+            label='Jenis Kelamin'
             labelAlign='left'
-            rules={[{ required: true }]}>
+            rules={[
+              { required: true, message: 'Masukan Jenis Kelamin Karyawan!' },
+            ]}>
             <Radio.Group>
               <Radio.Button value='Laki-Laki'>Laki-Laki</Radio.Button>
               <Radio.Button value='Perempuan'>Perempuan</Radio.Button>
@@ -300,27 +315,44 @@ const EditEmployee = () => {
           <Form.Item
             name='telepon'
             labelAlign='left'
-            rules={[{ required: true, message: 'Telepon' }]}
+            rules={[
+              {
+                required: true,
+                min: 9,
+                max: 12,
+                message: 'Nomor Telepon Hanya 9-12 digit!',
+              },
+            ]}
             label='Nomor Telepon'>
-            <Input addonBefore='+62' style={{ width: '100%' }} />
+            <Input
+              addonBefore='+62'
+              style={{ borderRadius: '5px' }}
+              type='number'
+            />
           </Form.Item>
           <Form.Item
             name='tanggal_bergabung'
             labelAlign='left'
-            rules={[{ required: true }]}
+            rules={[
+              {
+                required: true,
+                message: 'Masukan Tanggal Bergabung Karyawan!',
+              },
+            ]}
             label='Tanggal Bergabung'>
-            <DatePicker />
+            <DatePicker format={dateFormat} />
           </Form.Item>
-          <Form.Item wrapperCol={{ offset: 8 }}>
+          <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
             <div className='addEmployee'>
-              <Button
-                type='primary'
-                htmlType='submit'
-                style={{ borderRadius: '5px', width: '80px' }}
-                loading={loading}>
+              <Button loading={loading} type='primary' htmlType='submit'>
                 Submit
               </Button>
-              <Button className='button' type='danger' onClick={resetButton}>
+              <Button
+                loading={loading}
+                className='button'
+                type='danger'
+                onClick={resetButton}
+                style={{ minWidth: '80px' }}>
                 Reset
               </Button>
             </div>

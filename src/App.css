@@ -56,7 +56,7 @@ h1 {
 }
 
 .ant-btn-danger {
-  width: 85px;
+  width: auto;
   border-radius: 8px;
   background-color: red;
   border-color: aliceblue;
@@ -116,6 +116,7 @@ h1 {
 }
 
 .ant-input,
+.ant-input-password,
 .ant-picker,
 .ant-select:not(.ant-select-customize-input) .ant-select-selector {
   border-radius: 5px;

@@ -1,8 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { UserContext } from '../../context/UserContext';
-import axios from 'axios';
-import { Form, Input, Button, message, useForm } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import { useHistory } from 'react-router-dom';
+import myAxios from '../../myAxios';
 
 const layout = {
   labelCol: { span: 8 },
@@ -42,25 +42,23 @@ const ChangePassword = () => {
     console.log(values.reNewPass);
 
     if (values.newPass !== values.reNewPass) {
-      message.error("Current passwords and new passwords don't match!");
+      message.error('Kata Sandi Baru Tidak Cocok!');
       setLoading(false);
+    } else if (values.newPass.length < 6) {
+      setLoading(false);
+      message.error('Kata Sandi Minimal 6 Karakter!');
     } else {
       console.log('INPUT EMAIL : ', newObj);
-      axios
-        .put(
-          `https://dbakbresto.ezraaudivano.com/api/changePass/${user.id_karyawan}`,
-          newObj,
-          {
-            headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('token'),
-              //   'Access-Control-Allow-Origin': '*',
-            },
-          }
-        )
+      myAxios
+        .put(`changePass/${user.id_karyawan}`, newObj, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('token'),
+          },
+        })
         .then((res) => {
           message.success('Kata Sandi Berhasil diubah!');
           setLoading(false);
-          /*history.push("/");*/
+          history.push('/');
         })
         .catch((err) => {
           message.error(err.response.data.message);
@@ -72,6 +70,14 @@ const ChangePassword = () => {
 
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
+  };
+
+  const resetButton = () => {
+    form.setFieldsValue({
+      oldPass: '',
+      newPass: '',
+      reNewPass: '',
+    });
   };
 
   return (
@@ -100,7 +106,7 @@ const ChangePassword = () => {
         <table className='' style={{ marginTop: '15px', width: '60%' }}>
           <tr>
             <td>
-              <Form.Item labelAlign='left' label='Name' name='nama'>
+              <Form.Item labelAlign='left' label='Nama' name='nama'>
                 <Input disabled />
               </Form.Item>
             </td>
@@ -114,15 +120,16 @@ const ChangePassword = () => {
           </tr>
           <tr>
             <td>
-              <Form.Item labelAlign='left' label='Old Password' name='oldPass'>
-                <Input.Password />
-              </Form.Item>
-            </td>
-          </tr>
-
-          <tr>
-            <td>
-              <Form.Item labelAlign='left' label='New Password' name='newPass'>
+              <Form.Item
+                labelAlign='left'
+                label='Kata Sandi Lama'
+                name='oldPass'
+                rules={[
+                  {
+                    required: true,
+                    message: 'Masukan Kata Sandi Lama!',
+                  },
+                ]}>
                 <Input.Password />
               </Form.Item>
             </td>
@@ -132,8 +139,35 @@ const ChangePassword = () => {
             <td>
               <Form.Item
                 labelAlign='left'
-                label='Re New Password'
-                name='reNewPass'>
+                label='Kata Sandi Baru'
+                name='newPass'
+                rules={[
+                  {
+                    required: true,
+                    message: 'Kata Sandi Harus Terdiri dari 6-16 Karakter!',
+                    min: 6,
+                    max: 16,
+                  },
+                ]}>
+                <Input.Password />
+              </Form.Item>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <Form.Item
+                labelAlign='left'
+                label='Konfirmasi Kata Sandi Baru'
+                name='reNewPass'
+                rules={[
+                  {
+                    required: true,
+                    message: 'Kata Sandi Harus Terdiri dari 6-16 Karakter!',
+                    min: 6,
+                    max: 16,
+                  },
+                ]}>
                 <Input.Password />
               </Form.Item>
             </td>
@@ -148,13 +182,11 @@ const ChangePassword = () => {
                 <Button
                   style={{
                     width: '80px',
-                    backgroundColor: 'red',
-                    borderColor: '#f0f2f5',
-                    borderRadius: '12px',
+                    borderRadius: '7px',
                     marginLeft: '10px',
                   }}
-                  type='primary'
-                  primary
+                  onClick={resetButton}
+                  type='danger'
                   loading={loading}>
                   Reset
                 </Button>

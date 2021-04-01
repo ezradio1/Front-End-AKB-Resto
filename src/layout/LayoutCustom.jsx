@@ -1,6 +1,7 @@
 import React, { Component, useState, useContext, useEffect } from 'react';
 import { Layout, Menu, Button, Drawer, Dropdown, message } from 'antd';
 import { BrowserRouter as Router, Link } from 'react-router-dom';
+import myAxios from '../myAxios';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -23,9 +24,7 @@ import { UserContext } from '../context/UserContext';
 import LogoAkb from '../asset/logo/logo-col.png';
 import LogoAkbFull from '../asset/logo/logo-nav-1.png';
 
-import axios from 'axios';
 import './Layout.css';
-import myAxios from '../myAxios';
 
 const { Header, Content, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -47,7 +46,6 @@ const LayoutCustom = () => {
     setUser(null);
     const mytoken = localStorage.getItem('token');
     let newObj;
-    console.log(mytoken);
     myAxios
       .post('logout', newObj, {
         headers: {
