@@ -8,11 +8,13 @@ import {
   Row,
   DatePicker,
   message,
+  Image,
 } from 'antd';
 import { useParams, useForm, useHistory } from 'react-router-dom';
 
 import TextArea from 'antd/lib/input/TextArea';
 import myAxios from '../../myAxios';
+import NoImg from '../../asset/icon/no-img.png';
 
 const layout = {
   labelCol: { span: 8 },
@@ -35,6 +37,10 @@ const validateMessages = {
 const EditMenu = () => {
   const [bahan, setBahan] = useState(null);
   const [namaBahan, setNamaBahan] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [imgPrev, setImgPrev] = useState(null);
+  const [suffixBahan, setSuffixBahan] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const { userId } = useParams();
 
@@ -51,6 +57,9 @@ const EditMenu = () => {
         })
         .then((res) => {
           const data = res.data.data;
+          if (imgPrev === null) {
+            setImgPrev(`http://127.0.0.1:8000/photo/${data.gambar}`);
+          }
           myAxios
             .get(`showBahan`, {
               headers: {
@@ -73,6 +82,8 @@ const EditMenu = () => {
                 keterangan: data.keterangan,
                 nama_bahan: getNamaBahan,
               });
+              setSuffixBahan(temp[0].unit);
+              console.log(data.gambar);
             });
         });
     }
@@ -95,41 +106,63 @@ const EditMenu = () => {
     }
   };
 
+  const onImageChange = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      let img = event.target.files[0];
+      setImgPrev(URL.createObjectURL(img));
+      setImageUrl(img);
+    }
+
+    console.log(imageUrl);
+  };
+
   const onFinish = (values) => {
+    setLoading(true);
     const mytoken = localStorage.getItem('token');
     const temp = namaBahan.filter((i) => {
       return i.nama_bahan == values.nama_bahan;
     });
     const idBahan = temp[0].id;
-
-    let newObj = {
-      nama_menu: values.nama_menu,
-      kategori: values.kategori,
-      unit: values.unit,
-      takaran_saji: values.takaran_saji,
-      harga_menu: values.harga_menu,
-      keterangan: values.keterangan,
-      id_bahan: idBahan,
-    };
-    console.log(newObj.telepon);
+    const formData = new FormData();
+    if (imageUrl === null) {
+      formData.append('gambar', 'no pict');
+    } else {
+      formData.append('gambar', imageUrl);
+    }
+    formData.append('nama_menu', values.nama_menu);
+    formData.append('unit', values.unit);
+    formData.append('kategori', values.kategori);
+    formData.append('takaran_saji', values.takaran_saji);
+    formData.append('nama_menu', values.nama_menu);
+    formData.append('harga_menu', values.harga_menu);
+    formData.append('keterangan', values.keterangan);
+    formData.append('id_bahan', idBahan);
     myAxios
-      .put(`editMenu/${userId}`, newObj, {
+      .post(`editMenu/${userId}`, formData, {
         headers: {
           Authorization: 'Bearer ' + mytoken,
         },
       })
       .then((res) => {
-        // setLoading(false);
-        message.success(newObj.nama_menu + ' berhasil diubah!');
+        setLoading(false);
+        message.success(values.nama_menu + ' berhasil diubah!');
         history.push('/showMenu');
       })
       .catch((err) => {
+        setLoading(false);
         message.error('Ubah Menu Gagal : ' + err);
       });
   };
 
   const resetButton = () => {
     history.push('/showMenu');
+  };
+
+  const onChangeTak = (evt) => {
+    const bahan = namaBahan.filter((i) => {
+      return i.nama_bahan == evt;
+    });
+    setSuffixBahan(bahan[0].unit);
   };
 
   return (
@@ -199,7 +232,7 @@ const EditMenu = () => {
               label='Bahan'
               labelAlign='left'
               rules={[{ required: true }]}>
-              <Select>
+              <Select onChange={onChangeTak}>
                 {namaBahan.map((val, item) => (
                   <Select.Option key={val.nama_bahan} value={val.nama_bahan}>
                     {val.nama_bahan}
@@ -214,7 +247,7 @@ const EditMenu = () => {
             label='Takaran Saji'
             labelAlign='left'
             rules={[{ required: true }]}>
-            <Input type='number' suffix='gram' />
+            <Input type='number' suffix={suffixBahan} />
           </Form.Item>
           <Form.Item
             name='harga_menu'
@@ -231,15 +264,36 @@ const EditMenu = () => {
             <TextArea />
           </Form.Item>
 
+          <Form.Item name='photo' label='Upload Foto' labelAlign='left'>
+            <input
+              style={{ marginBottom: '10px' }}
+              type='file'
+              name='myImage'
+              onChange={onImageChange}
+            />
+            <Image
+              name='photo'
+              fallback={NoImg}
+              style={{
+                width: '150px',
+                height: '150px',
+                objectFit: 'cover',
+              }}
+              src={imgPrev}
+            />
+          </Form.Item>
+
           <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
             <div className='addEmployee'>
-              <Button
-                type='primary'
-                htmlType='submit'
-                style={{ borderRadius: '5px', width: '80px' }}>
+              <Button loading={loading} type='primary' htmlType='submit'>
                 Submit
               </Button>
-              <Button className='button' type='danger' onClick={resetButton}>
+              <Button
+                loading={loading}
+                className='button'
+                type='danger'
+                onClick={resetButton}
+                style={{ minWidth: '80px' }}>
                 Cancel
               </Button>
             </div>

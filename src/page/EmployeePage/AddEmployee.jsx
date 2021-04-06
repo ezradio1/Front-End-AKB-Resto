@@ -1,11 +1,9 @@
 import React, { useState, useCallback, forwardRef } from 'react';
-import axios from 'axios';
 import './App.css';
 import Moment from 'moment';
 import {
   Form,
   Input,
-  InputNumber,
   Select,
   Button,
   Row,
@@ -17,85 +15,53 @@ import {
 import { useParams, useHistory } from 'react-router-dom';
 import 'react-phone-number-input/style.css';
 import 'antd-country-phone-input/dist/index.css';
-import { PhoneFilled } from '@ant-design/icons';
+import myAxios from '../../myAxios';
+import moment from 'moment';
 
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 18 },
 };
-const { MonthPicker, RangePicker } = DatePicker;
 const dateFormat = 'YYYY/MM/DD';
 
-const validateMessages = {
-  required: '${label} is required!',
-  types: {
-    email: '${label} is not a valid email!',
-    number: '${label} is not a valid number!',
-  },
-  number: {
-    range: '${label} must be between ${min} and ${max}',
-  },
-};
-
 const AddEmployee = () => {
-  const [value, setValue] = useState();
   const [loading, setLoading] = useState(false);
   const [subTitle, setsubTitle] = useState(false);
   const [showResult, setshowResult] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState(null);
   const [form] = Form.useForm();
   let history = useHistory();
-
-  const PhoneInputComponent = forwardRef(({ onChange, ...props }, ref) => {
-    const handleChange = useCallback((e) => onChange(e.target.value), [
-      onChange,
-    ]);
-    return <Input ref={ref} />;
-  });
 
   const onFinish = (values) => {
     const tanggal = values.tanggal_bergabung._d;
     const telepon = values.telepon.toString();
-    console.log(telepon[0]);
-    var x = new Date();
-    var y = new Date(tanggal);
-    console.log(x.getTime() > y.getTime());
-    if (telepon[0] === '0' || telepon[0] !== '8') {
-      message.error('Nomor Telepon Tidak Valid!');
-    } else if (x.getTime() < y.getTime()) {
-      console.log('Masuk sini');
-      message.error('Tanggal Masuk Minimal Tanggal Hari Ini!');
-    } else {
-      setLoading(true);
-      setsubTitle(
-        `Karyawan ${values.nama} sebagai ${values.jabatan} berhasil ditambahkan pada tanggal ${tanggal} `
-      );
-      const mytoken = localStorage.getItem('token');
-      let newObj = {
-        nama: values.nama,
-        email: values.email,
-        jenisKelamin: values.jenisKelamin,
-        jabatan: values.jabatan,
-        telepon: '0' + telepon,
-        tanggal_bergabung: Moment(tanggal).format('YYYY-MM-DD'),
-        password: values.password,
-      };
-      axios
-        .post(`https://dbakbresto.ezraaudivano.com/api/karyawan`, newObj, {
-          headers: {
-            Authorization: 'Bearer ' + mytoken,
-          },
-        })
-        .then((res) => {
-          setshowResult(true);
-          setLoading(false);
-          // history.push('/showEmployee');
-        })
-        .catch((err) => {
-          setLoading(false);
-          message.error('Tambah Karyawan Gagal : ' + err.response.data.message);
-        });
-    }
+    setLoading(true);
+    setsubTitle(
+      `Karyawan ${values.nama} sebagai ${values.jabatan} berhasil ditambahkan pada tanggal ${tanggal} `
+    );
+    const mytoken = localStorage.getItem('token');
+    let newObj = {
+      nama: values.nama,
+      email: values.email,
+      jenisKelamin: values.jenisKelamin,
+      jabatan: values.jabatan,
+      telepon: '0' + telepon,
+      tanggal_bergabung: Moment(tanggal).format('YYYY-MM-DD'),
+      password: values.password,
+    };
+    myAxios
+      .post(`karyawan`, newObj, {
+        headers: {
+          Authorization: 'Bearer ' + mytoken,
+        },
+      })
+      .then((res) => {
+        setshowResult(true);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+        message.error('Tambah Karyawan Gagal : ' + err.response.data.message);
+      });
   };
 
   const resetButton = () => {
@@ -107,14 +73,46 @@ const AddEmployee = () => {
       jenisKelamin: '',
       password: '',
     });
+  };
 
-    const tambahKaryawan = () => {
-      history.push('/showEmployee');
-    };
-
-    const lihatKaryawan = () => {
-      history.push('/addEmployee');
-    };
+  const checkActionCode = async (rule, value, callback) => {
+    console.log('value ' + value);
+    console.log(value);
+    if (value === '' || value === undefined) {
+      rule.message = 'Nomor Telepon Wajib diisi!';
+      form.setFields({
+        telepon: {
+          value: value,
+          errors: [new Error('forbid ha')],
+        },
+      });
+    } else if (value[0] == 0 || value[0] != 8) {
+      rule.message = 'Nomor Telepon Harus diawali dengan 8!';
+      form.setFields({
+        telepon: {
+          value: value,
+          errors: [new Error('forbid ha')],
+        },
+      });
+    } else if (value.length < 10) {
+      rule.message = 'Nomor Telepon Harus lebih dari 10!';
+      form.setFields({
+        telepon: {
+          value: value,
+          errors: [new Error('forbid ha')],
+        },
+      });
+    } else if (value.length > 14) {
+      rule.message = 'Nomor Telepon Harus kurang dari 14!';
+      form.setFields({
+        telepon: {
+          value: value,
+          errors: [new Error('forbid ha')],
+        },
+      });
+    } else {
+      await callback();
+    }
   };
 
   return (
@@ -167,8 +165,7 @@ const AddEmployee = () => {
               basic
               name='basic'
               onFinish={onFinish}
-              style={{ width: '1000px', padding: '10px 35px' }}
-              validateMessages={validateMessages}>
+              style={{ width: '1000px', padding: '10px 35px' }}>
               <Form.Item
                 name='nama'
                 label='Nama'
@@ -232,13 +229,13 @@ const AddEmployee = () => {
                 rules={[
                   {
                     required: true,
-                    min: 9,
-                    max: 12,
-                    message: 'Nomor Telepon Hanya 9-12 digit!',
+                    validator: checkActionCode,
                   },
                 ]}
                 label='Nomor Telepon'>
                 <Input
+                  autoComplete='off'
+                  defaultValue=''
                   addonBefore='+62'
                   style={{ borderRadius: '5px' }}
                   type='number'
@@ -254,7 +251,13 @@ const AddEmployee = () => {
                   },
                 ]}
                 label='Tanggal Bergabung'>
-                <DatePicker format={dateFormat} />
+                <DatePicker
+                  placeholder='Masukan Tanggal Bergabung'
+                  format={dateFormat}
+                  disabledDate={(current) => {
+                    return current > moment();
+                  }}
+                />
               </Form.Item>
               <Form.Item
                 name='password'

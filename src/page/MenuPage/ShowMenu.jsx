@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Table, Button, Space, Popconfirm, Input, message } from 'antd';
+import { Table, Button, Space, Popconfirm, Input, message, Image } from 'antd';
 import { Link } from 'react-router-dom';
 
 import { SearchOutlined, DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
 import { UserContext } from '../../context/UserContext';
 import myAxios from '../../myAxios';
+import NoImg from '../../asset/icon/no-img.png';
 
 class ShowMenu extends Component {
   constructor(props) {
@@ -262,6 +263,23 @@ class ShowMenu extends Component {
         align: 'center',
       },
       {
+        title: 'Gambar',
+        dataIndex: 'gambar',
+        key: 'gambar',
+        ellipsis: true,
+        align: 'center',
+
+        render: (dataIndex) => (
+          <div>
+            <Image
+              fallback={NoImg}
+              style={{ width: '90px', height: '80px', objectFit: 'cover' }}
+              src={`http://127.0.0.1:8000/photo/${dataIndex}`}
+            />
+          </div>
+        ),
+      },
+      {
         title: 'Action',
         dataIndex: 'id',
         key: 'id',
@@ -315,7 +333,7 @@ class ShowMenu extends Component {
           </Button> */}
         </Space>
         <Table
-          scroll={{ x: 900, y: 1000 }}
+          scroll={{ x: 900, y: 1500 }}
           columns={columns}
           dataSource={this.state.menu}
           onChange={this.handleChange}

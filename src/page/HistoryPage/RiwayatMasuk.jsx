@@ -1,7 +1,17 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Table, Button, Space, Input, message, Tag } from 'antd';
+import {
+  Table,
+  Button,
+  Space,
+  Popconfirm,
+  Input,
+  message,
+  Tag,
+  Spin,
+} from 'antd';
 import { Link } from 'react-router-dom';
+import moment from 'moment';
 
 import {
   SearchOutlined,
@@ -12,11 +22,11 @@ import { UserContext } from '../../context/UserContext';
 import myAxios from '../../myAxios';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
-class ShowEmployee extends Component {
+class RiwayatMasuk extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      karyawan: null,
+      riwMasuk: null,
       filteredInfo: null,
       sortedInfo: null,
       currId: null,
@@ -40,7 +50,23 @@ class ShowEmployee extends Component {
   };
 
   clearFilters = () => {
-    this.setState({ filteredInfo: null, sortedInfo: null });
+    this.setState({ filteredInfo: null });
+  };
+
+  clearAll = () => {
+    this.setState({
+      filteredInfo: null,
+      sortedInfo: null,
+    });
+  };
+
+  setAgeSort = () => {
+    this.setState({
+      sortedInfo: {
+        order: 'descend',
+        columnKey: 'year',
+      },
+    });
   };
 
   componentDidMount() {
@@ -48,20 +74,23 @@ class ShowEmployee extends Component {
     console.log('CEK ' + user.object);
     this.setState({ token: localStorage.getItem('token'), loading: true });
     console.log('SYALALA : ' + localStorage.getItem('token'));
-    if (this.state.karyawan === null) {
+    if (this.state.riwMasuk === null) {
       myAxios
-        .get(`showKaryawan`, {
+        .get(`showRiwayatBahanMasuk`, {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('token'),
           },
         })
         .then((res) => {
           const data = res.data.data;
+          data.map((el) => {
+            el.tanggal = moment(el.tanggal).format('D  MMM  YY');
+          });
           this.setState({
-            karyawan: data,
+            riwMasuk: data,
             loading: false,
           });
-          console.log('Data Karyawan = ');
+          console.log('Data riwMasuk = ');
           console.log(res.data.data);
         })
         .catch((err) => {
@@ -72,20 +101,25 @@ class ShowEmployee extends Component {
           console.log('error  : ' + err);
         });
     }
+    console.log(this.state.riwMasuk);
   }
 
   DeleteItem(param) {
     const mytoken = localStorage.getItem('token');
     console.log('Delete Item ' + param + mytoken);
     let newObj = {};
-    myAxios
-      .put(`deleteKaryawan/${param}`, newObj, {
-        headers: {
-          Authorization: 'Bearer ' + mytoken,
-        },
-      })
+    axios
+      .put(
+        `https://dbakbresto.ezraaudivano.com/api/deleteriwMasuk/${param}`,
+        newObj,
+        {
+          headers: {
+            Authorization: 'Bearer ' + mytoken,
+          },
+        }
+      )
       .then((res) => {
-        let filter = this.state.karyawan.filter((el) => {
+        let filter = this.state.riwMasuk.filter((el) => {
           return el.id === param;
         });
         console.log(res);
@@ -180,86 +214,40 @@ class ShowEmployee extends Component {
     filteredInfo = filteredInfo || {};
     const columns = [
       {
-        title: 'Nama',
-        dataIndex: 'nama',
-        key: 'nama',
-        ...this.getColumnSearchProps('nama'),
-        filteredValue: filteredInfo.nama || null,
-        sorter: (a, b) => a.nama.length - b.nama.length,
+        title: 'Tanggal Masuk',
+        dataIndex: 'tanggal',
+        key: 'tanggal',
+        ...this.getColumnSearchProps('tanggal'),
+        filteredValue: filteredInfo.tanggal || null,
+        sorter: (a, b) => a.tanggal.length - b.tanggal.length,
         ellipsis: true,
       },
       {
-        title: 'Email',
-        dataIndex: 'email',
-        key: 'email',
-        sorter: (a, b) => a.email.length - b.email.length,
+        title: 'Bahan',
+        dataIndex: 'nama_bahan',
+        key: 'nama_bahan',
+        ...this.getColumnSearchProps('nama_bahan'),
+        filteredValue: filteredInfo.nama_bahan || null,
+        onFilter: (value, record) => record.nama_bahan.includes(value),
+        sorter: (a, b) => a.nama_bahan.length - b.nama_bahan.length,
+      },
+      {
+        title: 'Jumlah',
+        dataIndex: 'jumlah',
+        key: 'jumlah',
+        sorter: (a, b) => a.jumlah.length - b.jumlah.length,
         ellipsis: true,
       },
       {
-        title: 'Gender',
-        dataIndex: 'jenisKelamin',
-        key: 'jenisKelamin',
-        filters: [
-          { text: 'Laki-Laki', value: 'Laki-Laki' },
-          { text: 'Perempuan', value: 'Perempuan' },
-        ],
-        filteredValue: filteredInfo.jenisKelamin || null,
-        onFilter: (value, record) => record.jenisKelamin.includes(value),
-        sorter: (a, b) => a.jenisKelamin.length - b.jenisKelamin.length,
+        title: 'Harga',
+        dataIndex: 'harga',
+        key: 'harga',
+        filteredValue: filteredInfo.harga || null,
+        onFilter: (value, record) => record.harga.includes(value),
+        sorter: (a, b) => a.harga.length - b.harga.length,
       },
+
       {
-        title: 'Jabatan',
-        dataIndex: 'jabatan',
-        key: 'jabatan',
-        filters: [
-          { text: 'Owner', value: 'Owner' },
-          { text: 'Operational Manager', value: 'Operational Manager' },
-          { text: 'Cashier', value: 'Cashier' },
-          { text: 'Chef', value: 'Chef' },
-          { text: 'Waiter', value: 'Waiter' },
-        ],
-        filteredValue: filteredInfo.jabatan || null,
-        onFilter: (value, record) => record.jabatan.includes(value),
-        sorter: (a, b) => a.jabatan.length - b.jabatan.length,
-        ellipsis: true,
-      },
-      {
-        title: 'Telepon',
-        dataIndex: 'telepon',
-        key: 'telepon',
-        ellipsis: true,
-      },
-      {
-        title: 'Status',
-        dataIndex: 'status',
-        key: 'status',
-        filters: [
-          { text: 'Aktif', value: 'Aktif' },
-          { text: 'Resign', value: 'Resign' },
-        ],
-        filteredValue: filteredInfo.status || null,
-        onFilter: (value, record) => record.status.includes(value),
-        sorter: (a, b) => a.status.length - b.status.length,
-        ellipsis: true,
-        render: (status) => (
-          <>
-            <Tag color={status === 'Resign' ? 'red' : 'blue'}>
-              {status.toUpperCase()}
-            </Tag>
-          </>
-        ),
-      },
-      {
-        title: 'Bergabung',
-        dataIndex: 'tanggal_bergabung',
-        key: 'tanggal_bergabung',
-        ...this.getColumnSearchProps('tanggal_bergabung'),
-        filteredValue: filteredInfo.title || null,
-        sorter: (a, b) => a.title.length - b.title.length,
-        ellipsis: true,
-      },
-      {
-        align: 'center',
         title: 'Action',
         dataIndex: 'id',
         key: 'id',
@@ -284,7 +272,7 @@ class ShowEmployee extends Component {
             color: '#001529',
             textTransform: 'uppercase',
           }}>
-          <strong>data karyawan</strong>
+          <strong>data riwayat bahan masuk</strong>
         </h1>
         <div
           style={{
@@ -305,7 +293,7 @@ class ShowEmployee extends Component {
           loadingIndicator={antIcon}
           scroll={{ x: 900, y: 1000 }}
           columns={columns}
-          dataSource={this.state.karyawan}
+          dataSource={this.state.riwMasuk}
           onChange={this.handleChange}
         />
       </div>
@@ -313,4 +301,4 @@ class ShowEmployee extends Component {
   }
 }
 
-export default ShowEmployee;
+export default RiwayatMasuk;

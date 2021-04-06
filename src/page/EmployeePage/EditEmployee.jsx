@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import myAxios from '../../myAxios';
-// import './App.css';
 import Moment from 'moment';
 import {
   UsergroupDeleteOutlined,
@@ -9,7 +8,6 @@ import {
 import {
   Form,
   Input,
-  InputNumber,
   Select,
   Button,
   Row,
@@ -18,29 +16,17 @@ import {
   message,
   Card,
   Popconfirm,
-  Alert,
 } from 'antd';
 import { useParams, useForm, useHistory } from 'react-router-dom';
+import moment from 'moment';
+
 const { Meta } = Card;
 
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 18 },
 };
-const { MonthPicker, RangePicker } = DatePicker;
 const dateFormat = 'YYYY/MM/DD';
-
-/* eslint-disable no-template-curly-in-string */
-const validateMessages = {
-  required: '${label} is required!',
-  types: {
-    email: '${label} is not a valid email!',
-    number: '${label} is not a valid number!',
-  },
-  number: {
-    range: '${label} must be between ${min} and ${max}',
-  },
-};
 
 const EditEmployee = () => {
   const [karyawan, setKaryawan] = useState(null);
@@ -82,6 +68,7 @@ const EditEmployee = () => {
   });
 
   const onFinish = (values) => {
+    setLoading(true);
     var tanggal = values.tanggal_bergabung._d;
     console.log(Moment(tanggal).format('YYYY-MM-DD'));
 
@@ -102,11 +89,11 @@ const EditEmployee = () => {
       })
       .then((res) => {
         setLoading(false);
-
         message.success(newObj.nama + ' berhasil di edit!');
         history.push('/showEmployee');
       })
       .catch((err) => {
+        setLoading(false);
         message.error('Edit Karyawan Gagal : ' + err);
       });
   };
@@ -155,6 +142,46 @@ const EditEmployee = () => {
         setLoading(false);
         message.error('Gagal Mengaktifkan : ' + err);
       });
+  };
+
+  const checkActionCode = async (rule, value, callback) => {
+    console.log('value ' + value);
+    console.log(value);
+    if (value === '' || value === undefined) {
+      rule.message = 'Nomor Telepon Wajib diisi!';
+      form.setFields({
+        telepon: {
+          value: value,
+          errors: [new Error('forbid ha')],
+        },
+      });
+    } else if (value[0] == 0 || value[0] != 8) {
+      rule.message = 'Nomor Telepon Harus diawali dengan 8!';
+      form.setFields({
+        telepon: {
+          value: value,
+          errors: [new Error('forbid ha')],
+        },
+      });
+    } else if (value.length < 10) {
+      rule.message = 'Nomor Telepon Harus lebih dari 10!';
+      form.setFields({
+        telepon: {
+          value: value,
+          errors: [new Error('forbid ha')],
+        },
+      });
+    } else if (value.length > 14) {
+      rule.message = 'Nomor Telepon Harus kurang dari 14!';
+      form.setFields({
+        telepon: {
+          value: value,
+          errors: [new Error('forbid ha')],
+        },
+      });
+    } else {
+      await callback();
+    }
   };
 
   return (
@@ -258,8 +285,7 @@ const EditEmployee = () => {
           basic
           name='basic'
           onFinish={onFinish}
-          style={{ width: '1000px', padding: '10px 35px' }}
-          validateMessages={validateMessages}>
+          style={{ width: '1000px', padding: '10px 35px' }}>
           <Form.Item
             name='nama'
             label='Nama'
@@ -318,13 +344,13 @@ const EditEmployee = () => {
             rules={[
               {
                 required: true,
-                min: 9,
-                max: 12,
-                message: 'Nomor Telepon Hanya 9-12 digit!',
+                validator: checkActionCode,
               },
             ]}
             label='Nomor Telepon'>
             <Input
+              autoComplete='off'
+              defaultValue=''
               addonBefore='+62'
               style={{ borderRadius: '5px' }}
               type='number'
@@ -340,7 +366,13 @@ const EditEmployee = () => {
               },
             ]}
             label='Tanggal Bergabung'>
-            <DatePicker format={dateFormat} />
+            <DatePicker
+              placeholder='Masukan Tanggal Bergabung'
+              format={dateFormat}
+              disabledDate={(current) => {
+                return current > moment();
+              }}
+            />
           </Form.Item>
           <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
             <div className='addEmployee'>

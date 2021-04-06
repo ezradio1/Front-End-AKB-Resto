@@ -62,12 +62,10 @@ h1 {
   border-color: aliceblue;
 }
 .ant-btn-danger:hover {
-  width: 80px;
   border-radius: 8px;
   background-color: #f0f2f5;
   border-color: red;
   color: red;
-  width: 90px;
 }
 
 .ant-btn-sm {

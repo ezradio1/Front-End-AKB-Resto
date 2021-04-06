@@ -63,7 +63,7 @@ const Login = () => {
         localStorage.setItem('nama', user.nama);
         localStorage.setItem('token', token);
         setLoading(false);
-        message.success('Selamat Datang, ' + jabatan + '!');
+        message.success('Selamat Datang, ' + user.nama + '!');
         // history.push("/");
       })
       .catch((err) => {

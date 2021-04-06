@@ -1,12 +1,136 @@
 import React from 'react';
 import { Card, Row, Col } from 'antd';
 
-import User from '../../asset/icon/user.png';
+import { Line, Bar } from '@ant-design/charts';
+import { HomeOutlined } from '@ant-design/icons';
+import './home.css';
+import Kartu1 from '../../asset/icon/kartu1.png';
+import Kartu2 from '../../asset/icon/kartu2.png';
+import Kartu3 from '../../asset/icon/kartu3.png';
+import Kartu4 from '../../asset/icon/kartu4.png';
+
+const { Meta } = Card;
+const data = [
+  { Bulan: 'Januari', Penjualan: 150 },
+  { Bulan: 'Februari', Penjualan: 142 },
+  { Bulan: 'Maret', Penjualan: 156 },
+  { Bulan: 'April', Penjualan: 242 },
+  { Bulan: 'Mei', Penjualan: 268 },
+  { Bulan: 'Juni', Penjualan: 251 },
+  { Bulan: 'Juli', Penjualan: 195 },
+  { Bulan: 'Agustus', Penjualan: 210 },
+  { Bulan: 'September', Penjualan: 250 },
+  { Bulan: 'Oktober', Penjualan: 215 },
+  { Bulan: 'November', Penjualan: 251 },
+  { Bulan: 'Desember', Penjualan: 265 },
+];
+const config = {
+  data,
+  height: 400,
+  xField: 'Bulan',
+  yField: 'Penjualan',
+  point: {
+    size: 5,
+    shape: 'diamond',
+  },
+  label: {
+    style: {
+      fill: '#aaa',
+    },
+  },
+};
 
 const Home = () => {
   return (
-    <div style={{ padding: '50px' }}>
+    <div style={{ padding: '25px 30px' }}>
+      <Row>
+        <Col>
+          <HomeOutlined
+            style={{
+              marginLeft: '5px',
+              marginRight: '20px',
+              fontSize: '20px',
+              marginTop: '5px',
+            }}
+          />
+        </Col>
+        <Col>
+          <h1 style={{ fontWeight: 'bold', fontSize: '25px' }}>
+            Dashboard Statistik
+          </h1>
+        </Col>
+      </Row>
+      <div
+        style={{
+          border: '1px solid #8C98AD',
+          marginBottom: '15px',
+        }}></div>
+      <Card
+        style={{
+          marginTop: 16,
+          marginBottom: 16,
+          borderRadius: '8px',
+          border: '0.5px solid #3C8065',
+          backgroundColor: '#DFF0D8',
+        }}>
+        {/* <Meta
+          style={{ color: '#3C8065' }}
+          title='Selamat Datang di Halaman Website AKB Restaurant'
+          description='Berikan layanan terbaik pada pelanggan AKB Restaurant untuk mengingkatkan kualitas dari AKB Restaurant!'
+        /> */}
+        <p
+          style={{
+            color: '#3C8065',
+            marginTop: '-10px',
+            fontWeight: 'bold',
+          }}>
+          Selamat Datang di Halaman Website AKB Restaurant
+        </p>
+        <p
+          style={{
+            color: '#3C8065',
+            marginBottom: '-10px',
+            marginTop: '-10px',
+          }}>
+          Berikan layanan terbaik pada pelanggan AKB Restaurant untuk
+          mengingkatkan kualitas dari AKB Restaurant!
+        </p>
+      </Card>
       <Row justify='space-between'>
+        <Col>
+          <div className='mycard'>
+            <h1>68</h1>
+            <img src={Kartu1} />
+          </div>
+        </Col>
+        <Col>
+          <div className='mycard'>
+            <h1 style={{ color: '#3C763D' }}>25</h1>
+            <img src={Kartu2} />
+          </div>
+        </Col>
+        <Col>
+          <div className='mycard'>
+            <h1 style={{ color: '#A94442' }}>24</h1>
+            <img src={Kartu3} />
+          </div>
+        </Col>
+        <Col>
+          <div className='mycard'>
+            <h1 style={{ color: '#EF9B0F ' }}>1,347</h1>
+            <img src={Kartu4} />
+          </div>
+        </Col>
+      </Row>
+      <h1 style={{ textAlign: 'CENTER', marginTop: '30px' }}>
+        Grafik Penjualan AKB Resto Tahun 2020
+      </h1>
+      <Line {...config} />
+      <Row>
+        <Col></Col>
+      </Row>
+
+      {/* <Row justify='space-between'>
         <Col md={3} style={{ margin: '7px 2px' }}>
           <Card
             style={{
@@ -31,7 +155,7 @@ const Home = () => {
               1
             </h1>
             <h3
-              style={{ textAlign: 'center', color: 'white', fontSize: '20px' }}>
+              style={{ textAlign: 'center', color: 'white', fontSize: '25px' }}>
               Owner
             </h3>
           </Card>
@@ -169,7 +293,7 @@ const Home = () => {
             </h3>
           </Card>
         </Col>
-      </Row>
+      </Row> */}
     </div>
   );
 };

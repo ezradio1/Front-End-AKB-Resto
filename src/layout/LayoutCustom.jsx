@@ -53,20 +53,10 @@ const LayoutCustom = () => {
       })
       .then((res) => {
         setUser(null);
-        // var user = res.data.user;
-        // var token = res.data.access_token;
-        // var jabatan = res.data.user.jabatan;
-        // var id_karyawan = res.data.user.id;
-        // var currentUser = { nama: user.nama, email: user.email, token, jabatan, id_karyawan };
-        // setUser(currentUser);
-        // console.log(currentUser);
-        // localStorage.setItem('user', JSON.stringify(currentUser));
-        // localStorage.setItem('nama', user.nama);
-        // localStorage.setItem('token', token);
-        // setLoading(false);
         message.success('Logout Berhasil!');
         localStorage.removeItem('user');
-        localStorage.removeItem('name');
+        localStorage.removeItem('token');
+        localStorage.removeItem('nama');
       })
       .catch((err) => {
         // setLoading(false);
@@ -195,7 +185,7 @@ const LayoutCustom = () => {
                           color: 'white',
                           marginRight: '15px',
                         }}>
-                        Halo, {user.nama} <CaretDownOutlined />
+                        Halo, {user.jabatan} <CaretDownOutlined />
                       </span>
                     </Dropdown>
                   </>

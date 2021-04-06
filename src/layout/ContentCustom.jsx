@@ -19,14 +19,17 @@ import AddEmployee from '../page/EmployeePage/AddEmployee';
 import EditEmployee from '../page/EmployeePage/EditEmployee';
 
 import ShowTable from '../page/TablePage/ShowTable';
-import AddTable from '../page/TablePage/AddTable';
+
+import ShowCustomer from '../page/CustomerPage/ShowCustomer';
 
 import ShowMenu from '../page/MenuPage/ShowMenu';
 import AddMenu from '../page/MenuPage/AddMenu';
 import EditMenu from '../page/MenuPage/EditMenu';
 
 import ShowBahan from '../page/BahanPage/ShowBahan';
-import AddBahan from '../page/BahanPage/AddBahan';
+
+import RiwayatBahanMasuk from '../page/HistoryPage/RiwayatMasuk';
+import RiwayatBahanKeluar from '../page/HistoryPage/RiwayatKeluar';
 
 const { Content } = Layout;
 
@@ -66,7 +69,10 @@ const ContentCustom = () => {
   const EmployeeRoute = ({ ...props }) => {
     if (!user) {
       return <Redirect to='/login' />;
-    } else if (user.jabatan === 'Owner') {
+    } else if (
+      user.jabatan === 'Owner' ||
+      user.jabatan === 'Operational Manager'
+    ) {
       return <Route {...props} />;
     } else {
       return <Redirect to='/' />;
@@ -78,6 +84,20 @@ const ContentCustom = () => {
       return <Redirect to='/login' />;
     } else if (
       user.jabatan === 'Operational Manager' ||
+      user.jabatan === 'Chef'
+    ) {
+      return <Route {...props} />;
+    } else {
+      return <Redirect to='/' />;
+    }
+  };
+
+  const OMWaiterChefRoute = ({ ...props }) => {
+    if (!user) {
+      return <Redirect to='/login' />;
+    } else if (
+      user.jabatan === 'Operational Manager' ||
+      user.jabatan === 'Waiter' ||
       user.jabatan === 'Chef'
     ) {
       return <Route {...props} />;
@@ -102,14 +122,16 @@ const ContentCustom = () => {
       />
 
       <OMRoute exact path='/showTable' component={ShowTable} />
-      <OMRoute exact path='/addTable' component={AddTable} />
 
       <OMRoute exact path='/showMenu' component={ShowMenu} />
       <OMRoute exact path='/addMenu' component={AddMenu} />
       <OMRoute exact path='/editMenu/:userId' component={EditMenu} />
 
       <OMChefRoute exact path='/showBahan' component={ShowBahan} />
-      <OMChefRoute exact path='/addBahan' component={AddBahan} />
+      <OMWaiterChefRoute exact path='/showCustomer' component={ShowCustomer} />
+
+      <OMRoute exact path='/riwmas' component={RiwayatBahanMasuk} />
+      <OMRoute exact path='/riwkel' component={RiwayatBahanKeluar} />
     </Switch>
   );
 };

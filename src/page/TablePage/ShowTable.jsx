@@ -41,7 +41,7 @@ const ShowTable = () => {
   const [buttonModal, setbuttonModal] = useState(null);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [spin, setSpin] = useState(false);
+  const [noMeja, setNoMeja] = useState(null);
   let history = useHistory();
   const [form] = Form.useForm();
   const mytoken = localStorage.getItem('token');
@@ -69,7 +69,7 @@ const ShowTable = () => {
         <a
           target='_blank'
           rel='noopener noreferrer'
-          onClick={() => onFilter('Isi')}>
+          onClick={() => onFilter('Terisi')}>
           Tampil Meja Terisi
         </a>
       </Menu.Item>
@@ -85,12 +85,13 @@ const ShowTable = () => {
       })
       .then((res) => {
         var data = res.data.data;
-        // var nomor_meja;
-        // data.map((val, index) => {
-        //   valNoMeja.nomor_meja.sort();
-        // });
-        console.log('CUS');
-        // console.log(nomor_meja);
+        data.sort((a, b) =>
+          parseInt(a.nomor_meja) > parseInt(b.nomor_meja)
+            ? 1
+            : parseInt(b.nomor_meja) > parseInt(a.nomor_meja)
+            ? -1
+            : 0
+        );
         setMeja(data);
         settempMeja(data);
       });

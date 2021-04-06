@@ -9,12 +9,12 @@ import {
   Popconfirm,
   message,
   Modal,
-  Spin,
-  Checkbox,
-  InputNumber,
+  Select,
+  DatePicker,
 } from 'antd';
-import { Link } from 'react-router-dom';
 
+import moment from 'moment';
+import Moment from 'moment';
 import {
   SearchOutlined,
   DeleteTwoTone,
@@ -23,7 +23,6 @@ import {
 } from '@ant-design/icons';
 import { UserContext } from '../../context/UserContext';
 import myAxios from '../../myAxios';
-import LogoModal from '../../asset/icon/logo modal.png';
 
 const layout = {
   labelCol: { span: 8 },
@@ -40,11 +39,12 @@ class ShowBahan extends Component {
     super(props);
     this.state = {
       modalVisible: false,
+      modalStokVisible: false,
+      modalVisible: false,
       bahan: null,
       filteredInfo: null,
       sortedInfo: null,
       idEdit: null,
-      token: null,
       searchText: '',
       searchedColumn: '',
       judulModal: '',
@@ -54,8 +54,15 @@ class ShowBahan extends Component {
 
       nama_bahan: '',
       unit: '',
+
+      harga: '',
+      tanggal: null,
+      jumlah: '',
+      suffix: null,
     };
   }
+
+  static contextType = UserContext;
 
   openModal = () => {
     this.setState({
@@ -64,6 +71,20 @@ class ShowBahan extends Component {
       judulModal: 'Tambah Data Bahan',
       nama_bahan: '',
       unit: '',
+    });
+    console.log(this.state.modalVisible);
+  };
+
+  openModalStok = () => {
+    this.setState({
+      modalStokVisible: true,
+    });
+    console.log(this.state.modalStokVisible);
+  };
+
+  openModalKeluar = () => {
+    this.setState({
+      modalKeluarVisible: true,
     });
     console.log(this.state.modalVisible);
   };
@@ -86,8 +107,20 @@ class ShowBahan extends Component {
     });
   };
 
+  handleChangeInputTanggal = (evt) => {
+    const tanggal = evt._d;
+    console.log(tanggal);
+    this.setState({
+      tanggal: Moment(tanggal).format('YYYY-MM-DD'),
+    });
+  };
+
   handleCancel = () => {
-    this.setState({ modalVisible: false });
+    this.setState({
+      modalVisible: false,
+      modalStokVisible: false,
+      modalKeluarVisible: false,
+    });
   };
 
   editBahan = (modalVisible, index) => {
@@ -119,8 +152,6 @@ class ShowBahan extends Component {
     console.log('ID Edit Adalah : ' + this.state.nama_bahan);
   };
 
-  static contextType = UserContext;
-
   handleChange = (pagination, filters, sorter) => {
     console.log('Various parameters', pagination, filters, sorter);
     this.setState({
@@ -134,13 +165,6 @@ class ShowBahan extends Component {
 
   clearFilters = () => {
     this.setState({ filteredInfo: null });
-  };
-
-  clearAll = () => {
-    this.setState({
-      filteredInfo: null,
-      sortedInfo: null,
-    });
   };
 
   getBahan = () => {
@@ -272,6 +296,16 @@ class ShowBahan extends Component {
     this.setState({ searchText: '' });
   };
 
+  onChangeTak = (evt) => {
+    const bahan = this.state.bahan.filter((i) => {
+      return i.nama_bahan == evt;
+    });
+    this.setState({
+      nama_bahan: evt,
+      suffix: bahan[0].unit,
+    });
+  };
+
   handleSubmit = (event) => {
     event.preventDefault();
     console.log('Id = ' + this.state.idEdit);
@@ -342,6 +376,111 @@ class ShowBahan extends Component {
     }
   };
 
+  handleSubmitStok = (event) => {
+    event.preventDefault();
+
+    if (
+      this.state.nama_bahan === '' ||
+      this.state.tanggal === '' ||
+      this.state.harga === '' ||
+      this.state.jumlah === ''
+    ) {
+      message.error('Masukan input yang valid!');
+    } else {
+      this.setState({
+        loading: true,
+      });
+      console.log('MASUK TAMBAH STOK MENU');
+      const temp = this.state.bahan.filter((i) => {
+        return i.nama_bahan == this.state.nama_bahan;
+      });
+      let newObj = {
+        tanggal: this.state.tanggal,
+        jumlah: this.state.jumlah,
+        harga: this.state.harga,
+        id_bahan: temp[0].id,
+      };
+      myAxios
+        .post(`riwayatBahanMasuk`, newObj, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('token'),
+          },
+        })
+        .then((res) => {
+          message.success(newObj.nama_bahan + ' berhasil tambah stok!');
+          let data = res.data.data;
+          this.setState({
+            modalStokVisible: false,
+            nama_bahan: '',
+            harga: '',
+            tanggal: '',
+            loading: false,
+          });
+          this.getBahan();
+        })
+        .catch((err) => {
+          this.setState({
+            loading: false,
+          });
+          message.error(
+            'Tambah Stok Bahan Gagal : ' + err.response.data.message
+          );
+        });
+    }
+  };
+
+  handleSubmitKeluar = (event) => {
+    event.preventDefault();
+
+    if (
+      this.state.nama_bahan === '' ||
+      this.state.tanggal === '' ||
+      this.state.jumlah === ''
+    ) {
+      message.error('Masukan input yang valid!');
+    } else {
+      this.setState({
+        loading: true,
+      });
+      console.log('MASUK TAMBAH BAHAN BUANG');
+      const temp = this.state.bahan.filter((i) => {
+        return i.nama_bahan == this.state.nama_bahan;
+      });
+      let newObj = {
+        tanggal: this.state.tanggal,
+        jumlah: this.state.jumlah,
+        id_bahan: temp[0].id,
+        status: 'Buang',
+      };
+      myAxios
+        .post(`riwayatBahanKeluar`, newObj, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('token'),
+          },
+        })
+        .then((res) => {
+          message.success(newObj.nama_bahan + ' berhasil dibuang!');
+          let data = res.data.data;
+          this.setState({
+            modalKeluarVisible: false,
+            nama_bahan: '',
+            jumlah: '',
+            tanggal: '',
+            loading: false,
+          });
+          this.getBahan();
+        })
+        .catch((err) => {
+          this.setState({
+            loading: false,
+          });
+          message.error(
+            'Tambah Bahan Buang Gagal : ' + err.response.data.message
+          );
+        });
+    }
+  };
+
   render() {
     let { sortedInfo, filteredInfo } = this.state;
     sortedInfo = sortedInfo || {};
@@ -360,6 +499,9 @@ class ShowBahan extends Component {
         title: 'Jumlah Stok',
         dataIndex: 'jumlah',
         key: 'jumlah',
+        filters: [{ text: 'Bahan Habis', value: 0 }],
+        filteredValue: filteredInfo.jumlah || null,
+        onFilter: (value, record) => record.jumlah == value,
         sorter: (a, b) => a.jumlah.length - b.jumlah.length,
         ellipsis: true,
       },
@@ -429,7 +571,10 @@ class ShowBahan extends Component {
             <Button
               loading={this.state.loading}
               type='primary'
-              style={{ marginTop: '20px', width: '100%' }}>
+              style={{
+                marginTop: '20px',
+                width: '100%',
+              }}>
               <button
                 style={{
                   width: '100%',
@@ -437,6 +582,130 @@ class ShowBahan extends Component {
                   backgroundColor: 'transparent',
                 }}>
                 {this.state.buttonModal}
+              </button>
+            </Button>
+          </form>
+        </Modal>
+
+        <Modal
+          visible={this.state.modalStokVisible}
+          title='Tambah Bahan Masuk'
+          onCancel={this.handleCancel}
+          footer={[]}>
+          <form onSubmit={this.handleSubmitStok}>
+            <label>Nama Bahan</label>
+            {this.state.bahan !== null && (
+              <Select style={{ width: '100%' }} onChange={this.onChangeTak}>
+                {this.state.bahan.map((val, item) => (
+                  <Select.Option key={val.nama_bahan} value={val.nama_bahan}>
+                    {val.nama_bahan}
+                  </Select.Option>
+                ))}
+              </Select>
+            )}
+
+            <label style={{ marginTop: '15px' }}>Tanggal Masuk</label>
+            <DatePicker
+              name='tanggal'
+              onChange={this.handleChangeInputTanggal}
+              placeholder='Masukan Tanggal Masuk'
+              format='YYYY / MM / DD'
+              disabledDate={(current) => {
+                return current > moment();
+              }}
+            />
+
+            <label style={{ marginTop: '15px' }}>Jumlah Masuk</label>
+
+            <Input
+              type='number'
+              suffix={this.state.suffix}
+              name='jumlah'
+              value={this.state.jumlah}
+              onChange={this.handleChangeInput}
+              autoComplete='off'
+            />
+            <label style={{ marginTop: '15px' }}>Harga</label>
+            <Input
+              type='number'
+              prefix='Rp. '
+              name='harga'
+              value={this.state.harga}
+              onChange={this.handleChangeInput}
+              autoComplete='off'
+            />
+            <Button
+              loading={this.state.loading}
+              type='primary'
+              style={{
+                marginTop: '20px',
+                width: '100%',
+              }}>
+              <button
+                style={{
+                  width: '100%',
+                  border: 'transparent',
+                  backgroundColor: 'transparent',
+                }}>
+                Tambah Stok Bahan
+              </button>
+            </Button>
+          </form>
+        </Modal>
+
+        <Modal
+          visible={this.state.modalKeluarVisible}
+          title='Buang Stok Bahan'
+          onCancel={this.handleCancel}
+          footer={[]}>
+          <form onSubmit={this.handleSubmitKeluar}>
+            <label>Nama Bahan</label>
+            {this.state.bahan !== null && (
+              <Select style={{ width: '100%' }} onChange={this.onChangeTak}>
+                {this.state.bahan.map((val, item) => (
+                  <Select.Option key={val.nama_bahan} value={val.nama_bahan}>
+                    {val.nama_bahan}
+                  </Select.Option>
+                ))}
+              </Select>
+            )}
+
+            <label style={{ marginTop: '15px' }}>Tanggal Buang</label>
+            <DatePicker
+              name='tanggal'
+              onChange={this.handleChangeInputTanggal}
+              placeholder='Masukan Tanggal Buang'
+              format='YYYY / MM / DD'
+              disabledDate={(current) => {
+                return current > moment();
+              }}
+            />
+
+            <label style={{ marginTop: '15px' }}>Jumlah Buang</label>
+
+            <Input
+              type='number'
+              suffix={this.state.suffix}
+              name='jumlah'
+              value={this.state.jumlah}
+              onChange={this.handleChangeInput}
+              autoComplete='off'
+            />
+
+            <Button
+              loading={this.state.loading}
+              type='primary'
+              style={{
+                marginTop: '20px',
+                width: '100%',
+              }}>
+              <button
+                style={{
+                  width: '100%',
+                  border: 'transparent',
+                  backgroundColor: 'transparent',
+                }}>
+                Buang Stok Bahan
               </button>
             </Button>
           </form>
@@ -467,7 +736,19 @@ class ShowBahan extends Component {
             style={{ width: 'auto', borderRadius: '7px' }}
             type='primary'
             onClick={this.openModal}>
-            Tambah Bahan
+            Tambah Data Bahan
+          </Button>
+          <Button
+            style={{ width: 'auto', borderRadius: '7px' }}
+            type='primary'
+            onClick={this.openModalStok}>
+            Tambah Bahan Masuk
+          </Button>
+          <Button
+            style={{ width: 'auto', borderRadius: '7px' }}
+            type='primary'
+            onClick={this.openModalKeluar}>
+            Buang Stok Bahan
           </Button>
         </Space>
         <Table

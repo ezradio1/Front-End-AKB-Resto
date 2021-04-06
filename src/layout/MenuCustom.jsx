@@ -43,7 +43,8 @@ class MenuCustom extends Component {
         mode='inline'
         defaultSelectedKeys={['1']}
         style={{ backgroundColor: '#1F1F1F' }}>
-        {this.state.jabatan === 'Owner' && (
+        {(this.state.jabatan === 'Owner' ||
+          this.state.jabatan === 'Operational Manager') && (
           <SubMenu key='sub1' icon={<IdcardOutlined />} title='Karyawan'>
             <Menu.Item
               key='1'
@@ -69,8 +70,8 @@ class MenuCustom extends Component {
             key='3'
             icon={<UserOutlined />}
             style={{ margin: '0', backgroundColor: '#1F1F1F' }}>
-            <Link className='link' to='/addCustomer'>
-              Customer
+            <Link className='link' to='/showCustomer'>
+              Pelanggan
             </Link>
           </Menu.Item>
         )}
@@ -88,7 +89,7 @@ class MenuCustom extends Component {
 
         {(this.state.jabatan === 'Operational Manager' ||
           this.state.jabatan === 'Waiter' ||
-          this.state.jabatan === 'Chef') && (
+          this.state.jabatan === 'Cashier') && (
           <Menu.Item
             icon={<ScheduleOutlined />}
             key='5'
@@ -98,9 +99,7 @@ class MenuCustom extends Component {
             </Link>
           </Menu.Item>
         )}
-        {(this.state.jabatan === 'Operational Manager' ||
-          this.state.jabatan === 'Cashier' ||
-          this.state.jabatan === 'Waiter') && (
+        {this.state.jabatan === 'Operational Manager' && (
           <Menu.Item
             key='6'
             icon={<ApartmentOutlined />}
@@ -111,8 +110,7 @@ class MenuCustom extends Component {
           </Menu.Item>
         )}
 
-        {(this.state.jabatan === 'Cashier' ||
-          this.state.jabatan === 'Waiter') && (
+        {(this.state.jabatan === 'Waiter' || this.state.jabatan === 'Chef') && (
           <Menu.Item
             key='7'
             icon={<OrderedListOutlined />}
@@ -124,8 +122,7 @@ class MenuCustom extends Component {
         )}
 
         {(this.state.jabatan === 'Operational Manager' ||
-          this.state.jabatan === 'Cashier' ||
-          this.state.jabatan === 'Waiter') && (
+          this.state.jabatan === 'Cashier') && (
           <Menu.Item
             key='8'
             icon={<ContainerOutlined />}
