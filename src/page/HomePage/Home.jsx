@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Row, Col } from 'antd';
 
 import { Line, Bar } from '@ant-design/charts';
@@ -8,6 +8,7 @@ import Kartu1 from '../../asset/icon/kartu1.png';
 import Kartu2 from '../../asset/icon/kartu2.png';
 import Kartu3 from '../../asset/icon/kartu3.png';
 import Kartu4 from '../../asset/icon/kartu4.png';
+import myAxios from '../../myAxios';
 
 const { Meta } = Card;
 const data = [
@@ -41,6 +42,65 @@ const config = {
 };
 
 const Home = () => {
+  const [jumlahKaryawan, setJumlahKar] = useState(null);
+  const [jumlahTransaksi, setJumlahTr] = useState(null);
+  const [jumlahBahan, setJumlahBah] = useState(null);
+  const [jumlahMenu, setJumlahMen] = useState(null);
+
+  useEffect(() => {
+    if (jumlahKaryawan === null) {
+      myAxios
+        .get(`getJumlahKaryawan`, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('token'),
+          },
+        })
+        .then((res) => {
+          const data = res.data.data;
+          setJumlahKar(data[0].jumlah);
+        })
+        .catch((err) => {});
+    }
+    if (jumlahTransaksi === null) {
+      myAxios
+        .get(`getJumlahTransaksi`, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('token'),
+          },
+        })
+        .then((res) => {
+          const data = res.data.data;
+          setJumlahTr(data[0].jumlah);
+        })
+        .catch((err) => {});
+    }
+    if (jumlahBahan === null) {
+      myAxios
+        .get(`getJumlahBahan`, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('token'),
+          },
+        })
+        .then((res) => {
+          const data = res.data.data;
+          setJumlahBah(data[0].jumlah);
+        })
+        .catch((err) => {});
+    }
+    if (jumlahMenu === null) {
+      myAxios
+        .get(`getJumlahMenu`, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('token'),
+          },
+        })
+        .then((res) => {
+          const data = res.data.data;
+          setJumlahMen(data[0].jumlah);
+        })
+        .catch((err) => {});
+    }
+  });
   return (
     <div style={{ padding: '25px 30px' }}>
       <Row>
@@ -73,11 +133,6 @@ const Home = () => {
           border: '0.5px solid #3C8065',
           backgroundColor: '#DFF0D8',
         }}>
-        {/* <Meta
-          style={{ color: '#3C8065' }}
-          title='Selamat Datang di Halaman Website AKB Restaurant'
-          description='Berikan layanan terbaik pada pelanggan AKB Restaurant untuk mengingkatkan kualitas dari AKB Restaurant!'
-        /> */}
         <p
           style={{
             color: '#3C8065',
@@ -99,31 +154,31 @@ const Home = () => {
       <Row justify='space-between'>
         <Col>
           <div className='mycard'>
-            <h1>68</h1>
+            <h1>{jumlahKaryawan}</h1>
             <img src={Kartu1} />
           </div>
         </Col>
         <Col>
           <div className='mycard'>
-            <h1 style={{ color: '#3C763D' }}>25</h1>
+            <h1 style={{ color: '#3C763D' }}>{jumlahMenu}</h1>
             <img src={Kartu2} />
           </div>
         </Col>
         <Col>
           <div className='mycard'>
-            <h1 style={{ color: '#A94442' }}>24</h1>
+            <h1 style={{ color: '#A94442' }}>{jumlahBahan}</h1>
             <img src={Kartu3} />
           </div>
         </Col>
         <Col>
           <div className='mycard'>
-            <h1 style={{ color: '#EF9B0F ' }}>1,347</h1>
+            <h1 style={{ color: '#EF9B0F ' }}>{jumlahTransaksi}</h1>
             <img src={Kartu4} />
           </div>
         </Col>
       </Row>
       <h1 style={{ textAlign: 'CENTER', marginTop: '30px' }}>
-        Grafik Penjualan AKB Resto Tahun 2020
+        <b>Grafik Penjualan AKB Resto Tahun 2020</b>
       </h1>
       <Line {...config} />
       <Row>

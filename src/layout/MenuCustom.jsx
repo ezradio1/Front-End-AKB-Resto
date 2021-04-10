@@ -94,7 +94,7 @@ class MenuCustom extends Component {
             icon={<ScheduleOutlined />}
             key='5'
             style={{ margin: '0', backgroundColor: '#1F1F1F' }}>
-            <Link className='link' to='/showBahan'>
+            <Link className='link' to='/showReservasi'>
               Reservasi
             </Link>
           </Menu.Item>

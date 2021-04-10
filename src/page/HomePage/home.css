@@ -6,6 +6,7 @@
   color: #f1f1f1;
   margin-right: 13px;
   margin-top: 19px;
+  font-weight: bold;
 }
 
 .mycard {
@@ -15,6 +16,11 @@
   height: 100%;
   -webkit-backface-visibility: hidden; /* Safari */
   backface-visibility: hidden;
+  transition: transform 0.3s;
+}
+
+.mycard:hover {
+  transform: scale(1.05);
 }
 
 .mycard,

@@ -1,20 +1,7 @@
 import React, { Component } from 'react';
-import ResizableAntdTable from 'resizable-antd-table';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {
-  Input,
-  Table,
-  Button,
-  Space,
-  Popconfirm,
-  message,
-  Modal,
-  Select,
-  DatePicker,
-} from 'antd';
+import { Input, Table, Button, Space, Popconfirm, message, Modal } from 'antd';
 
-import moment from 'moment';
-import Moment from 'moment';
 import {
   SearchOutlined,
   DeleteTwoTone,
@@ -24,13 +11,10 @@ import {
 import { UserContext } from '../../context/UserContext';
 import myAxios from '../../myAxios';
 
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+function validateEmail(email) {
+  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -65,20 +49,6 @@ class ShowCustomer extends Component {
       judulModal: 'Tambah Data Pelanggan',
       nama_bahan: '',
       unit: '',
-    });
-    console.log(this.state.modalVisible);
-  };
-
-  openModalStok = () => {
-    this.setState({
-      modalStokVisible: true,
-    });
-    console.log(this.state.modalStokVisible);
-  };
-
-  openModalKeluar = () => {
-    this.setState({
-      modalKeluarVisible: true,
     });
     console.log(this.state.modalVisible);
   };
@@ -291,14 +261,21 @@ class ShowCustomer extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
     console.log('Id = ' + this.state.idEdit);
-    if (this.state.telepon[0] == 0 || this.state.telepon[0] != 8) {
-      message.error('Nomor telepon harus diawali dengan 8!');
-    } else if (
+    if (
       this.state.nama_customer === '' ||
       this.state.telepon === '' ||
       this.state.email === ''
     ) {
       message.error('Masukan input yang valid!');
+    } else if (this.state.telepon[0] == 0 || this.state.telepon[0] != 8) {
+      message.error('Nomor telepon harus diawali dengan 8!');
+    } else if (
+      this.state.telepon.length < 10 ||
+      this.state.telepon.length > 14
+    ) {
+      message.error('Nomor telepon harus 10 - 14 digit!');
+    } else if (!validateEmail(this.state.email)) {
+      message.error('Email Tidak Valid!');
     } else {
       if (this.state.idEdit === null) {
         this.setState({ loading: true });
@@ -551,6 +528,7 @@ class ShowCustomer extends Component {
             />
             <label style={{ marginTop: '15px' }}>Telepon</label>
             <Input
+              type='number'
               addonBefore='+62'
               placeholder='Telepon'
               name='telepon'

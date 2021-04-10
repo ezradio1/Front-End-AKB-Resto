@@ -247,22 +247,22 @@ class RiwayatMasuk extends Component {
         sorter: (a, b) => a.harga.length - b.harga.length,
       },
 
-      {
-        title: 'Action',
-        dataIndex: 'id',
-        key: 'id',
+      // {
+      //   title: 'Action',
+      //   dataIndex: 'id',
+      //   key: 'id',
 
-        render: (dataIndex) => (
-          <div>
-            <Link className='link' to={`/editEmployee/${dataIndex}`}>
-              <EditTwoTone
-                twoToneColor='#d94a4b'
-                style={{ marginRight: '5px' }}
-              />
-            </Link>
-          </div>
-        ),
-      },
+      //   render: (dataIndex) => (
+      //     <div>
+      //       <Link className='link' to={`/editEmployee/${dataIndex}`}>
+      //         <EditTwoTone
+      //           twoToneColor='#d94a4b'
+      //           style={{ marginRight: '5px' }}
+      //         />
+      //       </Link>
+      //     </div>
+      //   ),
+      // },
     ];
     return (
       <div style={{ padding: '25px 30px' }}>

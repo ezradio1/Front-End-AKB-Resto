@@ -275,23 +275,23 @@ class RiwayatKeluar extends Component {
         ),
       },
 
-      {
-        title: 'Action',
-        dataIndex: 'id',
-        key: 'id',
-        align: 'center',
+      //   {
+      //     title: 'Action',
+      //     dataIndex: 'id',
+      //     key: 'id',
+      //     align: 'center',
 
-        render: (dataIndex) => (
-          <div>
-            <Link className='link' to={`/editEmployee/${dataIndex}`}>
-              <EditTwoTone
-                twoToneColor='#d94a4b'
-                style={{ marginRight: '5px' }}
-              />
-            </Link>
-          </div>
-        ),
-      },
+      //     render: (dataIndex) => (
+      //       <div>
+      //         <Link className='link' to={`/editEmployee/${dataIndex}`}>
+      //           <EditTwoTone
+      //             twoToneColor='#d94a4b'
+      //             style={{ marginRight: '5px' }}
+      //           />
+      //         </Link>
+      //       </div>
+      //     ),
+      //   },
     ];
     return (
       <div style={{ padding: '25px 30px' }}>

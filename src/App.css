@@ -127,8 +127,9 @@ h1 {
 
 @import url('https://fonts.googleapis.com/css2?family=PT+Sans&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
 .myContent {
-  font-family: 'Varela Round', sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 @media (max-width: 575px) {

@@ -31,6 +31,10 @@ import ShowBahan from '../page/BahanPage/ShowBahan';
 import RiwayatBahanMasuk from '../page/HistoryPage/RiwayatMasuk';
 import RiwayatBahanKeluar from '../page/HistoryPage/RiwayatKeluar';
 
+import ShowReservasi from '../page/ReservasiPage/ShowReservasi';
+import ReservasiLangsung from '../page/ReservasiPage/ReservasiLangsung';
+import ReservasiTakLangsung from '../page/ReservasiPage/ReservasiTakLangsung';
+
 const { Content } = Layout;
 
 const ContentCustom = () => {
@@ -106,6 +110,20 @@ const ContentCustom = () => {
     }
   };
 
+  const OMWaiterCashierRoute = ({ ...props }) => {
+    if (!user) {
+      return <Redirect to='/login' />;
+    } else if (
+      user.jabatan === 'Operational Manager' ||
+      user.jabatan === 'Waiter' ||
+      user.jabatan === 'Cashier'
+    ) {
+      return <Route {...props} />;
+    } else {
+      return <Redirect to='/' />;
+    }
+  };
+
   return (
     <Switch>
       <PrivateRoute exact path='/' component={Home} />
@@ -132,6 +150,22 @@ const ContentCustom = () => {
 
       <OMRoute exact path='/riwmas' component={RiwayatBahanMasuk} />
       <OMRoute exact path='/riwkel' component={RiwayatBahanKeluar} />
+
+      <OMWaiterCashierRoute
+        exact
+        path='/showReservasi'
+        component={ShowReservasi}
+      />
+      <OMWaiterCashierRoute
+        exact
+        path='/reservasiLangsung'
+        component={ReservasiLangsung}
+      />
+      <OMWaiterCashierRoute
+        exact
+        path='/reservasiTakLangsung'
+        component={ReservasiTakLangsung}
+      />
     </Switch>
   );
 };

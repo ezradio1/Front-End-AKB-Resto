@@ -125,7 +125,10 @@ const Login = () => {
               />
             </Form.Item>
 
-            <Col style={{ margin: 'auto' }} md={16} className='btnLogin'>
+            <Col
+              style={{ margin: 'auto', marginTop: '15px' }}
+              md={16}
+              className='btnLogin'>
               <Button type='primary' htmlType='submit' loading={loading}>
                 <b>LOGIN</b>
               </Button>

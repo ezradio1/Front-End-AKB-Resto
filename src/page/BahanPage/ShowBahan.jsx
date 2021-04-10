@@ -11,6 +11,7 @@ import {
   Modal,
   Select,
   DatePicker,
+  Tag
 } from 'antd';
 
 import moment from 'moment';
@@ -52,7 +53,7 @@ class ShowBahan extends Component {
       loading: false,
       validated: false,
 
-      nama_bahan: '',
+      nama_bahan: null,
       unit: '',
 
       harga: '',
@@ -89,13 +90,6 @@ class ShowBahan extends Component {
     console.log(this.state.modalVisible);
   };
 
-  onFinish = (values) => {
-    console.log('Success:', values.curr);
-    console.log('Masuk On Finish');
-
-    this.setState({ modalVisible: false });
-  };
-
   onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
@@ -120,6 +114,12 @@ class ShowBahan extends Component {
       modalVisible: false,
       modalStokVisible: false,
       modalKeluarVisible: false,
+      nama_bahan: null,
+      jumlah: '',
+      harga:'',
+      tanggal:null,
+      unit: ''
+
     });
   };
 
@@ -380,7 +380,7 @@ class ShowBahan extends Component {
     event.preventDefault();
 
     if (
-      this.state.nama_bahan === '' ||
+      this.state.nama_bahan === null ||
       this.state.tanggal === '' ||
       this.state.harga === '' ||
       this.state.jumlah === ''
@@ -413,6 +413,7 @@ class ShowBahan extends Component {
             modalStokVisible: false,
             nama_bahan: '',
             harga: '',
+            jumlah: '',
             tanggal: '',
             loading: false,
           });
@@ -433,7 +434,7 @@ class ShowBahan extends Component {
     event.preventDefault();
 
     if (
-      this.state.nama_bahan === '' ||
+      this.state.nama_bahan === null ||
       this.state.tanggal === '' ||
       this.state.jumlah === ''
     ) {
@@ -595,7 +596,7 @@ class ShowBahan extends Component {
           <form onSubmit={this.handleSubmitStok}>
             <label>Nama Bahan</label>
             {this.state.bahan !== null && (
-              <Select style={{ width: '100%' }} onChange={this.onChangeTak}>
+              <Select style={{ width: '100%' }} onChange={this.onChangeTak} value={this.state.nama_bahan}>
                 {this.state.bahan.map((val, item) => (
                   <Select.Option key={val.nama_bahan} value={val.nama_bahan}>
                     {val.nama_bahan}
