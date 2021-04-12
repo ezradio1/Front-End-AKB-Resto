@@ -202,6 +202,7 @@ const EditEmployee = () => {
         }}></div>
       {status === 'Resign' && (
         <Card
+          className='card-reservasi'
           style={{
             width: 'auto',
             marginTop: 16,
@@ -239,6 +240,7 @@ const EditEmployee = () => {
       )}
       {status === 'Aktif' && (
         <Card
+          className='card-reservasi'
           style={{
             width: 'auto',
             marginTop: 16,

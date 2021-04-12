@@ -126,6 +126,7 @@ const Home = () => {
           marginBottom: '15px',
         }}></div>
       <Card
+        className='card-reservasi'
         style={{
           marginTop: 16,
           marginBottom: 16,

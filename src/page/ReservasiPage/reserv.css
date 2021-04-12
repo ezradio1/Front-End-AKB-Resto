@@ -24,9 +24,15 @@
 .result {
   transition: transform calc(var(--toggle) * 0.15s) ease-in-out;
 }
-.flip-card-front img {
+.flip-card-front img,
+.card-reservasi {
   box-shadow: 0 10px 6px -6px grey;
 }
+
+.card-reservasi {
+  box-shadow: 0 7px 6px -6px grey;
+}
+
 .flip-card-front:hover {
   transform: scale(1.05);
 }

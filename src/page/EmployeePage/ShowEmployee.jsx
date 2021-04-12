@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons';
 import { UserContext } from '../../context/UserContext';
 import myAxios from '../../myAxios';
+import Moment from 'moment';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 class ShowEmployee extends Component {
@@ -57,6 +58,11 @@ class ShowEmployee extends Component {
         })
         .then((res) => {
           const data = res.data.data;
+          data.map((el) => {
+            el.tanggal_bergabung = Moment(el.tanggal_bergabung).format(
+              'D MMM YY'
+            );
+          });
           this.setState({
             karyawan: data,
             loading: false,

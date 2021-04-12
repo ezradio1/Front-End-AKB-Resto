@@ -27,15 +27,7 @@ import TableMerah from '../../asset/icon/tableMerah.png';
 import myAxios from '../../myAxios';
 import { UserContext } from '../../context/UserContext';
 import Moment from 'moment';
-import { Subtitles } from '@material-ui/icons';
 
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
 const { Search } = Input;
 const { Option } = Select;
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
@@ -84,12 +76,6 @@ const ReservasiLangsung = () => {
     console.log('data qr');
     setmodalQr(true);
     setobjectQr(JSON.stringify(reservasi));
-
-    // this.setState({
-    //   modalQr: true,
-    //   objectQr: JSON.stringify(filter[0]),
-    //   idEdit: id,
-    // });
   };
 
   const onSubmitQr = (idEdit) => {
@@ -123,7 +109,6 @@ const ReservasiLangsung = () => {
     } else {
       setModal(true);
       setidMeja(val.id);
-      // setnoMeja(val.nomor_meja);
       var tanggal = Moment(new Date(), 'YYYY-MM-DD');
       form.setFieldsValue({
         nomor_meja: val.nomor_meja,
@@ -155,7 +140,7 @@ const ReservasiLangsung = () => {
 
   const getMeja = () => {
     myAxios
-      .get(`tampilMejaReservasi`, {
+      .get(`showMeja`, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('token'),
         },
@@ -249,41 +234,6 @@ const ReservasiLangsung = () => {
     }
     console.log(meja);
   });
-
-  useEffect(() => {
-    const pokemon = [];
-    const promises = new Array(20).fill().map((v, i) =>
-      myAxios(`showCustomer`, {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
-        },
-      }).then((res) => {
-        var myData = res.data.data;
-        Promise.all(promises).then((myData) => {
-          return myData.map((value) => ({ nama_customer, email }) =>
-            pokemon.push({ nama_customer, email })
-          );
-        });
-        console.log('yuk');
-        console.log(myData);
-        setOptions(myData);
-      })
-    );
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      window.removeEventListener('mousedown', handleClickOutside);
-    };
-  });
-
-  const handleClickOutside = (event) => {
-    const { current: wrap } = wrapperRef;
-    if (wrap && !wrap.contains(event.target)) {
-      setDisplay(false);
-    }
-  };
 
   const checkActionCode = async (rule, value, callback) => {
     console.log('value ' + value);
@@ -381,7 +331,7 @@ const ReservasiLangsung = () => {
             <Button
               type='primary'
               key='console'
-              onClick={() => history.push('/showReservasi')}>
+              onClick={() => history.push('/showReservasiLangsung')}>
               Kembali ke Reservasi
             </Button>,
             <Button type='primary' key='console' onClick={openModalQr}>
@@ -427,7 +377,7 @@ const ReservasiLangsung = () => {
               color: '#001529',
               textTransform: 'uppercase',
             }}>
-            <strong>Reservasi</strong>
+            <strong>Reservasi Langsung</strong>
           </h1>
           <div
             style={{

@@ -84,7 +84,7 @@ class RiwayatMasuk extends Component {
         .then((res) => {
           const data = res.data.data;
           data.map((el) => {
-            el.tanggal = moment(el.tanggal).format('D  MMM  YY');
+            el.tanggal = moment(el.tanggal).format('D MMM YY');
           });
           this.setState({
             riwMasuk: data,

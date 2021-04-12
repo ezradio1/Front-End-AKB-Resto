@@ -1,29 +1,50 @@
 import React, { Component } from 'react';
+import ResizableAntdTable from 'resizable-antd-table';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Input, Table, Button, Space, Popconfirm, message, Modal } from 'antd';
+import {
+  Input,
+  Table,
+  Button,
+  Space,
+  Popconfirm,
+  message,
+  Tooltip,
+  Modal,
+  Select,
+  DatePicker,
+  Tag,
+} from 'antd';
 
+import moment from 'moment';
+import Moment from 'moment';
 import {
   SearchOutlined,
   DeleteTwoTone,
   EditTwoTone,
   LoadingOutlined,
+  CloudUploadOutlined,
 } from '@ant-design/icons';
 import { UserContext } from '../../context/UserContext';
 import myAxios from '../../myAxios';
 
-function validateEmail(email) {
-  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(String(email).toLowerCase());
-}
+const layout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};
+const tailLayout = {
+  wrapperCol: { offset: 8, span: 16 },
+};
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
-class ShowCustomer extends Component {
+class DaftarPesananAll extends Component {
   constructor(props) {
     super(props);
     this.state = {
       modalVisible: false,
-      customer: null,
+      modalStokVisible: false,
+      modalVisible: false,
+      pesanan: null,
       filteredInfo: null,
       sortedInfo: null,
       idEdit: null,
@@ -34,9 +55,13 @@ class ShowCustomer extends Component {
       loading: false,
       validated: false,
 
-      nama_customer: '',
-      telepon: '',
-      email: '',
+      nama_bahan: null,
+      unit: '',
+
+      harga: '',
+      tanggal: null,
+      jumlah: '',
+      suffix: null,
     };
   }
 
@@ -45,19 +70,26 @@ class ShowCustomer extends Component {
   openModal = () => {
     this.setState({
       modalVisible: true,
-      buttonModal: 'Tambah Pelanggan',
-      judulModal: 'Tambah Data Pelanggan',
+      buttonModal: 'Tambah Bahan',
+      judulModal: 'Tambah Data Bahan',
       nama_bahan: '',
       unit: '',
     });
     console.log(this.state.modalVisible);
   };
 
-  onFinish = (values) => {
-    console.log('Success:', values.curr);
-    console.log('Masuk On Finish');
+  openModalStok = () => {
+    this.setState({
+      modalStokVisible: true,
+    });
+    console.log(this.state.modalStokVisible);
+  };
 
-    this.setState({ modalVisible: false });
+  openModalKeluar = () => {
+    this.setState({
+      modalKeluarVisible: true,
+    });
+    console.log(this.state.modalVisible);
   };
 
   onFinishFailed = (errorInfo) => {
@@ -74,37 +106,43 @@ class ShowCustomer extends Component {
   handleCancel = () => {
     this.setState({
       modalVisible: false,
+      modalStokVisible: false,
+      modalKeluarVisible: false,
+      nama_bahan: null,
+      jumlah: '',
+      harga: '',
+      tanggal: null,
+      unit: '',
     });
   };
 
-  editPelanggan = (modalVisible, index) => {
+  editBahan = (modalVisible, index) => {
     console.log('id handle  = ' + index);
     this.setState({
-      nama_customer: '',
-      telepon: '',
-      email: '',
+      nama_bahan: '',
+      unit: '',
       idEdit: index,
     });
     myAxios
-      .get(`showCustomer/${index}`, {
+      .get(`showBahan/${index}`, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('token'),
         },
       })
       .then((res) => {
         const data = res.data.data;
-        data.telepon = data.telepon.slice(1);
         this.setState({
           modalVisible,
-          judulModal: 'Edit Data Pelanggan',
-          buttonModal: 'Edit Pelanggan',
-          nama_customer: data.nama_customer,
-          telepon: data.telepon,
-          email: data.email,
+          judulModal: 'Edit Data Bahan',
+          buttonModal: 'Edit Bahan',
+          nama_bahan: data.nama_bahan,
+          unit: data.unit,
         });
-        console.log('Data Pelanggan = ');
+        console.log('Data Bahan = ');
         console.log(res.data.data);
       });
+
+    console.log('ID Edit Adalah : ' + this.state.nama_bahan);
   };
 
   handleChange = (pagination, filters, sorter) => {
@@ -122,9 +160,9 @@ class ShowCustomer extends Component {
     this.setState({ filteredInfo: null });
   };
 
-  getCustomer = () => {
+  getPesanan = () => {
     myAxios
-      .get(`showCustomer`, {
+      .get(`showPesananAll`, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('token'),
         },
@@ -132,39 +170,43 @@ class ShowCustomer extends Component {
       .then((res) => {
         const data = res.data.data;
         this.setState({
-          customer: data,
+          pesanan: data,
           loading: false,
         });
-        console.log('Data Customer = ');
+        console.log('Data Pesanan = ');
         console.log(res.data.data);
       });
+
+    console.log(this.state.pesanan);
   };
 
   componentDidMount() {
     this.setState({ loading: true });
     const user = this.context;
-    if (this.state.customer === null) {
-      this.getCustomer();
+    if (this.state.pesanan === null) {
+      this.getPesanan();
     }
   }
 
-  DeleteItem(param) {
+  updateStatus(param) {
     const mytoken = localStorage.getItem('token');
     console.log('Delete Item ' + param + mytoken);
-    let newObj = {};
+    let newObj = {
+      status_pesanan: 'Ready to Serve',
+    };
     myAxios
-      .put(`deleteCustomer/${param}`, newObj, {
+      .put(`updateStatusPesanan/${param}`, newObj, {
         headers: {
           Authorization: 'Bearer ' + mytoken,
         },
       })
       .then((res) => {
-        let filter = this.state.customer.filter((el) => {
+        let filter = this.state.pesanan.filter((el) => {
           return el.id !== param;
         });
-        this.setState({ customer: filter });
+        this.setState({ pesanan: filter });
         console.log(res);
-        message.success(res.data.data.nama_customer + ' berhasil dihapus!');
+        message.success(res.data.data.nama_menu + ' berhasil diupdate!');
       })
       .catch((err) => {
         message.error('Gagal Menghapus : ' + err);
@@ -262,90 +304,68 @@ class ShowCustomer extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
     console.log('Id = ' + this.state.idEdit);
-    if (
-      this.state.nama_customer === '' ||
-      this.state.telepon === '' ||
-      this.state.email === ''
-    ) {
+    if (this.state.nama_bahan === '' || this.state.unit === '') {
       message.error('Masukan input yang valid!');
-    } else if (this.state.telepon[0] == 0 || this.state.telepon[0] != 8) {
-      message.error('Nomor telepon harus diawali dengan 8!');
-    } else if (
-      this.state.telepon.length < 10 ||
-      this.state.telepon.length > 14
-    ) {
-      message.error('Nomor telepon harus 10 - 14 digit!');
-    } else if (!validateEmail(this.state.email)) {
-      message.error('Email Tidak Valid!');
     } else {
       if (this.state.idEdit === null) {
         this.setState({ loading: true });
         console.log('MASUK TAMBAH MENU');
+        console.log('Handle Submit + ' + this.state.nama_bahan);
         let newObj = {
-          nama_customer: this.state.nama_customer,
-          email: this.state.email,
-          telepon: '0' + this.state.telepon,
+          nama_bahan: this.state.nama_bahan,
+          jumlah: 0,
+          unit: this.state.unit,
         };
         myAxios
-          .post(`customer`, newObj, {
+          .post(`bahan`, newObj, {
             headers: {
               Authorization: 'Bearer ' + localStorage.getItem('token'),
             },
           })
           .then((res) => {
-            message.success(newObj.nama_customer + ' berhasil ditambahkan!');
+            message.success(newObj.nama_bahan + ' berhasil ditambahkan!');
             let data = res.data.data;
             this.setState({
               modalVisible: false,
-              nama_customer: '',
-              telepon: '',
-              email: '',
+              nama_bahan: '',
+              unit: '',
               loading: false,
-              customer: [...this.state.customer, data],
+              bahan: [...this.state.bahan, data],
             });
           })
           .catch((err) => {
-            message.error(
-              'Tambah Pelanggan Gagal : ' + err.response.data.message
-            );
-            this.setState({
-              loading: false,
-            });
+            message.error('Tambah Bahan Gagal : ' + err.response.data.message);
           });
       } else {
-        console.log('MASUK EDIT PELANGGAN');
+        console.log('MASUK EDIT MENU');
         this.setState({ loading: true });
         let newObj = {
-          nama_customer: this.state.nama_customer,
-          telepon: '0' + this.state.telepon,
-          email: this.state.email,
+          nama_bahan: this.state.nama_bahan,
+          unit: this.state.unit,
         };
         myAxios
-          .put(`editCustomer/${this.state.idEdit}`, newObj, {
+          .put(`editBahan/${this.state.idEdit}`, newObj, {
             headers: {
               Authorization: 'Bearer ' + localStorage.getItem('token'),
             },
           })
           .then((res) => {
-            message.success(newObj.nama_customer + ' berhasil diubah!');
+            message.success(newObj.nama_bahan + ' berhasil diubah!');
             let data = res.data.data;
+            const temp = this.state.bahan.filter((i) => {
+              return i.id !== data.id;
+            });
             this.setState({
               modalVisible: false,
-              nama_customer: '',
-              telepon: '',
-              email: '',
+              nama_bahan: '',
+              unit: '',
               idEdit: null,
               loading: false,
             });
-            this.getCustomer();
+            // this.getBahan();
           })
           .catch((err) => {
-            this.setState({
-              loading: false,
-            });
-            message.error(
-              'Ubah Data Pelanggan Gagal : ' + err.response.data.message
-            );
+            message.error('Ubah Bahan Gagal : ' + err.response.data.message);
           });
       }
     }
@@ -355,7 +375,7 @@ class ShowCustomer extends Component {
     event.preventDefault();
 
     if (
-      this.state.nama_bahan === '' ||
+      this.state.nama_bahan === null ||
       this.state.tanggal === '' ||
       this.state.harga === '' ||
       this.state.jumlah === ''
@@ -388,10 +408,11 @@ class ShowCustomer extends Component {
             modalStokVisible: false,
             nama_bahan: '',
             harga: '',
+            jumlah: '',
             tanggal: '',
             loading: false,
           });
-          this.getCustomer();
+          //   this.getBahan();
         })
         .catch((err) => {
           this.setState({
@@ -408,7 +429,7 @@ class ShowCustomer extends Component {
     event.preventDefault();
 
     if (
-      this.state.nama_bahan === '' ||
+      this.state.nama_bahan === null ||
       this.state.tanggal === '' ||
       this.state.jumlah === ''
     ) {
@@ -443,7 +464,7 @@ class ShowCustomer extends Component {
             tanggal: '',
             loading: false,
           });
-          this.getCustomer();
+          this.getBahan();
         })
         .catch((err) => {
           this.setState({
@@ -462,28 +483,44 @@ class ShowCustomer extends Component {
     filteredInfo = filteredInfo || {};
     const columns = [
       {
-        title: 'Nama Pelanggan',
-        dataIndex: 'nama_customer',
-        key: 'nama_customer',
-        ...this.getColumnSearchProps('nama_customer'),
-        filteredValue: filteredInfo.nama_customer || null,
-        sorter: (a, b) => a.nama_customer.length - b.nama_customer.length,
+        title: 'Nomor Transaksi',
+        dataIndex: 'nomor_transaksi',
+        key: 'nomor_transaksi',
+        ...this.getColumnSearchProps('nomor_transaksi'),
+        filteredValue: filteredInfo.nomor_transaksi || null,
+        sorter: (a, b) => a.nomor_transaksi.length - b.nomor_transaksi.length,
         ellipsis: true,
       },
       {
-        title: 'Telepon',
-        dataIndex: 'telepon',
-        key: 'telepon',
-        onFilter: (value, record) => record.telepon == value,
-        sorter: (a, b) => a.telepon.length - b.telepon.length,
+        title: 'Nama Menu',
+        dataIndex: 'nama_menu',
+        key: 'nama_menu',
+        filteredValue: filteredInfo.nama_menu || null,
+        onFilter: (value, record) => record.nama_menu == value,
+        sorter: (a, b) => a.nama_menu.length - b.nama_menu.length,
         ellipsis: true,
       },
       {
-        title: 'Email',
-        dataIndex: 'email',
-        key: 'email',
-        onFilter: (value, record) => record.email.includes(value),
-        sorter: (a, b) => a.email.length - b.email.length,
+        title: 'Jumlah Menu',
+        dataIndex: 'jumlah',
+        key: 'jumlah',
+        filteredValue: filteredInfo.jumlah || null,
+        onFilter: (value, record) => record.jumlah == value,
+        sorter: (a, b) => a.jumlah.length - b.jumlah.length,
+        ellipsis: true,
+      },
+      {
+        title: 'Status Pesanan',
+        dataIndex: 'status_pesanan',
+        key: 'status_pesanan',
+        filters: [
+          { text: 'Gram', value: 'gram' },
+          { text: 'Mililiter', value: 'ml' },
+          { text: 'Botol', value: 'botol' },
+        ],
+        filteredValue: filteredInfo.status_pesanan || null,
+        onFilter: (value, record) => record.status_pesanan.includes(value),
+        sorter: (a, b) => a.status_pesanan.length - b.status_pesanan.length,
       },
       {
         align: 'center',
@@ -493,19 +530,20 @@ class ShowCustomer extends Component {
 
         render: (dataIndex) => (
           <div>
-            <EditTwoTone
-              twoToneColor='#d94a4b'
-              style={{ marginRight: '5px' }}
-              onClick={() => this.editPelanggan(true, dataIndex)}
-            />
-            <Popconfirm
-              placement='left'
-              title={'Apakah anda yakin ingin menghapus ?'}
-              onConfirm={() => this.DeleteItem(dataIndex)}
-              okText='Yes'
-              cancelText='No'>
-              <DeleteTwoTone twoToneColor='#d94a4b' />
-            </Popconfirm>
+            <Tooltip
+              placement='bottom'
+              title='Update Pesanan'
+              color='#1f1f1f'
+              key='white'>
+              <Popconfirm
+                placement='left'
+                title={'Ubah Status Pesanan ?'}
+                onConfirm={() => this.updateStatus(dataIndex)}
+                okText='Yes'
+                cancelText='No'>
+                <CloudUploadOutlined twoToneColor='#d94a4b' />
+              </Popconfirm>
+            </Tooltip>
           </div>
         ),
       },
@@ -513,64 +551,13 @@ class ShowCustomer extends Component {
 
     return (
       <div style={{ padding: '25px 30px' }}>
-        <Modal
-          visible={this.state.modalVisible}
-          title={this.state.judulModal}
-          onCancel={this.handleCancel}
-          footer={[]}>
-          <form onSubmit={this.handleSubmit}>
-            <label>Nama Pelanggan</label>
-            <Input
-              placeholder='Nama Customer'
-              name='nama_customer'
-              value={this.state.nama_customer}
-              onChange={this.handleChangeInput}
-              autoComplete='off'
-            />
-            <label style={{ marginTop: '15px' }}>Telepon</label>
-            <Input
-              type='number'
-              addonBefore='+62'
-              placeholder='Telepon'
-              name='telepon'
-              value={this.state.telepon}
-              onChange={this.handleChangeInput}
-              autoComplete='off'
-            />
-            <label style={{ marginTop: '15px' }}>Email</label>
-            <Input
-              placeholder='Email'
-              name='email'
-              value={this.state.email}
-              onChange={this.handleChangeInput}
-              autoComplete='off'
-            />
-            <Button
-              loading={this.state.loading}
-              type='primary'
-              style={{
-                marginTop: '20px',
-                width: '100%',
-              }}>
-              <button
-                style={{
-                  width: '100%',
-                  border: 'transparent',
-                  backgroundColor: 'transparent',
-                }}>
-                {this.state.buttonModal}
-              </button>
-            </Button>
-          </form>
-        </Modal>
-
         <h1
           style={{
             fontSize: 'x-large',
             color: '#001529',
             textTransform: 'uppercase',
           }}>
-          <strong>data pelanggan</strong>
+          <strong>daftar pesanan pelanggan</strong>
         </h1>
         <div
           style={{
@@ -585,19 +572,13 @@ class ShowCustomer extends Component {
             onClick={this.clearFilters}>
             Hapus Filter
           </Button>
-          <Button
-            style={{ width: 'auto', borderRadius: '7px' }}
-            type='primary'
-            onClick={this.openModal}>
-            Tambah Data Pelanggan
-          </Button>
         </Space>
         <Table
           loading={this.state.loading}
           loadingIndicator={antIcon}
           scroll={{ x: 900, y: 1000 }}
           columns={columns}
-          dataSource={this.state.customer}
+          dataSource={this.state.pesanan}
           onChange={this.handleChange}
         />
       </div>
@@ -605,4 +586,4 @@ class ShowCustomer extends Component {
   }
 }
 
-export default ShowCustomer;
+export default DaftarPesananAll;

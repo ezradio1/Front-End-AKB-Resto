@@ -31,9 +31,16 @@ import ShowBahan from '../page/BahanPage/ShowBahan';
 import RiwayatBahanMasuk from '../page/HistoryPage/RiwayatMasuk';
 import RiwayatBahanKeluar from '../page/HistoryPage/RiwayatKeluar';
 
-import ShowReservasi from '../page/ReservasiPage/ShowReservasi';
+import ShowReservasiLangsung from '../page/ReservasiPage/ShowReservasiLangsung';
+import ShowReservasiTakLangsung from '../page/ReservasiPage/ShowReservasiTakLangsung';
 import ReservasiLangsung from '../page/ReservasiPage/ReservasiLangsung';
+import EditReservasiLangsung from '../page/ReservasiPage/EditReservasiLangsung';
+import EditReservasiTakLangsung from '../page/ReservasiPage/EditReservasiTakLangsung';
 import ReservasiTakLangsung from '../page/ReservasiPage/ReservasiTakLangsung';
+
+import DaftarPesananAll from '../page/DaftarPesanan/DaftarPesananAll';
+import DaftarPesananChef from '../page/DaftarPesanan/DaftarPesananChef';
+import DaftarPesananWaiter from '../page/DaftarPesanan/DaftarPesananWaiter';
 
 const { Content } = Layout;
 
@@ -124,6 +131,26 @@ const ContentCustom = () => {
     }
   };
 
+  const ChefRoute = ({ ...props }) => {
+    if (!user) {
+      return <Redirect to='/login' />;
+    } else if (user.jabatan === 'Chef') {
+      return <Route {...props} />;
+    } else {
+      return <Redirect to='/' />;
+    }
+  };
+
+  const WaiterRoute = ({ ...props }) => {
+    if (!user) {
+      return <Redirect to='/login' />;
+    } else if (user.jabatan === 'Waiter') {
+      return <Route {...props} />;
+    } else {
+      return <Redirect to='/' />;
+    }
+  };
+
   return (
     <Switch>
       <PrivateRoute exact path='/' component={Home} />
@@ -148,24 +175,47 @@ const ContentCustom = () => {
       <OMChefRoute exact path='/showBahan' component={ShowBahan} />
       <OMWaiterChefRoute exact path='/showCustomer' component={ShowCustomer} />
 
-      <OMRoute exact path='/riwmas' component={RiwayatBahanMasuk} />
-      <OMRoute exact path='/riwkel' component={RiwayatBahanKeluar} />
+      <OMChefRoute exact path='/riwmas' component={RiwayatBahanMasuk} />
+      <OMChefRoute exact path='/riwkel' component={RiwayatBahanKeluar} />
 
       <OMWaiterCashierRoute
         exact
-        path='/showReservasi'
-        component={ShowReservasi}
+        path='/showReservasiLangsung'
+        component={ShowReservasiLangsung}
       />
       <OMWaiterCashierRoute
         exact
-        path='/reservasiLangsung'
+        path='/showReservasiTakLangsung'
+        component={ShowReservasiTakLangsung}
+      />
+      <OMWaiterCashierRoute
+        exact
+        path='/showReservasiLangsung/reservasiLangsung'
         component={ReservasiLangsung}
       />
       <OMWaiterCashierRoute
         exact
-        path='/reservasiTakLangsung'
+        path='/showReservasiLangsung/EditReservasiLangsung/:userId'
+        component={EditReservasiLangsung}
+      />
+      <OMWaiterCashierRoute
+        exact
+        path='/showReservasiTakLangsung/EditReservasiTakLangsung/:userId'
+        component={EditReservasiTakLangsung}
+      />
+      <OMWaiterCashierRoute
+        exact
+        path='/showReservasiTakLangsung/reservasiTakLangsung'
         component={ReservasiTakLangsung}
       />
+
+      <ChefRoute exact path='/pesananChef' component={DaftarPesananChef} />
+      <WaiterRoute
+        exact
+        path='/pesananWaiter'
+        component={DaftarPesananWaiter}
+      />
+      <OMRoute exact path='/daftarPesanan' component={DaftarPesananAll} />
     </Switch>
   );
 };

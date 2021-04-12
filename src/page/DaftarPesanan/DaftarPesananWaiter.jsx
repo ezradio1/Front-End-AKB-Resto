@@ -1,43 +1,82 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import ResizableAntdTable from 'resizable-antd-table';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import {
+  Input,
   Table,
   Button,
   Space,
   Popconfirm,
-  Input,
   message,
+  Tooltip,
+  Modal,
+  Select,
+  DatePicker,
   Tag,
-  Spin,
 } from 'antd';
-import { Link } from 'react-router-dom';
+
 import moment from 'moment';
 import Moment from 'moment';
-
 import {
   SearchOutlined,
-  LoadingOutlined,
+  DeleteTwoTone,
   EditTwoTone,
+  LoadingOutlined,
+  CloudUploadOutlined,
 } from '@ant-design/icons';
 import { UserContext } from '../../context/UserContext';
 import myAxios from '../../myAxios';
+
+const layout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};
+const tailLayout = {
+  wrapperCol: { offset: 8, span: 16 },
+};
+
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
-class RiwayatKeluar extends Component {
+class DaftarPesananWaiter extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      riwKel: null,
+      pesanan: null,
       filteredInfo: null,
       sortedInfo: null,
-      currId: null,
-      token: null,
+      idEdit: null,
       searchText: '',
       searchedColumn: '',
       loading: false,
+      validated: false,
     };
   }
+
   static contextType = UserContext;
+
+  onFinishFailed = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
+
+  handleChangeInput = (evt) => {
+    console.log(evt.target.value);
+    this.setState({
+      [evt.target.name]: evt.target.value,
+    });
+  };
+
+  handleCancel = () => {
+    this.setState({
+      modalVisible: false,
+      modalStokVisible: false,
+      modalKeluarVisible: false,
+      nama_bahan: null,
+      jumlah: '',
+      harga: '',
+      tanggal: null,
+      unit: '',
+    });
+  };
 
   handleChange = (pagination, filters, sorter) => {
     console.log('Various parameters', pagination, filters, sorter);
@@ -54,80 +93,53 @@ class RiwayatKeluar extends Component {
     this.setState({ filteredInfo: null });
   };
 
-  clearAll = () => {
-    this.setState({
-      filteredInfo: null,
-      sortedInfo: null,
-    });
-  };
+  getPesanan = () => {
+    myAxios
+      .get(`showDetailPesananWaiter`, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token'),
+        },
+      })
+      .then((res) => {
+        const data = res.data.data;
+        this.setState({
+          pesanan: data,
+          loading: false,
+        });
+        console.log('Data Bahan = ');
+        console.log(res.data.data);
+      });
 
-  setAgeSort = () => {
-    this.setState({
-      sortedInfo: {
-        order: 'descend',
-        columnKey: 'year',
-      },
-    });
+    console.log(this.state.pesanan);
   };
 
   componentDidMount() {
+    this.setState({ loading: true });
     const user = this.context;
-    console.log('CEK ' + user.object);
-    this.setState({ token: localStorage.getItem('token'), loading: true });
-    console.log('SYALALA : ' + localStorage.getItem('token'));
-    if (this.state.riwKel === null) {
-      myAxios
-        .get(`showRiwayatBahanKeluar`, {
-          headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token'),
-          },
-        })
-        .then((res) => {
-          const data = res.data.data;
-          moment().format('Do MMm YY');
-          data.map((el) => {
-            el.tanggal = Moment(el.tanggal).format('D MMM YY');
-          });
-          console.log('test test');
-          console.log(data.tanggal);
-          this.setState({
-            riwKel: data,
-            loading: false,
-          });
-          console.log('Data riwKel = ');
-          console.log(res.data.data);
-        })
-        .catch((err) => {
-          this.setState({
-            loading: false,
-          });
-          message.error('Gagal Ambil : ' + err);
-          console.log('error  : ' + err);
-        });
+    if (this.state.pesanan === null) {
+      this.getPesanan();
     }
-    console.log(this.state.riwKel);
   }
 
-  DeleteItem(param) {
+  updateStatus(param) {
     const mytoken = localStorage.getItem('token');
     console.log('Delete Item ' + param + mytoken);
-    let newObj = {};
-    axios
-      .put(
-        `https://dbakbresto.ezraaudivano.com/api/deleteriwKel/${param}`,
-        newObj,
-        {
-          headers: {
-            Authorization: 'Bearer ' + mytoken,
-          },
-        }
-      )
+    let newObj = {
+      status_pesanan: 'Already Served',
+    };
+    myAxios
+      .put(`updateStatusPesanan/${param}`, newObj, {
+        headers: {
+          Authorization: 'Bearer ' + mytoken,
+        },
+      })
       .then((res) => {
-        let filter = this.state.riwKel.filter((el) => {
-          return el.id === param;
+        let filter = this.state.pesanan.filter((el) => {
+          return el.id !== param;
         });
+        this.setState({ pesanan: filter });
         console.log(res);
-        message.success(res.data.data.nama + ' berhasil dinonaktifkan!');
+        message.success(res.data.data.nama_menu + ' berhasil diupdate!');
       })
       .catch((err) => {
         message.error('Gagal Menghapus : ' + err);
@@ -218,84 +230,72 @@ class RiwayatKeluar extends Component {
     filteredInfo = filteredInfo || {};
     const columns = [
       {
-        title: 'Tanggal Keluar',
-        dataIndex: 'tanggal',
-        key: 'tanggal',
-        ...this.getColumnSearchProps('tanggal'),
-        sorter: (a, b) => a.tanggal.length - b.tanggal.length,
-        // filters: [
-        //   { text: 'Januari', value: 'Januari' },
-        //   { text: 'Februari', value: 'Feb' },
-        //   { text: 'Maret', value: 'Mar' },
-        //   { text: 'April', value: 'Apr' },
-        //   { text: 'Mei', value: 'Mei' },
-        //   { text: 'Juni', value: 'Juni' },
-        //   { text: 'Juli', value: 'Juli' },
-        //   { text: 'Agustus', value: 'Agustus' },
-        //   { text: 'September', value: 'September' },
-        //   { text: 'Oktober', value: 'Oktober' },
-        //   { text: 'November', value: 'November' },
-        //   { text: 'Desember', value: 'Desember' },
-        // ],
-        filteredValue: filteredInfo.tanggal || null,
-        onFilter: (value, record) => record.tanggal.includes(value),
+        title: 'Nomor Transaksi',
+        dataIndex: 'nomor_transaksi',
+        key: 'nomor_transaksi',
+        ...this.getColumnSearchProps('nomor_transaksi'),
+        filteredValue: filteredInfo.nomor_transaksi || null,
+        sorter: (a, b) => a.nomor_transaksi.length - b.nomor_transaksi.length,
         ellipsis: true,
       },
       {
-        title: 'Bahan',
-        dataIndex: 'nama_bahan',
-        key: 'nama_bahan',
-        ...this.getColumnSearchProps('nama_bahan'),
-        filteredValue: filteredInfo.nama_bahan || null,
-        onFilter: (value, record) => record.nama_bahan.includes(value),
-        sorter: (a, b) => a.nama_bahan.length - b.nama_bahan.length,
+        title: 'Nama Menu',
+        dataIndex: 'nama_menu',
+        key: 'nama_menu',
+        filteredValue: filteredInfo.nama_menu || null,
+        onFilter: (value, record) => record.nama_menu == value,
+        sorter: (a, b) => a.nama_menu.length - b.nama_menu.length,
+        ellipsis: true,
       },
       {
-        title: 'Jumlah',
+        title: 'Jumlah Menu',
         dataIndex: 'jumlah',
         key: 'jumlah',
+        filteredValue: filteredInfo.jumlah || null,
+        onFilter: (value, record) => record.jumlah == value,
         sorter: (a, b) => a.jumlah.length - b.jumlah.length,
         ellipsis: true,
       },
       {
-        title: 'Status',
-        dataIndex: 'status',
-        key: 'status',
+        title: 'Status Pesanan',
+        dataIndex: 'status_pesanan',
+        key: 'status_pesanan',
         filters: [
-          { text: 'Buang', value: 'Buang' },
-          { text: 'Keluar', value: 'Keluar' },
+          { text: 'Gram', value: 'gram' },
+          { text: 'Mililiter', value: 'ml' },
+          { text: 'Botol', value: 'botol' },
         ],
-        filteredValue: filteredInfo.status || null,
-        onFilter: (value, record) => record.status.includes(value),
-        sorter: (a, b) => a.status.length - b.status.length,
-        ellipsis: true,
-        render: (status) => (
-          <>
-            <Tag color={status === 'Buang' ? 'green' : 'blue'}>
-              {status.toUpperCase()}
-            </Tag>
-          </>
+        filteredValue: filteredInfo.status_pesanan || null,
+        onFilter: (value, record) => record.status_pesanan.includes(value),
+        sorter: (a, b) => a.status_pesanan.length - b.status_pesanan.length,
+      },
+      {
+        align: 'center',
+        title: 'Action',
+        dataIndex: 'id',
+        key: 'id',
+
+        render: (dataIndex) => (
+          <div>
+            <Tooltip
+              placement='bottom'
+              title='Update Pesanan'
+              color='#1f1f1f'
+              key='white'>
+              <Popconfirm
+                placement='left'
+                title={'Ubah Status Pesanan ?'}
+                onConfirm={() => this.updateStatus(dataIndex)}
+                okText='Yes'
+                cancelText='No'>
+                <CloudUploadOutlined twoToneColor='#d94a4b' />
+              </Popconfirm>
+            </Tooltip>
+          </div>
         ),
       },
-
-      //   {
-      //     title: 'Action',
-      //     dataIndex: 'id',
-      //     key: 'id',
-      //     align: 'center',
-
-      //     render: (dataIndex) => (
-      //       <div>
-      //         <Link className='link' to={`/editEmployee/${dataIndex}`}>
-      //           <EditTwoTone
-      //             twoToneColor='#d94a4b'
-      //             style={{ marginRight: '5px' }}
-      //           />
-      //         </Link>
-      //       </div>
-      //     ),
-      //   },
     ];
+
     return (
       <div style={{ padding: '25px 30px' }}>
         <h1
@@ -304,7 +304,7 @@ class RiwayatKeluar extends Component {
             color: '#001529',
             textTransform: 'uppercase',
           }}>
-          <strong>data riwayat bahan keluar</strong>
+          <strong>daftar pesanan pelanggan</strong>
         </h1>
         <div
           style={{
@@ -325,7 +325,7 @@ class RiwayatKeluar extends Component {
           loadingIndicator={antIcon}
           scroll={{ x: 900, y: 1000 }}
           columns={columns}
-          dataSource={this.state.riwKel}
+          dataSource={this.state.pesanan}
           onChange={this.handleChange}
         />
       </div>
@@ -333,4 +333,4 @@ class RiwayatKeluar extends Component {
   }
 }
 
-export default RiwayatKeluar;
+export default DaftarPesananWaiter;

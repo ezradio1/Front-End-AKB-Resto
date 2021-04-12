@@ -14,6 +14,7 @@ import {
   Tag,
   Empty,
   Spin,
+  Tooltip,
 } from 'antd';
 import QRCode from 'react-qr-code';
 import moment from 'moment';
@@ -43,7 +44,7 @@ const tableLoading = {
   indicator: <Spin indicator={antIcon} />,
 };
 
-class ShowBahan extends Component {
+class ShowReservasiTakLangsung extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -142,13 +143,18 @@ class ShowBahan extends Component {
       loadingTable: tableLoading,
     });
     myAxios
-      .get(`showReservasi`, {
+      .get(`showReservasiTakLangsung`, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('token'),
         },
       })
       .then((res) => {
         const data = res.data.data;
+        data.map((el) => {
+          el.tanggal_reservasi = Moment(el.tanggal_reservasi).format(
+            'D MMM YY'
+          );
+        });
         this.setState({
           reservasi: data,
           loading: false,
@@ -409,6 +415,19 @@ class ShowBahan extends Component {
       });
   };
 
+  editReservasi = async (index) => {
+    let filter = this.state.reservasi.filter((el) => {
+      return el.id === index;
+    });
+    let data_reservasi = filter[0];
+    if (data_reservasi.status === 'Selesai') {
+      await this.setState({ cekStatus: true });
+      message.error('Data Reservasi "Selesai" tidak bisa dihapus!');
+    } else {
+      await this.setState({ cekStatus: false });
+    }
+  };
+
   render() {
     let { sortedInfo, filteredInfo } = this.state;
     sortedInfo = sortedInfo || {};
@@ -430,7 +449,6 @@ class ShowBahan extends Component {
         key: 'sesi_reservasi',
 
         filters: [
-          { text: 'Langsung', value: 'Langsung' },
           { text: 'Dinner', value: 'Dinner' },
           { text: 'Lunch', value: 'Lunch' },
         ],
@@ -438,6 +456,13 @@ class ShowBahan extends Component {
         onFilter: (value, record) => record.sesi_reservasi.includes(value),
         sorter: (a, b) => a.sesi_reservasi.length - b.sesi_reservasi.length,
         ellipsis: true,
+        render: (sesi_reservasi) => (
+          <>
+            <Tag color={sesi_reservasi === 'Dinner' ? '#3F51B5' : '#f50'}>
+              {sesi_reservasi.toUpperCase()}
+            </Tag>
+          </>
+        ),
       },
       {
         title: 'Status',
@@ -494,23 +519,44 @@ class ShowBahan extends Component {
 
         render: (dataIndex) => (
           <div>
-            <QrcodeOutlined
-              style={{ marginRight: '5px' }}
-              onClick={() => this.openModalQr(dataIndex)}
-            />
-            <EditTwoTone
-              twoToneColor='#d94a4b'
-              style={{ marginRight: '5px' }}
-              onClick={() => this.editBahan(true, dataIndex)}
-            />
-            <Popconfirm
-              placement='left'
-              title={'Apakah anda yakin ingin menghapus ?'}
-              onConfirm={() => this.DeleteItem(dataIndex)}
-              okText='Yes'
-              cancelText='No'>
-              <DeleteTwoTone twoToneColor='#d94a4b' />
-            </Popconfirm>
+            <Tooltip
+              placement='bottom'
+              title='Cetak Qr'
+              color='#1f1f1f'
+              key='white'>
+              <QrcodeOutlined
+                style={{ marginRight: '5px' }}
+                onClick={() => this.openModalQr(dataIndex)}
+              />
+            </Tooltip>
+            <Tooltip
+              placement='bottom'
+              title='Edit Reservasi'
+              color='#1f1f1f'
+              key='white'>
+              <Link
+                className='link'
+                to={`/showReservasiTakLangsung/editReservasiTakLangsung/${dataIndex}`}>
+                <EditTwoTone
+                  twoToneColor='#d94a4b'
+                  style={{ marginRight: '5px' }}
+                  onClick={() => this.editReservasi(dataIndex)}></EditTwoTone>
+              </Link>
+            </Tooltip>
+            <Tooltip
+              placement='bottom'
+              title='Hapus Reservasi'
+              color='#1f1f1f'
+              key='white'>
+              <Popconfirm
+                placement='left'
+                title={'Apakah anda yakin ingin menghapus ?'}
+                onConfirm={() => this.DeleteItem(dataIndex)}
+                okText='Yes'
+                cancelText='No'>
+                <DeleteTwoTone twoToneColor='#d94a4b' />
+              </Popconfirm>
+            </Tooltip>
           </div>
         ),
       },
@@ -575,7 +621,7 @@ class ShowBahan extends Component {
             color: '#001529',
             textTransform: 'uppercase',
           }}>
-          <b>reservasi</b>
+          <b>reservasi tidak langsung</b>
         </h1>
         <div
           style={{
@@ -590,17 +636,11 @@ class ShowBahan extends Component {
             onClick={this.clearFilters}>
             Hapus Filter
           </Button>
-          <Button
-            style={{ width: 'auto', borderRadius: '7px' }}
-            type='primary'
-            onClick={this.reservasiLangsung}>
-            <Link className='link' to='/reservasiLangsung'>
-              Tambah Reservasi Langsung
-            </Link>
-          </Button>
           <Button style={{ width: 'auto', borderRadius: '7px' }} type='primary'>
-            <Link className='link' to='/reservasiTakLangsung'>
-              Tambah Reservasi Tidak Langsung
+            <Link
+              className='link'
+              to='showReservasiTakLangsung/reservasiTakLangsung'>
+              Tambah Reservasi
             </Link>
           </Button>
         </Space>
@@ -617,4 +657,4 @@ class ShowBahan extends Component {
   }
 }
 
-export default ShowBahan;
+export default ShowReservasiTakLangsung;

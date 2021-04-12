@@ -14,6 +14,7 @@ import {
   UserOutlined,
   MenuOutlined,
   NodeIndexOutlined,
+  ClockCircleOutlined,
 } from '@ant-design/icons';
 
 import MenuCustom from './MenuCustom';
@@ -23,6 +24,7 @@ import FooterCustom from './FooterCustom';
 import { UserContext } from '../context/UserContext';
 import LogoAkb from '../asset/logo/logo-col.png';
 import LogoAkbFull from '../asset/logo/logo-nav-1.png';
+import Clock from 'react-live-clock';
 
 import './Layout.css';
 
@@ -188,6 +190,20 @@ const LayoutCustom = () => {
                         Halo, {user.jabatan} <CaretDownOutlined />
                       </span>
                     </Dropdown>
+                    <span
+                      style={{
+                        float: 'right',
+                        color: 'white',
+                        marginRight: '15px',
+                      }}>
+                      {/* <ClockCircleOutlined /> */}
+
+                      <Clock
+                        format={'HH:mm:ss'}
+                        ticking={true}
+                        timezone={'ID'}
+                      />
+                    </span>
                   </>
                 )}
               </div>
