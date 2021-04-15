@@ -94,35 +94,6 @@ class ShowReservasiTakLangsung extends Component {
     });
   };
 
-  editBahan = (modalVisible, index) => {
-    console.log('id handle  = ' + index);
-    this.setState({
-      nama_bahan: '',
-      unit: '',
-      idEdit: index,
-    });
-    myAxios
-      .get(`showBahan/${index}`, {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
-        },
-      })
-      .then((res) => {
-        const data = res.data.data;
-        this.setState({
-          modalVisible,
-          judulModal: 'Edit Data Bahan',
-          buttonModal: 'Edit Bahan',
-          nama_bahan: data.nama_bahan,
-          unit: data.unit,
-        });
-        console.log('Data Bahan = ');
-        console.log(res.data.data);
-      });
-
-    console.log('ID Edit Adalah : ' + this.state.nama_bahan);
-  };
-
   handleChange = (pagination, filters, sorter) => {
     console.log('Various parameters', pagination, filters, sorter);
     this.setState({
@@ -176,26 +147,39 @@ class ShowReservasiTakLangsung extends Component {
   }
 
   DeleteItem(param) {
-    const mytoken = localStorage.getItem('token');
-    console.log('Delete Item ' + param + mytoken);
-    let newObj = {};
-    myAxios
-      .put(`deleteBahan/${param}`, newObj, {
-        headers: {
-          Authorization: 'Bearer ' + mytoken,
-        },
-      })
-      .then((res) => {
-        let filter = this.state.bahan.filter((el) => {
-          return el.id !== param;
+    let filter = this.state.reservasi.filter((el) => {
+      return el.id === param;
+    });
+    let data_reservasi = filter[0];
+    console.log('hay');
+    console.log(param);
+    if (data_reservasi.status === 'Selesai') {
+      this.setState({ cekStatus: true });
+      this.setState({ idEdit: param });
+      message.error('Data Reservasi "Selesai" tidak bisa dihapus!');
+    } else {
+      const mytoken = localStorage.getItem('token');
+      console.log('Delete Item ' + param + mytoken);
+      let newObj = {};
+      myAxios
+        .put(`deleteReservasi/${param}`, newObj, {
+          headers: {
+            Authorization: 'Bearer ' + mytoken,
+          },
+        })
+        .then((res) => {
+          let filter = this.state.reservasi.filter((el) => {
+            return el.id !== param;
+          });
+          this.setState({ reservasi: filter });
+          console.log(res);
+          message.success('Data Reservasi berhasil dihapus!');
+        })
+        .catch((err) => {
+          message.error('Gagal Menghapus : ' + err);
         });
-        this.setState({ bahan: filter });
-        console.log(res);
-        message.success(res.data.data.nama_bahan + ' berhasil dihapus!');
-      })
-      .catch((err) => {
-        message.error('Gagal Menghapus : ' + err);
-      });
+      this.setState({ cekStatus: false });
+    }
   }
 
   getColumnSearchProps = (dataIndex) => ({
@@ -309,6 +293,7 @@ class ShowReservasiTakLangsung extends Component {
           objectQr: JSON.stringify(objQr),
           loadingQr: false,
           printed: data.printed,
+          idEdit: id,
         });
       })
       .catch((err) => {
@@ -415,16 +400,18 @@ class ShowReservasiTakLangsung extends Component {
       });
   };
 
-  editReservasi = async (index) => {
+  editReservasi = (index) => {
     let filter = this.state.reservasi.filter((el) => {
       return el.id === index;
     });
     let data_reservasi = filter[0];
     if (data_reservasi.status === 'Selesai') {
-      await this.setState({ cekStatus: true });
-      message.error('Data Reservasi "Selesai" tidak bisa dihapus!');
+      this.setState({ cekStatus: true });
+      this.setState({ idEdit: index.id });
+      message.error('Data Reservasi "Selesai" tidak bisa diedit!');
     } else {
-      await this.setState({ cekStatus: false });
+      window.location.pathname = `/showReservasiTakLangsung/editReservasiTakLangsung/${index}`;
+      this.setState({ cekStatus: false });
     }
   };
 
@@ -534,14 +521,10 @@ class ShowReservasiTakLangsung extends Component {
               title='Edit Reservasi'
               color='#1f1f1f'
               key='white'>
-              <Link
-                className='link'
-                to={`/showReservasiTakLangsung/editReservasiTakLangsung/${dataIndex}`}>
-                <EditTwoTone
-                  twoToneColor='#d94a4b'
-                  style={{ marginRight: '5px' }}
-                  onClick={() => this.editReservasi(dataIndex)}></EditTwoTone>
-              </Link>
+              <EditTwoTone
+                twoToneColor='#d94a4b'
+                style={{ marginRight: '5px' }}
+                onClick={() => this.editReservasi(dataIndex)}></EditTwoTone>
             </Tooltip>
             <Tooltip
               placement='bottom'

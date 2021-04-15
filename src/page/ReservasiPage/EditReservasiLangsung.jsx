@@ -27,6 +27,7 @@ import TableMerah from '../../asset/icon/tableMerah.png';
 import myAxios from '../../myAxios';
 import { UserContext } from '../../context/UserContext';
 import Moment from 'moment';
+import LogoQR from '../../asset/logo/akb-logo-full.png';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -57,7 +58,9 @@ const EditReservasiLangsung = () => {
   const [reservasi, setReservasi] = useState(null);
   //QR CODE
   const [modalQr, setmodalQr] = useState(false);
+  const [printed, setPrinted] = useState(null);
   const [objectQr, setobjectQr] = useState('');
+  const [loadingQr, setLoadingQr] = useState(false);
 
   const { userId } = useParams();
 
@@ -74,26 +77,54 @@ const EditReservasiLangsung = () => {
     setmodalQr(false);
   };
 
-  const openModalQr = (id) => {
+  const openModalQr = () => {
     console.log('data qr');
+    setLoading(false);
+    let newObj = { id_reservasi: userId };
     setmodalQr(true);
-    setobjectQr(JSON.stringify(reservasi));
+    setLoadingQr(true);
+    myAxios
+      .post(`transaksi`, newObj, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token'),
+        },
+      })
+      .then((res) => {
+        let data = res.data.data;
+        console.log('data reservasi');
+        console.log(data);
+        let objQr = {
+          id_transaksi: data.id_transaksi,
+          nomor_meja: data.nomor_meja,
+          nama_customer: data.nama_customer,
+          tanggal: data.tanggal,
+        };
+        setLoadingQr(false);
+        setobjectQr(JSON.stringify(objQr));
+        setPrinted(data.printed);
+      })
+      .catch((err) => {
+        setLoadingQr(false);
+        console.log('error r');
+        console.log(err);
+        message.error('Edit Reservasi Gagal : ');
+        setmodalQr(false);
+      });
   };
 
-  const onSubmitQr = (idEdit) => {
+  const onSubmitQr = () => {
     let newObj;
-    this.setState({ loading: true });
+    setLoading(true);
+
     myAxios
-      .put(`updateStatusReservasi/${this.state.idEdit}`, newObj, {
+      .put(`updateStatusReservasi/${userId}`, newObj, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('token'),
         },
       })
       .then((res) => {
         message.success('Berhasil Cetak Qr Pemesanan');
-        let data = res.data.data;
         setmodalQr(false);
-        setobjectQr(JSON.stringify(reservasi));
         setLoading(false);
       })
       .catch((err) => {
@@ -109,7 +140,6 @@ const EditReservasiLangsung = () => {
     if (val.status === 'Terisi') {
       message.error('Meja sudah terisi!');
     } else {
-      setModal(true);
       setidMeja(val.id);
       //   setReservasi({ nomor_meja: val });
       var tanggal = Moment(reservasi.tanggal_reservasi, 'YYYY-MM-DD');
@@ -120,6 +150,7 @@ const EditReservasiLangsung = () => {
           },
         })
         .then((res) => {
+          setModal(true);
           var data = res.data.data;
           console.log('customer');
           setCust(data.id);
@@ -211,30 +242,16 @@ const EditReservasiLangsung = () => {
         console.log(temp);
       });
   };
-  const getSingleCustomer = (id) => {
-    myAxios
-      .get(`showCustomer/${id}`, {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
-        },
-      })
-      .then((res) => {
-        const data = res.data.data;
-        var temp = [];
-        console.log('Data Customerku = ');
-        console.log(temp);
-      });
-  };
 
   const hapusFilter = (values) => {
     setMeja(tempmeja);
   };
 
-  const onFinish = async (values) => {
+  const onFinish = (values) => {
     setLoading(true);
     console.log('On Finish Edit Reservasi Tak Langsung');
     var date = Moment(values.tanggal).format('YYYY-MM-DD');
-    var dateShow = Moment(values.tanggal).format('MMMM Do YYYY, h:mm:ss a');
+    var dateShow = Moment(values.tanggal).format('MMMM Do YYYY');
     var dateShowNow = Moment(new Date()).format('DD MMMM YYYY');
 
     let newObj = {
@@ -242,7 +259,7 @@ const EditReservasiLangsung = () => {
       email: values.email,
       telepon: '0' + values.telepon,
       tanggal_reservasi: date,
-      sesi_reservasi: values.sesi_reservasi,
+      sesi_reservasi: 'Langsung',
       id_meja: idMeja,
       id_karyawan: user.id_karyawan,
       tipe: togle,
@@ -259,7 +276,7 @@ const EditReservasiLangsung = () => {
         setModal(false);
         setReservasi(newObj);
         setSubTitle(
-          `Reservasi tanggal ${dateShow} sesi ${values.sesi_reservasi} atas nama ${values.nama_customer} dengan Nomor Meja ${values.nomor_meja}  berhasil ditambahkan pada ${dateShowNow}`
+          `Reservasi tanggal ${dateShow} atas nama ${values.nama_customer} dengan Nomor Meja ${values.nomor_meja}  berhasil diedit pada ${dateShowNow}`
         );
       })
       .catch((err) => {
@@ -278,16 +295,11 @@ const EditReservasiLangsung = () => {
     if (reservasi === null) {
       getReservasi();
     }
-    // console.log('const search');
-    // console.log(search);
-    // console.log('Show Meja ' + user);
 
-    // console.log('SYALALA : ' + localStorage.getItem('token'));
     if (meja === null) {
       getMeja();
       getCustomer();
     }
-    // console.log(meja);
   });
 
   const checkActionCode = async (rule, value, callback) => {
@@ -330,35 +342,10 @@ const EditReservasiLangsung = () => {
     }
   };
 
-  const onChange = (value) => {
-    console.log(`selected ${value}`);
-    const temp = options.filter((i) => {
-      return i.id == value;
-    });
-    const newTemp = temp[0];
-    form.setFieldsValue({
-      nama_customer: newTemp.nama_customer,
-      telepon: newTemp.telepon.slice(1),
-      email: newTemp.email,
-    });
-  };
-
   const onCancelModal = () => {
     setModal(false);
     form.resetFields();
   };
-
-  function onBlur() {
-    console.log('blur');
-  }
-
-  function onFocus() {
-    console.log('focus');
-  }
-
-  function onSearch(val) {
-    console.log('search:', val);
-  }
 
   return (
     <div style={{ padding: '25px 30px' }}>
@@ -366,7 +353,7 @@ const EditReservasiLangsung = () => {
         <Result
           className='result'
           status='success'
-          title='Reservasi berhasil ditambahkan!'
+          title='Reservasi berhasil diedit!'
           subTitle={subTitle}
           extra={[
             <Button
@@ -379,29 +366,50 @@ const EditReservasiLangsung = () => {
               Cetak Qr Pemesanan
             </Button>,
             <Modal
+              style={{ top: 30 }}
               visible={modalQr}
               title='Cetak QR Code Pesanan'
               onCancel={handleCancel}
               footer={[]}
-              width={400}>
+              width={500}>
               <h1 style={{ textAlign: 'center' }}>
-                <QRCode
-                  loading={loading}
-                  fgColor='#1F1F1F'
-                  style={{
-                    textAlign: 'center',
-                    marginBottom: '15px',
-                  }}
-                  value={objectQr}
+                <img
+                  style={{ width: '32%', marginBottom: '5px' }}
+                  src={LogoQR}
+                  alt=''
                 />
+                <br />
+                {loadingQr && <Spin indicator={antIcon} />}
+                <br />
+                {!loadingQr && (
+                  <>
+                    <QRCode
+                      fgColor='#1F1F1F'
+                      style={{
+                        width: '100px',
+                        textAlign: 'center',
+                        marginBottom: '10px',
+                      }}
+                      value={objectQr}
+                    />
+                    <br />
+                    <p style={{ fontSize: '20px', marginTop: '35px' }}>
+                      <b>{printed}</b>
+                      <span style={{ fontSize: '15px' }}>
+                        <br />
+                        Printed by {localStorage.getItem('nama')}
+                      </span>
+                    </p>
+                  </>
+                )}
                 <Button
                   type='primary'
                   onClick={onSubmitQr}
                   loading={loading}
                   style={{
                     borderRadius: '5px',
-                    margin: '10px',
-                    width: '75%',
+                    margin: '15px',
+                    width: '60%',
                   }}>
                   Cetak QR Code
                 </Button>

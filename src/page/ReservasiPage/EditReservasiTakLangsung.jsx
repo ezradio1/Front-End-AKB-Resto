@@ -29,6 +29,7 @@ import { UserContext } from '../../context/UserContext';
 import Moment from 'moment';
 import { Subtitles } from '@material-ui/icons';
 import moment from 'moment';
+import LogoQR from '../../asset/logo/akb-logo-full.png';
 
 const layout = {
   labelCol: { span: 8 },
@@ -70,6 +71,9 @@ const EditReservasiTakLangsung = () => {
   const [modalTanggal, setmodalTanggal] = useState(false);
   const [objectQr, setobjectQr] = useState('');
   const [tempModal, setTempModal] = useState(false);
+  const [loadingQr, setLoadingQr] = useState(false);
+  const [printed, setPrinted] = useState(null);
+
   const { userId } = useParams();
 
   //Simpan Data Tanggal Sesi
@@ -91,32 +95,36 @@ const EditReservasiTakLangsung = () => {
     setmodalQr(false);
   };
 
-  const openModalQr = (id) => {
+  const openModalQr = () => {
     console.log('data qr');
+    setLoading(false);
+    let newObj = { id_reservasi: userId };
     setmodalQr(true);
-    setobjectQr(JSON.stringify(reservasi));
-  };
-
-  const onSubmitQr = (idEdit) => {
-    let newObj;
-    this.setState({ loading: true });
+    setLoadingQr(true);
     myAxios
-      .put(`updateStatusReservasi/${this.state.idEdit}`, newObj, {
+      .post(`transaksi`, newObj, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('token'),
         },
       })
       .then((res) => {
-        message.success('Berhasil Cetak Qr Pemesanan');
         let data = res.data.data;
-        setmodalQr(false);
-        setobjectQr(JSON.stringify(reservasi));
-        setLoading(false);
+        console.log('data reservasi');
+        console.log(data);
+        let objQr = {
+          id_transaksi: data.id_transaksi,
+          nomor_meja: data.nomor_meja,
+          nama_customer: data.nama_customer,
+          tanggal: data.tanggal,
+        };
+        setLoadingQr(false);
+        setobjectQr(JSON.stringify(objQr));
+        setPrinted(data.printed);
       })
       .catch((err) => {
-        message.error(
-          'Cetak Qr Pemesanan Gagal : ' + err.response.data.message
-        );
+        setLoadingQr(false);
+        message.error('Cetak QR Pemesanan Gagal');
+        setmodalQr(false);
       });
   };
 
@@ -291,6 +299,28 @@ const EditReservasiTakLangsung = () => {
     console.log('Failed:', errorInfo);
   };
 
+  const onSubmitQr = () => {
+    let newObj;
+    setLoading(true);
+
+    myAxios
+      .put(`updateStatusReservasi/${userId}`, newObj, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token'),
+        },
+      })
+      .then((res) => {
+        message.success('Berhasil Cetak Qr Pemesanan');
+        setmodalQr(false);
+        setLoading(false);
+      })
+      .catch((err) => {
+        message.error(
+          'Cetak Qr Pemesanan Gagal : ' + err.response.data.message
+        );
+      });
+  };
+
   const getReservasi = () => {
     myAxios
       .get(`showReservasi/${userId}`, {
@@ -412,18 +442,6 @@ const EditReservasiTakLangsung = () => {
     setmodalTanggal(false);
   };
 
-  function onBlur() {
-    console.log('blur');
-  }
-
-  function onFocus() {
-    console.log('focus');
-  }
-
-  function onSearch(val) {
-    console.log('search:', val);
-  }
-
   const onChangeTgl = (evt) => {
     setTglSesi({
       tanggal_reservasi: evt,
@@ -461,29 +479,50 @@ const EditReservasiTakLangsung = () => {
               Cetak Qr Pemesanan
             </Button>,
             <Modal
+              style={{ top: 30 }}
               visible={modalQr}
               title='Cetak QR Code Pesanan'
               onCancel={handleCancel}
               footer={[]}
-              width={400}>
+              width={500}>
               <h1 style={{ textAlign: 'center' }}>
-                <QRCode
-                  loading={loading}
-                  fgColor='#1F1F1F'
-                  style={{
-                    textAlign: 'center',
-                    marginBottom: '15px',
-                  }}
-                  value={objectQr}
+                <img
+                  style={{ width: '32%', marginBottom: '5px' }}
+                  src={LogoQR}
+                  alt=''
                 />
+                <br />
+                {loadingQr && <Spin indicator={antIcon} />}
+                <br />
+                {!loadingQr && (
+                  <>
+                    <QRCode
+                      fgColor='#1F1F1F'
+                      style={{
+                        width: '100px',
+                        textAlign: 'center',
+                        marginBottom: '10px',
+                      }}
+                      value={objectQr}
+                    />
+                    <br />
+                    <p style={{ fontSize: '20px', marginTop: '35px' }}>
+                      <b>{printed}</b>
+                      <span style={{ fontSize: '15px' }}>
+                        <br />
+                        Printed by {localStorage.getItem('nama')}
+                      </span>
+                    </p>
+                  </>
+                )}
                 <Button
                   type='primary'
                   onClick={onSubmitQr}
                   loading={loading}
                   style={{
                     borderRadius: '5px',
-                    margin: '10px',
-                    width: '75%',
+                    margin: '15px',
+                    width: '60%',
                   }}>
                   Cetak QR Code
                 </Button>
