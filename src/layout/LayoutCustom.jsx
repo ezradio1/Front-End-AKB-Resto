@@ -198,11 +198,7 @@ const LayoutCustom = () => {
                       }}>
                       {/* <ClockCircleOutlined /> */}
 
-                      <Clock
-                        format={'HH:mm:ss'}
-                        ticking={true}
-                        timezone={'ID'}
-                      />
+                      <Clock format={'HH:mm:ss'} ticking={true} />
                     </span>
                   </>
                 )}

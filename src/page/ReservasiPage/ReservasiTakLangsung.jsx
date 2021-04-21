@@ -793,7 +793,7 @@ const ReservasiTakLangsung = () => {
               </Form.Item>
             </Form>
           </Modal>
-          <showEmpty />
+
           {!meja && (
             <h1
               style={{

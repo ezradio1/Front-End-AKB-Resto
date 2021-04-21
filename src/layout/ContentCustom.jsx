@@ -1,4 +1,4 @@
-import React, { Component, useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Layout } from 'antd';
 import {
   BrowserRouter as Router,
@@ -131,20 +131,13 @@ const ContentCustom = () => {
     }
   };
 
-  const ChefRoute = ({ ...props }) => {
+  const OMWaiterRoute = ({ ...props }) => {
     if (!user) {
       return <Redirect to='/login' />;
-    } else if (user.jabatan === 'Chef') {
-      return <Route {...props} />;
-    } else {
-      return <Redirect to='/' />;
-    }
-  };
-
-  const WaiterRoute = ({ ...props }) => {
-    if (!user) {
-      return <Redirect to='/login' />;
-    } else if (user.jabatan === 'Waiter') {
+    } else if (
+      user.jabatan === 'Waiter' ||
+      user.jabatan === 'Operational Manager'
+    ) {
       return <Route {...props} />;
     } else {
       return <Redirect to='/' />;
@@ -209,8 +202,8 @@ const ContentCustom = () => {
         component={ReservasiTakLangsung}
       />
 
-      <ChefRoute exact path='/pesananChef' component={DaftarPesananChef} />
-      <WaiterRoute
+      <OMChefRoute exact path='/pesananChef' component={DaftarPesananChef} />
+      <OMWaiterRoute
         exact
         path='/pesananWaiter'
         component={DaftarPesananWaiter}

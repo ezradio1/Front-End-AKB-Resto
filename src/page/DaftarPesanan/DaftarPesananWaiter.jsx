@@ -108,6 +108,12 @@ class DaftarPesananWaiter extends Component {
         });
         console.log('Data Bahan = ');
         console.log(res.data.data);
+      })
+      .catch((err) => {
+        this.setState({
+          loading: false,
+        });
+        message.info(err.response.data.message);
       });
 
     console.log(this.state.pesanan);
@@ -139,7 +145,7 @@ class DaftarPesananWaiter extends Component {
         });
         this.setState({ pesanan: filter });
         console.log(res);
-        message.success(res.data.data.nama_menu + ' berhasil diupdate!');
+        message.success('Pesanan berhasil diupdate!');
       })
       .catch((err) => {
         message.error('Gagal Menghapus : ' + err);
@@ -256,22 +262,22 @@ class DaftarPesananWaiter extends Component {
         sorter: (a, b) => a.jumlah.length - b.jumlah.length,
         ellipsis: true,
       },
-      {
-        title: 'Status Pesanan',
-        dataIndex: 'status_pesanan',
-        key: 'status_pesanan',
-        filters: [
-          { text: 'Gram', value: 'gram' },
-          { text: 'Mililiter', value: 'ml' },
-          { text: 'Botol', value: 'botol' },
-        ],
-        filteredValue: filteredInfo.status_pesanan || null,
-        onFilter: (value, record) => record.status_pesanan.includes(value),
-        sorter: (a, b) => a.status_pesanan.length - b.status_pesanan.length,
-      },
+      // {
+      //   title: 'Status Pesanan',
+      //   dataIndex: 'status_pesanan',
+      //   key: 'status_pesanan',
+      //   filters: [
+      //     { text: 'Gram', value: 'gram' },
+      //     { text: 'Mililiter', value: 'ml' },
+      //     { text: 'Botol', value: 'botol' },
+      //   ],
+      //   filteredValue: filteredInfo.status_pesanan || null,
+      //   onFilter: (value, record) => record.status_pesanan.includes(value),
+      //   sorter: (a, b) => a.status_pesanan.length - b.status_pesanan.length,
+      // },
       {
         align: 'center',
-        title: 'Action',
+        title: 'Aksi',
         dataIndex: 'id',
         key: 'id',
 
@@ -288,7 +294,9 @@ class DaftarPesananWaiter extends Component {
                 onConfirm={() => this.updateStatus(dataIndex)}
                 okText='Yes'
                 cancelText='No'>
-                <CloudUploadOutlined twoToneColor='#d94a4b' />
+                <Button type='primary'>Pesanan Siap</Button>
+
+                {/* <CloudUploadOutlined twoToneColor='#d94a4b' /> */}
               </Popconfirm>
             </Tooltip>
           </div>
@@ -304,7 +312,7 @@ class DaftarPesananWaiter extends Component {
             color: '#001529',
             textTransform: 'uppercase',
           }}>
-          <strong>daftar pesanan pelanggan</strong>
+          <strong>pesanan siap antar</strong>
         </h1>
         <div
           style={{
@@ -322,7 +330,7 @@ class DaftarPesananWaiter extends Component {
         </Space>
         <Table
           loading={this.state.loading}
-          loadingIndicator={antIcon}
+          // loadingIndicator={antIcon}
           scroll={{ x: 900, y: 1000 }}
           columns={columns}
           dataSource={this.state.pesanan}

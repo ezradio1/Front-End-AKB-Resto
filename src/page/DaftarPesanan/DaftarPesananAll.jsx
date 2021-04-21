@@ -206,7 +206,7 @@ class DaftarPesananAll extends Component {
         });
         this.setState({ pesanan: filter });
         console.log(res);
-        message.success(res.data.data.nama_menu + ' berhasil diupdate!');
+        message.success('Pesanan berhasil diupdate!');
       })
       .catch((err) => {
         message.error('Gagal Menghapus : ' + err);

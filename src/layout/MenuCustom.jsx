@@ -118,6 +118,28 @@ class MenuCustom extends Component {
           </Menu.Item>
         )}
 
+        {this.state.jabatan === 'Operational Manager' && (
+          <SubMenu
+            key='sub6'
+            icon={<OrderedListOutlined />}
+            title='Daftar Pesanan'>
+            <Menu.Item
+              key='20'
+              style={{ margin: '0', backgroundColor: '#1F1F1F' }}>
+              <Link className='link' to='/pesananChef'>
+                Pesanan Antre Masak
+              </Link>
+            </Menu.Item>
+            <Menu.Item
+              key='21'
+              style={{ margin: '0', backgroundColor: '#1F1F1F' }}>
+              <Link className='link' to='/PesananWaiter'>
+                Pesanan Siap Antar
+              </Link>
+            </Menu.Item>
+          </SubMenu>
+        )}
+
         {(this.state.jabatan === 'Operational Manager' ||
           this.state.jabatan === 'Cashier') && (
           <Menu.Item
@@ -126,17 +148,6 @@ class MenuCustom extends Component {
             style={{ margin: '0', backgroundColor: '#1F1F1F' }}>
             <Link className='link' to='/showTable'>
               Transaksi
-            </Link>
-          </Menu.Item>
-        )}
-
-        {this.state.jabatan === 'Operational Manager' && (
-          <Menu.Item
-            key='8'
-            icon={<OrderedListOutlined />}
-            style={{ margin: '0', backgroundColor: '#1F1F1F' }}>
-            <Link className='link' to='/daftarPesanan'>
-              Daftar Pesanan
             </Link>
           </Menu.Item>
         )}
