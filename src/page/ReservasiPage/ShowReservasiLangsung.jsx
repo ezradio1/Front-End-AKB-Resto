@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { Link, BrowserRouter as Route, Redirect } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { Component } from "react";
+import { Link, BrowserRouter as Route, Redirect } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 import {
   Input,
   Table,
@@ -15,28 +15,23 @@ import {
   Empty,
   Spin,
   Tooltip,
-} from 'antd';
-import QRCode from 'react-qr-code';
-import moment from 'moment';
-import Moment from 'moment';
+} from "antd";
+import QRCode from "react-qr-code";
+import moment from "moment";
+import Moment from "moment";
 import {
   SearchOutlined,
   DeleteTwoTone,
   EditTwoTone,
   LoadingOutlined,
   QrcodeOutlined,
-} from '@ant-design/icons';
-import { UserContext } from '../../context/UserContext';
-import myAxios from '../../myAxios';
-import LogoQR from '../../asset/logo/akb-logo-full.png';
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+  ScanOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
+import { UserContext } from "../../context/UserContext";
+import myAxios from "../../myAxios";
+import LogoQR from "../../asset/logo/akb-logo-full.png";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -53,16 +48,16 @@ class ShowReservasiLangsung extends Component {
       filteredInfo: null,
       sortedInfo: null,
       idEdit: null,
-      searchText: '',
-      searchedColumn: '',
-      judulModal: '',
-      buttonModal: '',
+      searchText: "",
+      searchedColumn: "",
+      judulModal: "",
+      buttonModal: "",
       loading: false,
       validated: false,
       modalQr: false,
-      objectQr: '',
+      objectQr: "",
       loadingQr: false,
-      printed: '',
+      printed: "",
       loadingTable: null,
       cekStatus: false,
     };
@@ -71,15 +66,15 @@ class ShowReservasiLangsung extends Component {
   static contextType = UserContext;
 
   onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+    console.log("Failed:", errorInfo);
   };
 
   EditRoute = ({ ...props }) => {
     let filter = this.state.reservasi.filter((el) => {
       return el.id === this.state.idEdit;
     });
-    if (filter[0].status === 'Selesai') {
-      message.error('Tidak Bisa Diedit');
+    if (filter[0].status === "Selesai") {
+      message.error("Tidak Bisa Diedit");
     } else {
       return <Route {...props} />;
     }
@@ -96,7 +91,7 @@ class ShowReservasiLangsung extends Component {
     const tanggal = evt._d;
     console.log(tanggal);
     this.setState({
-      tanggal: Moment(tanggal).format('YYYY-MM-DD'),
+      tanggal: Moment(tanggal).format("YYYY-MM-DD"),
     });
   };
 
@@ -111,7 +106,7 @@ class ShowReservasiLangsung extends Component {
       return el.id === index;
     });
     let data_reservasi = filter[0];
-    if (data_reservasi.status === 'Selesai') {
+    if (data_reservasi.status === "Selesai") {
       this.setState({ cekStatus: true });
       this.setState({ idEdit: index.id });
       message.error('Data Reservasi "Selesai" tidak bisa diedit!');
@@ -122,13 +117,13 @@ class ShowReservasiLangsung extends Component {
   };
 
   handleChange = (pagination, filters, sorter) => {
-    console.log('Various parameters', pagination, filters, sorter);
+    console.log("Various parameters", pagination, filters, sorter);
     this.setState({
       filteredInfo: filters,
       sortedInfo: null,
-      sortDirection: 'asc',
-      searchText: '',
-      searchedColumn: '',
+      sortDirection: "asc",
+      searchText: "",
+      searchedColumn: "",
     });
   };
 
@@ -143,14 +138,14 @@ class ShowReservasiLangsung extends Component {
     myAxios
       .get(`showReservasiLangsung`, {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
       })
       .then((res) => {
         const data = res.data.data;
         data.map((el) => {
           el.tanggal_reservasi = Moment(el.tanggal_reservasi).format(
-            'D MMM YY'
+            "D MMM YY"
           );
         });
         this.setState({
@@ -158,7 +153,7 @@ class ShowReservasiLangsung extends Component {
           loading: false,
           loadingTable: false,
         });
-        console.log('Data Reservasi = ');
+        console.log("Data Reservasi = ");
         console.log(res.data.data);
       });
 
@@ -178,20 +173,20 @@ class ShowReservasiLangsung extends Component {
       return el.id === param;
     });
     let data_reservasi = filter[0];
-    console.log('hay');
+    console.log("hay");
     console.log(param);
-    if (data_reservasi.status === 'Selesai') {
+    if (data_reservasi.status === "Selesai") {
       this.setState({ cekStatus: true });
       this.setState({ idEdit: param });
       message.error('Data Reservasi "Selesai" tidak bisa dihapus!');
     } else {
-      const mytoken = localStorage.getItem('token');
-      console.log('Delete Item ' + param + mytoken);
+      const mytoken = localStorage.getItem("token");
+      console.log("Delete Item " + param + mytoken);
       let newObj = {};
       myAxios
         .put(`deleteReservasi/${param}`, newObj, {
           headers: {
-            Authorization: 'Bearer ' + mytoken,
+            Authorization: "Bearer " + mytoken,
           },
         })
         .then((res) => {
@@ -200,10 +195,10 @@ class ShowReservasiLangsung extends Component {
           });
           this.setState({ reservasi: filter });
           console.log(res);
-          message.success('Data Reservasi berhasil dihapus!');
+          message.success("Data Reservasi berhasil dihapus!");
         })
         .catch((err) => {
-          message.error('Gagal Menghapus : ' + err);
+          message.error("Gagal Menghapus : " + err);
         });
       this.setState({ cekStatus: false });
     }
@@ -229,28 +224,30 @@ class ShowReservasiLangsung extends Component {
           onPressEnter={() =>
             this.handleSearch(selectedKeys, confirm, dataIndex)
           }
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
         />
         <Space>
           <Button
-            type='primary'
+            type="primary"
             onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
-            size='small'
-            style={{ width: 90 }}>
+            size="small"
+            style={{ width: 90 }}
+          >
             Search
           </Button>
           <Button
             onClick={() => this.handleReset(clearFilters)}
-            size='small'
-            style={{ width: 90 }}>
+            size="small"
+            style={{ width: 90 }}
+          >
             Reset
           </Button>
         </Space>
       </div>
     ),
     filterIcon: (filtered) => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
@@ -258,7 +255,7 @@ class ShowReservasiLangsung extends Component {
             .toString()
             .toLowerCase()
             .includes(value.toLowerCase())
-        : '',
+        : "",
     onFilterDropdownVisibleChange: (visible) => {
       if (visible) {
         setTimeout(() => this.searchInput.select(), 100);
@@ -269,11 +266,11 @@ class ShowReservasiLangsung extends Component {
   handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     console.log(
-      'data:' +
+      "data:" +
         selectedKeys[0] +
-        'confirmnya : ' +
+        "confirmnya : " +
         confirm +
-        'datin :' +
+        "datin :" +
         dataIndex
     );
     this.setState({
@@ -284,7 +281,7 @@ class ShowReservasiLangsung extends Component {
 
   handleReset = (clearFilters) => {
     clearFilters();
-    this.setState({ searchText: '' });
+    this.setState({ searchText: "" });
   };
 
   openModalQr = (id) => {
@@ -296,7 +293,7 @@ class ShowReservasiLangsung extends Component {
     myAxios
       .post(`transaksi`, newObj, {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
       })
       .then((res) => {
@@ -314,7 +311,7 @@ class ShowReservasiLangsung extends Component {
         });
       })
       .catch((err) => {
-        message.error('Tambah Bahan Gagal : ' + err.response.data.message);
+        message.error("Tambah Bahan Gagal : " + err.response.data.message);
         this.setState({
           loadingQr: false,
         });
@@ -327,11 +324,11 @@ class ShowReservasiLangsung extends Component {
     myAxios
       .put(`updateStatusReservasi/${this.state.idEdit}`, newObj, {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
       })
       .then((res) => {
-        message.success('Berhasil Cetak Qr Pemesanan');
+        message.success("Berhasil Cetak Qr Pemesanan");
         let data = res.data.data;
         this.setState({
           modalQr: false,
@@ -345,7 +342,7 @@ class ShowReservasiLangsung extends Component {
           loading: false,
         });
         message.error(
-          'Cetak Qr Pemesanan Gagal : ' + err.response.data.message
+          "Cetak Qr Pemesanan Gagal : " + err.response.data.message
         );
       });
   };
@@ -356,103 +353,107 @@ class ShowReservasiLangsung extends Component {
     filteredInfo = filteredInfo || {};
     const columns = [
       {
-        title: 'Tanggal',
-        dataIndex: 'tanggal_reservasi',
-        key: 'tanggal_reservasi',
-        ...this.getColumnSearchProps('tanggal_reservasi'),
+        title: "Tanggal",
+        dataIndex: "tanggal_reservasi",
+        key: "tanggal_reservasi",
+        ...this.getColumnSearchProps("tanggal_reservasi"),
         filteredValue: filteredInfo.tanggal_reservasi || null,
         sorter: (a, b) =>
           a.tanggal_reservasi.length - b.tanggal_reservasi.length,
         ellipsis: true,
       },
       {
-        title: 'Status',
-        dataIndex: 'status',
-        key: 'status',
+        title: "Status",
+        dataIndex: "status",
+        key: "status",
         filters: [
-          { text: 'Pending', value: 'Pending' },
-          { text: 'Selesai', value: 'Selesai' },
+          { text: "Pending", value: "Pending" },
+          { text: "Selesai", value: "Selesai" },
         ],
         filteredValue: filteredInfo.status || null,
         onFilter: (value, record) => record.status.includes(value),
         sorter: (a, b) => a.status.length - b.status.length,
         render: (status) => (
           <>
-            <Tag color={status === 'Pending' ? 'blue' : 'green'}>
+            <Tag color={status === "Pending" ? "blue" : "green"}>
               {status.toUpperCase()}
             </Tag>
           </>
         ),
       },
       {
-        title: 'Pelanggan',
-        dataIndex: 'nama_customer',
-        key: 'nama_customer',
-        ...this.getColumnSearchProps('nama_customer'),
+        title: "Pelanggan",
+        dataIndex: "nama_customer",
+        key: "nama_customer",
+        ...this.getColumnSearchProps("nama_customer"),
         filteredValue: filteredInfo.nama_customer || null,
         onFilter: (value, record) => record.nama_customer.includes(value),
         sorter: (a, b) => a.nama_customer.length - b.nama_customer.length,
         ellipsis: true,
       },
       {
-        title: 'Meja',
-        dataIndex: 'nomor_meja',
-        key: 'nomor_meja',
-        ...this.getColumnSearchProps('nomor_meja'),
+        title: "Meja",
+        dataIndex: "nomor_meja",
+        key: "nomor_meja",
+        ...this.getColumnSearchProps("nomor_meja"),
         filteredValue: filteredInfo.nomor_meja || null,
         onFilter: (value, record) => record.nomor_meja.includes(value),
         sorter: (a, b) => a.nomor_meja.length - b.nomor_meja.length,
       },
       {
-        title: 'Karyawan',
-        dataIndex: 'nama_karyawan',
-        key: 'nama_karyawan',
-        ...this.getColumnSearchProps('nama_karyawan'),
+        title: "Karyawan",
+        dataIndex: "nama_karyawan",
+        key: "nama_karyawan",
+        ...this.getColumnSearchProps("nama_karyawan"),
         filteredValue: filteredInfo.nama_karyawan || null,
         onFilter: (value, record) => record.nama_karyawan.includes(value),
         sorter: (a, b) => a.nama_karyawan.length - b.nama_karyawan.length,
       },
       {
-        align: 'center',
-        title: 'Action',
-        dataIndex: 'id',
-        key: 'id',
+        align: "center",
+        title: "Action",
+        dataIndex: "id",
+        key: "id",
 
         render: (dataIndex) => (
           <div>
             <Tooltip
-              placement='bottom'
-              title='Cetak Qr'
-              color='#1f1f1f'
-              key='white'>
+              placement="bottom"
+              title="Cetak Qr"
+              color="#1f1f1f"
+              key="white"
+            >
               <QrcodeOutlined
-                style={{ marginRight: '5px' }}
+                style={{ marginRight: "5px" }}
                 onClick={() => this.openModalQr(dataIndex)}
               />
             </Tooltip>
 
             <Tooltip
-              placement='bottom'
-              title='Edit Reservasi'
-              color='#1f1f1f'
-              key='white'>
-              <EditTwoTone
-                twoToneColor='#d94a4b'
-                style={{ marginRight: '5px' }}
-                onClick={() => this.editReservasi(dataIndex)}></EditTwoTone>
+              placement="bottom"
+              title="Edit Reservasi"
+              color="#1f1f1f"
+              key="white"
+            >
+              <EditOutlined
+                style={{ marginRight: "5px" }}
+                onClick={() => this.editReservasi(dataIndex)}
+              ></EditOutlined>
             </Tooltip>
             <Tooltip
-              placement='bottom'
-              title='Hapus Reservasi'
-              color='#1f1f1f'
-              key='white'>
+              placement="bottom"
+              title="Hapus Reservasi"
+              color="#1f1f1f"
+              key="white"
+            >
               <Popconfirm
-                placement='left'
-                title={'Apakah anda yakin ingin menghapus ?'}
+                placement="left"
+                title={"Apakah anda yakin ingin menghapus ?"}
                 onConfirm={() => this.DeleteItem(dataIndex)}
-                okText='Yes'
-                cancelText='No'>
-                <DeleteTwoTone twoToneColor='#d94a4b' />
+                okText="Yes"
+                cancelText="No"
+              >
+                <DeleteOutlined twoToneColor="#000000" />
               </Popconfirm>
             </Tooltip>
           </div>
@@ -461,19 +462,20 @@ class ShowReservasiLangsung extends Component {
     ];
 
     return (
-      <div style={{ padding: '25px 30px' }}>
+      <div style={{ padding: "25px 30px" }}>
         <Modal
           style={{ top: 30 }}
           visible={this.state.modalQr}
-          title='Cetak QR Code Pesanan'
+          title="Cetak QR Code Pesanan"
           onCancel={this.handleCancel}
           footer={[]}
-          width={500}>
-          <h1 style={{ textAlign: 'center' }}>
+          width={500}
+        >
+          <h1 style={{ textAlign: "center" }}>
             <img
-              style={{ width: '32%', marginBottom: '5px' }}
+              style={{ width: "32%", marginBottom: "5px" }}
               src={LogoQR}
-              alt=''
+              alt=""
             />
             <br />
             {this.state.loadingQr && <Spin indicator={antIcon} />}
@@ -481,33 +483,34 @@ class ShowReservasiLangsung extends Component {
             {!this.state.loadingQr && (
               <>
                 <QRCode
-                  fgColor='#1F1F1F'
+                  fgColor="#1F1F1F"
                   style={{
-                    width: '100px',
-                    textAlign: 'center',
-                    marginBottom: '10px',
+                    width: "100px",
+                    textAlign: "center",
+                    marginBottom: "10px",
                   }}
                   value={this.state.objectQr}
                 />
                 <br />
-                <p style={{ fontSize: '20px', marginTop: '35px' }}>
+                <p style={{ fontSize: "20px", marginTop: "35px" }}>
                   <b>{this.state.printed}</b>
-                  <span style={{ fontSize: '15px' }}>
+                  <span style={{ fontSize: "15px" }}>
                     <br />
-                    Printed by {localStorage.getItem('nama')}
+                    Printed by {localStorage.getItem("nama")}
                   </span>
                 </p>
               </>
             )}
             <Button
-              type='primary'
+              type="primary"
               onClick={this.onSubmitQr}
               loading={this.state.loading}
               style={{
-                borderRadius: '5px',
-                margin: '15px',
-                width: '60%',
-              }}>
+                borderRadius: "5px",
+                margin: "15px",
+                width: "60%",
+              }}
+            >
               Cetak QR Code
             </Button>
           </h1>
@@ -515,30 +518,34 @@ class ShowReservasiLangsung extends Component {
 
         <h1
           style={{
-            fontSize: 'x-large',
-            color: '#001529',
-            textTransform: 'uppercase',
-          }}>
+            fontSize: "x-large",
+            color: "#001529",
+            textTransform: "uppercase",
+          }}
+        >
           <b>reservasi langsung</b>
         </h1>
         <div
           style={{
-            border: '1px solid #8C98AD',
-            marginTop: '-10px',
-            marginBottom: '15px',
-          }}></div>
+            border: "1px solid #8C98AD",
+            marginTop: "-10px",
+            marginBottom: "15px",
+          }}
+        ></div>
         <Space style={{ marginBottom: 16 }}>
           <Button
-            type='primary'
-            style={{ width: 'auto', borderRadius: '7px' }}
-            onClick={this.clearFilters}>
+            type="primary"
+            style={{ width: "auto", borderRadius: "7px" }}
+            onClick={this.clearFilters}
+          >
             Hapus Filter
           </Button>
           <Button
-            style={{ width: 'auto', borderRadius: '7px' }}
-            type='primary'
-            onClick={this.reservasiLangsung}>
-            <Link className='link' to='showReservasiLangsung/reservasiLangsung'>
+            style={{ width: "auto", borderRadius: "7px" }}
+            type="primary"
+            onClick={this.reservasiLangsung}
+          >
+            <Link className="link" to="showReservasiLangsung/reservasiLangsung">
               Tambah Reservasi
             </Link>
           </Button>
