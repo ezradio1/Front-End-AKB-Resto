@@ -671,19 +671,6 @@ class Transaksi extends Component {
                     </label>
                   </Col>
                 </Row>
-                <Row>
-                  <Col md={12}>
-                    <strong>
-                      <label>Total Harga</label>
-                    </strong>
-                  </Col>
-                  <Col md={2}> : </Col>
-                  <Col md={10}>
-                    <label style={{ color: "grey" }}>
-                      Rp. {this.state.dataDetail.total_harga},00
-                    </label>
-                  </Col>
-                </Row>
                 {this.state.dataDetail.metode_pembayaran === "Non-Tunai" && (
                   <>
                     <Row>
@@ -744,6 +731,60 @@ class Transaksi extends Component {
                     </Row>
                   </>
                 )}
+                <hr style={{ margin: "7px auto" }} />
+                <Row>
+                  <Col md={12}>
+                    <strong>
+                      <label>Total Harga</label>
+                    </strong>
+                  </Col>
+                  <Col md={2}> : </Col>
+                  <Col md={10}>
+                    <label style={{ color: "grey" }}>
+                      Rp. {this.state.dataDetail.total_harga},00
+                    </label>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={12}>
+                    <strong>
+                      <label>Biaya Layanan</label>
+                    </strong>
+                  </Col>
+                  <Col md={2}> : </Col>
+                  <Col md={10}>
+                    <label style={{ color: "grey" }}>
+                      Rp. {this.state.dataDetail.service},00
+                    </label>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={12}>
+                    <strong>
+                      <label>Biaya Pajak</label>
+                    </strong>
+                  </Col>
+                  <Col md={2}> : </Col>
+                  <Col md={10}>
+                    <label style={{ color: "grey" }}>
+                      Rp. {this.state.dataDetail.pajak},00
+                    </label>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={12}>
+                    <strong>
+                      <label>Harga Total</label>
+                    </strong>
+                  </Col>
+                  <Col md={2}> : </Col>
+                  <Col md={10}>
+                    <label style={{ color: "grey" }}>
+                      Rp. {this.state.dataDetail.hargaSetelah},00
+                    </label>
+                  </Col>
+                </Row>
+                <hr style={{ margin: "7px auto" }} />
               </Col>
             </Row>
           </Modal>

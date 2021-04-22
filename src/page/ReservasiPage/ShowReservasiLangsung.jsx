@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Link, BrowserRouter as Route, Redirect } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { renderToString } from "react-dom/server";
+
 import {
   Input,
   Table,
@@ -16,8 +18,11 @@ import {
   Spin,
   Tooltip,
 } from "antd";
+
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
+
 import QRCode from "react-qr-code";
-import moment from "moment";
 import Moment from "moment";
 import {
   SearchOutlined,
@@ -60,6 +65,7 @@ class ShowReservasiLangsung extends Component {
       printed: "",
       loadingTable: null,
       cekStatus: false,
+      no_trans: "",
     };
   }
 
@@ -290,6 +296,7 @@ class ShowReservasiLangsung extends Component {
       modalQr: true,
       loadingQr: true,
     });
+    console.log(this.state.modalQr);
     myAxios
       .post(`transaksi`, newObj, {
         headers: {
@@ -304,6 +311,7 @@ class ShowReservasiLangsung extends Component {
           nama_customer: data.nama_customer,
         };
         this.setState({
+          no_trans: data.nomor_transaksi,
           objectQr: JSON.stringify(objQr),
           idEdit: id,
           loadingQr: false,
@@ -345,6 +353,18 @@ class ShowReservasiLangsung extends Component {
           "Cetak Qr Pemesanan Gagal : " + err.response.data.message
         );
       });
+  };
+
+  generatePdfQr = () => {
+    this.setState({ loading: true });
+    let el = document.getElementById("modalQr");
+    const pdf = new jsPDF("p", "mm", [140, 185]);
+    html2canvas(el, { scale: 1, scrollY: window.scrollY }).then((canvas) => {
+      let img = canvas.toDataURL("image/jpg");
+      pdf.addImage(img, "JPEG", 10, 15, el.style.width, el.style.height);
+      pdf.save("QR_" + this.state.no_trans + ".pdf");
+      this.setState({ loading: false });
+    });
   };
 
   render() {
@@ -464,6 +484,7 @@ class ShowReservasiLangsung extends Component {
     return (
       <div style={{ padding: "25px 30px" }}>
         <Modal
+          id="modalQr"
           style={{ top: 30 }}
           visible={this.state.modalQr}
           title="Cetak QR Code Pesanan"
@@ -471,44 +492,63 @@ class ShowReservasiLangsung extends Component {
           footer={[]}
           width={500}
         >
+          <div id="modalQr">
+            <h1 style={{ textAlign: "center" }}>
+              <img
+                style={{ width: "32%", marginBottom: "5px" }}
+                src={LogoQR}
+                alt=""
+              />
+
+              <br />
+              {this.state.loadingQr && <Spin indicator={antIcon} />}
+              <br />
+              {!this.state.loadingQr && (
+                <>
+                  <QRCode
+                    fgColor="#1F1F1F"
+                    style={{
+                      textAlign: "center",
+                      marginBottom: "10px",
+                    }}
+                    value={this.state.objectQr}
+                  />
+                  <br />
+                  <p
+                    style={{
+                      fontSize: "20px",
+                      marginTop: "35px",
+                      fontFamily: "poppins",
+                    }}
+                  >
+                    <b>{this.state.printed}</b>
+                    <span
+                      style={{
+                        fontSize: "15px",
+                        color: "grey",
+                      }}
+                    >
+                      <br />
+                      Printed by {localStorage.getItem("nama")}
+                    </span>
+                    <hr />
+                    <p>FUN PLACE TO GRILL</p>
+                    <hr />
+                  </p>
+                </>
+              )}
+            </h1>
+          </div>
           <h1 style={{ textAlign: "center" }}>
-            <img
-              style={{ width: "32%", marginBottom: "5px" }}
-              src={LogoQR}
-              alt=""
-            />
-            <br />
-            {this.state.loadingQr && <Spin indicator={antIcon} />}
-            <br />
-            {!this.state.loadingQr && (
-              <>
-                <QRCode
-                  fgColor="#1F1F1F"
-                  style={{
-                    width: "100px",
-                    textAlign: "center",
-                    marginBottom: "10px",
-                  }}
-                  value={this.state.objectQr}
-                />
-                <br />
-                <p style={{ fontSize: "20px", marginTop: "35px" }}>
-                  <b>{this.state.printed}</b>
-                  <span style={{ fontSize: "15px" }}>
-                    <br />
-                    Printed by {localStorage.getItem("nama")}
-                  </span>
-                </p>
-              </>
-            )}
             <Button
               type="primary"
-              onClick={this.onSubmitQr}
+              onClick={this.generatePdfQr}
               loading={this.state.loading}
               style={{
                 borderRadius: "5px",
                 margin: "15px",
                 width: "60%",
+                fontFamily: "poppins",
               }}
             >
               Cetak QR Code
