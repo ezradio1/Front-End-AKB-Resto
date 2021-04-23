@@ -38,7 +38,7 @@ h1 {
   border-radius: 8px;
   background-color: #1f1f1f;
   border-color: aliceblue;
-  width: 'auto';
+  width: "auto";
   margin-right: 4px;
 }
 .ant-btn-primary:hover {
@@ -106,8 +106,8 @@ h1 {
 }
 
 .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled),
-.ant-radio-button-wrapper-checked:not([class*=' ant-radio-button-wrapper-disabled']).ant-radio-button-wrapper:first-child,
-.ant-radio-button-wrapper-checked:not([class*=' ant-radio-button-wrapper-disabled']).ant-radio-button-wrapper:last-child,
+.ant-radio-button-wrapper-checked:not([class*=" ant-radio-button-wrapper-disabled"]).ant-radio-button-wrapper:first-child,
+.ant-radio-button-wrapper-checked:not([class*=" ant-radio-button-wrapper-disabled"]).ant-radio-button-wrapper:last-child,
 .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):first-child {
   color: #d94b4a;
   border-color: #d94b4a;
@@ -125,11 +125,11 @@ h1 {
   border-radius: 10px;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=PT+Sans&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=PT+Sans&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Varela+Round&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap");
 .myContent {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 @media (max-width: 575px) {

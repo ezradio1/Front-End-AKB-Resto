@@ -5,19 +5,16 @@ import {
   Table,
   Button,
   Space,
-  Popconfirm,
   message,
   Modal,
-  Tag,
   Tooltip,
   Row,
   Col,
+  Spin,
 } from "antd";
 
 import {
   SearchOutlined,
-  DeleteTwoTone,
-  EditTwoTone,
   LoadingOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
@@ -26,6 +23,9 @@ import { UserContext } from "../../context/UserContext";
 import myAxios from "../../myAxios";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+const tableLoading = {
+  indicator: <Spin indicator={antIcon} />,
+};
 
 class Transaksi extends Component {
   constructor(props) {
@@ -144,6 +144,9 @@ class Transaksi extends Component {
   };
 
   getTransaksi = () => {
+    this.setState({
+      loading: tableLoading,
+    });
     myAxios
       .get(`showRiwayatTransaksi`, {
         headers: {
@@ -470,7 +473,7 @@ class Transaksi extends Component {
         ellipsis: true,
       },
       {
-        title: "Tanggal Transaksi",
+        title: "Tanggal",
         dataIndex: "tanggal_transaksi",
         key: "tanggal_transaksi",
         ...this.getColumnSearchProps("tanggal_transaksi"),
@@ -480,7 +483,7 @@ class Transaksi extends Component {
         ellipsis: true,
       },
       {
-        title: "Nama Pelanggan",
+        title: "Pelanggan",
         dataIndex: "nama_customer",
         key: "nama_customer",
         ...this.getColumnSearchProps("nama_customer"),
@@ -516,13 +519,14 @@ class Transaksi extends Component {
         filteredValue: filteredInfo.total_harga || null,
         sorter: (a, b) => a.total_harga.length - b.total_harga.length,
         ellipsis: true,
+        width: "10%",
       },
 
       {
-        align: "center",
         title: "",
         dataIndex: "id",
         key: "id",
+        width: "5%",
 
         render: (dataIndex) => (
           <div>
@@ -576,11 +580,12 @@ class Transaksi extends Component {
       <div style={{ padding: "25px 30px" }}>
         {this.state.dataDetail && this.state.detail && (
           <Modal
+            style={{ top: 25 }}
             visible={this.state.modalVisible}
             title={this.state.judulModal}
             onCancel={this.handleCancel}
             footer={[]}
-            width={1500}
+            width={1400}
           >
             <Row>
               <Col md={14}>

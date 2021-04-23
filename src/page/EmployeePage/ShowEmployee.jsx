@@ -1,17 +1,19 @@
-import React, { Component } from 'react';
-import axios from 'axios';
-import { Table, Button, Space, Input, message, Tag } from 'antd';
-import { Link } from 'react-router-dom';
+import React, { Component } from "react";
+import { Table, Button, Space, Input, message, Tag, Spin } from "antd";
+import { Link } from "react-router-dom";
 
 import {
   SearchOutlined,
   LoadingOutlined,
   EditTwoTone,
-} from '@ant-design/icons';
-import { UserContext } from '../../context/UserContext';
-import myAxios from '../../myAxios';
-import Moment from 'moment';
+} from "@ant-design/icons";
+import { UserContext } from "../../context/UserContext";
+import myAxios from "../../myAxios";
+import Moment from "moment";
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+const tableLoading = {
+  indicator: <Spin indicator={antIcon} />,
+};
 
 class ShowEmployee extends Component {
   constructor(props) {
@@ -22,21 +24,21 @@ class ShowEmployee extends Component {
       sortedInfo: null,
       currId: null,
       token: null,
-      searchText: '',
-      searchedColumn: '',
+      searchText: "",
+      searchedColumn: "",
       loading: false,
     };
   }
   static contextType = UserContext;
 
   handleChange = (pagination, filters, sorter) => {
-    console.log('Various parameters', pagination, filters, sorter);
+    console.log("Various parameters", pagination, filters, sorter);
     this.setState({
       filteredInfo: filters,
       sortedInfo: null,
-      sortDirection: 'asc',
-      searchText: '',
-      searchedColumn: '',
+      sortDirection: "asc",
+      searchText: "",
+      searchedColumn: "",
     });
   };
 
@@ -46,48 +48,51 @@ class ShowEmployee extends Component {
 
   componentDidMount() {
     const user = this.context;
-    console.log('CEK ' + user.object);
-    this.setState({ token: localStorage.getItem('token'), loading: true });
-    console.log('SYALALA : ' + localStorage.getItem('token'));
+    console.log("CEK " + user.object);
+    this.setState({ token: localStorage.getItem("token"), loading: true });
+    console.log("SYALALA : " + localStorage.getItem("token"));
     if (this.state.karyawan === null) {
+      this.setState({
+        loading: tableLoading,
+      });
       myAxios
         .get(`showKaryawan`, {
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token'),
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
         })
         .then((res) => {
           const data = res.data.data;
           data.map((el) => {
             el.tanggal_bergabung = Moment(el.tanggal_bergabung).format(
-              'D MMM YY'
+              "DD MMM YY"
             );
           });
           this.setState({
             karyawan: data,
             loading: false,
           });
-          console.log('Data Karyawan = ');
+          console.log("Data Karyawan = ");
           console.log(res.data.data);
         })
         .catch((err) => {
           this.setState({
             loading: false,
           });
-          message.error('Gagal Ambil : ' + err);
-          console.log('error  : ' + err);
+          message.error("Gagal Ambil : " + err);
+          console.log("error  : " + err);
         });
     }
   }
 
   DeleteItem(param) {
-    const mytoken = localStorage.getItem('token');
-    console.log('Delete Item ' + param + mytoken);
+    const mytoken = localStorage.getItem("token");
+    console.log("Delete Item " + param + mytoken);
     let newObj = {};
     myAxios
       .put(`deleteKaryawan/${param}`, newObj, {
         headers: {
-          Authorization: 'Bearer ' + mytoken,
+          Authorization: "Bearer " + mytoken,
         },
       })
       .then((res) => {
@@ -95,10 +100,10 @@ class ShowEmployee extends Component {
           return el.id === param;
         });
         console.log(res);
-        message.success(res.data.data.nama + ' berhasil dinonaktifkan!');
+        message.success(res.data.data.nama + " berhasil dinonaktifkan!");
       })
       .catch((err) => {
-        message.error('Gagal Menghapus : ' + err);
+        message.error("Gagal Menghapus : " + err);
       });
   }
 
@@ -122,28 +127,30 @@ class ShowEmployee extends Component {
           onPressEnter={() =>
             this.handleSearch(selectedKeys, confirm, dataIndex)
           }
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
         />
         <Space>
           <Button
-            type='primary'
+            type="primary"
             onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
-            size='small'
-            style={{ width: 90 }}>
+            size="small"
+            style={{ width: 90 }}
+          >
             Search
           </Button>
           <Button
             onClick={() => this.handleReset(clearFilters)}
-            size='small'
-            style={{ width: 90 }}>
+            size="small"
+            style={{ width: 90 }}
+          >
             Reset
           </Button>
         </Space>
       </div>
     ),
     filterIcon: (filtered) => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
@@ -151,7 +158,7 @@ class ShowEmployee extends Component {
             .toString()
             .toLowerCase()
             .includes(value.toLowerCase())
-        : '',
+        : "",
     onFilterDropdownVisibleChange: (visible) => {
       if (visible) {
         setTimeout(() => this.searchInput.select(), 100);
@@ -162,11 +169,11 @@ class ShowEmployee extends Component {
   handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     console.log(
-      'data:' +
+      "data:" +
         selectedKeys[0] +
-        'confirmnya : ' +
+        "confirmnya : " +
         confirm +
-        'datin :' +
+        "datin :" +
         dataIndex
     );
     this.setState({
@@ -177,7 +184,7 @@ class ShowEmployee extends Component {
 
   handleReset = (clearFilters) => {
     clearFilters();
-    this.setState({ searchText: '' });
+    this.setState({ searchText: "" });
   };
 
   render() {
@@ -186,62 +193,78 @@ class ShowEmployee extends Component {
     filteredInfo = filteredInfo || {};
     const columns = [
       {
-        title: 'Nama',
-        dataIndex: 'nama',
-        key: 'nama',
-        ...this.getColumnSearchProps('nama'),
+        title: "Nama",
+        dataIndex: "nama",
+        key: "nama",
+        ...this.getColumnSearchProps("nama"),
         filteredValue: filteredInfo.nama || null,
         sorter: (a, b) => a.nama.length - b.nama.length,
         ellipsis: true,
       },
       {
-        title: 'Email',
-        dataIndex: 'email',
-        key: 'email',
+        title: "Email",
+        dataIndex: "email",
+        key: "email",
         sorter: (a, b) => a.email.length - b.email.length,
         ellipsis: true,
       },
       {
-        title: 'Gender',
-        dataIndex: 'jenisKelamin',
-        key: 'jenisKelamin',
+        title: "Gender",
+        dataIndex: "jenisKelamin",
+        key: "jenisKelamin",
         filters: [
-          { text: 'Laki-Laki', value: 'Laki-Laki' },
-          { text: 'Perempuan', value: 'Perempuan' },
+          { text: "Laki-Laki", value: "Laki-Laki" },
+          { text: "Perempuan", value: "Perempuan" },
         ],
         filteredValue: filteredInfo.jenisKelamin || null,
         onFilter: (value, record) => record.jenisKelamin.includes(value),
         sorter: (a, b) => a.jenisKelamin.length - b.jenisKelamin.length,
       },
       {
-        title: 'Jabatan',
-        dataIndex: 'jabatan',
-        key: 'jabatan',
+        title: "Jabatan",
+        dataIndex: "jabatan",
+        key: "jabatan",
         filters: [
-          { text: 'Owner', value: 'Owner' },
-          { text: 'Operational Manager', value: 'Operational Manager' },
-          { text: 'Cashier', value: 'Cashier' },
-          { text: 'Chef', value: 'Chef' },
-          { text: 'Waiter', value: 'Waiter' },
+          { text: "Owner", value: "Owner" },
+          { text: "Operational Manager", value: "Operational Manager" },
+          { text: "Cashier", value: "Cashier" },
+          { text: "Chef", value: "Chef" },
+          { text: "Waiter", value: "Waiter" },
         ],
         filteredValue: filteredInfo.jabatan || null,
         onFilter: (value, record) => record.jabatan.includes(value),
         sorter: (a, b) => a.jabatan.length - b.jabatan.length,
         ellipsis: true,
+        width: 170,
+        render(jabatan) {
+          return (
+            <>
+              <Tag
+                color={
+                  jabatan === "Owner" || jabatan === "Operational Manager"
+                    ? "#3F51B5"
+                    : "#f50"
+                }
+              >
+                {jabatan}
+              </Tag>
+            </>
+          );
+        },
       },
       {
-        title: 'Telepon',
-        dataIndex: 'telepon',
-        key: 'telepon',
+        title: "Telepon",
+        dataIndex: "telepon",
+        key: "telepon",
         ellipsis: true,
       },
       {
-        title: 'Status',
-        dataIndex: 'status',
-        key: 'status',
+        title: "Status",
+        dataIndex: "status",
+        key: "status",
         filters: [
-          { text: 'Aktif', value: 'Aktif' },
-          { text: 'Resign', value: 'Resign' },
+          { text: "Aktif", value: "Aktif" },
+          { text: "Resign", value: "Resign" },
         ],
         filteredValue: filteredInfo.status || null,
         onFilter: (value, record) => record.status.includes(value),
@@ -249,33 +272,33 @@ class ShowEmployee extends Component {
         ellipsis: true,
         render: (status) => (
           <>
-            <Tag color={status === 'Resign' ? 'red' : 'blue'}>
-              {status.toUpperCase()}
-            </Tag>
+            <Tag color={status === "Resign" ? "red" : "blue"}>{status}</Tag>
           </>
         ),
       },
       {
-        title: 'Bergabung',
-        dataIndex: 'tanggal_bergabung',
-        key: 'tanggal_bergabung',
-        ...this.getColumnSearchProps('tanggal_bergabung'),
-        filteredValue: filteredInfo.title || null,
-        sorter: (a, b) => a.title.length - b.title.length,
+        title: "Bergabung",
+        dataIndex: "tanggal_bergabung",
+        key: "tanggal_bergabung",
+        ...this.getColumnSearchProps("tanggal_bergabung"),
+        filteredValue: filteredInfo.tanggal_bergabung || null,
+        sorter: (a, b) =>
+          a.tanggal_bergabung.length - b.tanggal_bergabung.length,
         ellipsis: true,
+        width: 160,
       },
       {
-        align: 'center',
-        title: 'Action',
-        dataIndex: 'id',
-        key: 'id',
+        align: "center",
+        title: "Action",
+        dataIndex: "id",
+        key: "id",
 
         render: (dataIndex) => (
           <div>
-            <Link className='link' to={`/editEmployee/${dataIndex}`}>
+            <Link className="link" to={`/editEmployee/${dataIndex}`}>
               <EditTwoTone
-                twoToneColor='#d94a4b'
-                style={{ marginRight: '5px' }}
+                twoToneColor="#d94a4b"
+                style={{ marginRight: "5px" }}
               />
             </Link>
           </div>
@@ -283,26 +306,29 @@ class ShowEmployee extends Component {
       },
     ];
     return (
-      <div style={{ padding: '25px 30px' }}>
+      <div style={{ padding: "25px 30px" }}>
         <h1
           style={{
-            fontSize: 'x-large',
-            color: '#001529',
-            textTransform: 'uppercase',
-          }}>
+            fontSize: "x-large",
+            color: "#001529",
+            textTransform: "uppercase",
+          }}
+        >
           <strong>data karyawan</strong>
         </h1>
         <div
           style={{
-            border: '1px solid #8C98AD',
-            marginTop: '-10px',
-            marginBottom: '15px',
-          }}></div>
+            border: "1px solid #8C98AD",
+            marginTop: "-10px",
+            marginBottom: "15px",
+          }}
+        ></div>
         <Space style={{ marginBottom: 16 }}>
           <Button
-            type='primary'
-            style={{ width: 'auto', borderRadius: '7px' }}
-            onClick={this.clearFilters}>
+            type="primary"
+            style={{ width: "auto", borderRadius: "7px" }}
+            onClick={this.clearFilters}
+          >
             Hapus Filter
           </Button>
         </Space>

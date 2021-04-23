@@ -58,6 +58,7 @@ class ShowReservasiLangsung extends Component {
       judulModal: "",
       buttonModal: "",
       loading: false,
+      loadingAct: false,
       validated: false,
       modalQr: false,
       objectQr: "",
@@ -108,6 +109,7 @@ class ShowReservasiLangsung extends Component {
   };
 
   editReservasi = (index) => {
+    this.setState({ loadingAct: true });
     let filter = this.state.reservasi.filter((el) => {
       return el.id === index;
     });
@@ -115,10 +117,11 @@ class ShowReservasiLangsung extends Component {
     if (data_reservasi.status === "Selesai") {
       this.setState({ cekStatus: true });
       this.setState({ idEdit: index.id });
+      this.setState({ loadingAct: false });
       message.error('Data Reservasi "Selesai" tidak bisa diedit!');
     } else {
       window.location.pathname = `/showReservasiLangsung/editReservasiLangsung/${index}`;
-      this.setState({ cekStatus: false });
+      this.setState({ cekStatus: false, loadingAct: false });
     }
   };
 
@@ -178,12 +181,13 @@ class ShowReservasiLangsung extends Component {
     let filter = this.state.reservasi.filter((el) => {
       return el.id === param;
     });
+    this.setState({ loadingAct: true });
     let data_reservasi = filter[0];
     console.log("hay");
     console.log(param);
     if (data_reservasi.status === "Selesai") {
       this.setState({ cekStatus: true });
-      this.setState({ idEdit: param });
+      this.setState({ idEdit: param, loadingAct: false });
       message.error('Data Reservasi "Selesai" tidak bisa dihapus!');
     } else {
       const mytoken = localStorage.getItem("token");
@@ -199,11 +203,12 @@ class ShowReservasiLangsung extends Component {
           let filter = this.state.reservasi.filter((el) => {
             return el.id !== param;
           });
-          this.setState({ reservasi: filter });
+          this.setState({ reservasi: filter, loadingAct: false });
           console.log(res);
           message.success("Data Reservasi berhasil dihapus!");
         })
         .catch((err) => {
+          this.setState({ loadingAct: false });
           message.error("Gagal Menghapus : " + err);
         });
       this.setState({ cekStatus: false });
@@ -295,6 +300,7 @@ class ShowReservasiLangsung extends Component {
     this.setState({
       modalQr: true,
       loadingQr: true,
+      loadingAct: true,
     });
     console.log(this.state.modalQr);
     myAxios
@@ -316,12 +322,15 @@ class ShowReservasiLangsung extends Component {
           idEdit: id,
           loadingQr: false,
           printed: data.printed,
+          loadingAct: false,
         });
+        this.getReservasi();
       })
       .catch((err) => {
         message.error("Tambah Bahan Gagal : " + err.response.data.message);
         this.setState({
           loadingQr: false,
+          loadingAct: false,
         });
       });
   };
@@ -431,52 +440,58 @@ class ShowReservasiLangsung extends Component {
       },
       {
         align: "center",
-        title: "Action",
+        // title: "Action",
         dataIndex: "id",
         key: "id",
 
         render: (dataIndex) => (
-          <div>
-            <Tooltip
-              placement="bottom"
-              title="Cetak Qr"
-              color="#1f1f1f"
-              key="white"
-            >
-              <QrcodeOutlined
-                style={{ marginRight: "5px" }}
-                onClick={() => this.openModalQr(dataIndex)}
-              />
-            </Tooltip>
+          <>
+            {!this.state.loadingAct && (
+              <div>
+                <Tooltip
+                  placement="bottom"
+                  title="Cetak Qr"
+                  color="#1f1f1f"
+                  key="white"
+                >
+                  <QrcodeOutlined
+                    style={{ marginRight: "5px" }}
+                    onClick={() => this.openModalQr(dataIndex)}
+                  />
+                </Tooltip>
 
-            <Tooltip
-              placement="bottom"
-              title="Edit Reservasi"
-              color="#1f1f1f"
-              key="white"
-            >
-              <EditOutlined
-                style={{ marginRight: "5px" }}
-                onClick={() => this.editReservasi(dataIndex)}
-              ></EditOutlined>
-            </Tooltip>
-            <Tooltip
-              placement="bottom"
-              title="Hapus Reservasi"
-              color="#1f1f1f"
-              key="white"
-            >
-              <Popconfirm
-                placement="left"
-                title={"Apakah anda yakin ingin menghapus ?"}
-                onConfirm={() => this.DeleteItem(dataIndex)}
-                okText="Yes"
-                cancelText="No"
-              >
-                <DeleteOutlined twoToneColor="#000000" />
-              </Popconfirm>
-            </Tooltip>
-          </div>
+                <Tooltip
+                  placement="bottom"
+                  title="Edit Reservasi"
+                  color="#1f1f1f"
+                  key="white"
+                >
+                  <EditTwoTone
+                    twoToneColor="blue"
+                    style={{ marginRight: "5px" }}
+                    onClick={() => this.editReservasi(dataIndex)}
+                  ></EditTwoTone>
+                </Tooltip>
+                <Tooltip
+                  placement="bottom"
+                  title="Hapus Reservasi"
+                  color="#1f1f1f"
+                  key="white"
+                >
+                  <Popconfirm
+                    placement="left"
+                    title={"Apakah anda yakin ingin menghapus ?"}
+                    onConfirm={() => this.DeleteItem(dataIndex)}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <DeleteTwoTone twoToneColor="red" />
+                  </Popconfirm>
+                </Tooltip>
+              </div>
+            )}
+            {this.state.loadingAct && <Spin indicator={antIcon} />}
+          </>
         ),
       },
     ];

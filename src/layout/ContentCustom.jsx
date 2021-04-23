@@ -19,6 +19,7 @@ import AddEmployee from "../page/EmployeePage/AddEmployee";
 import EditEmployee from "../page/EmployeePage/EditEmployee";
 
 import ShowTable from "../page/TablePage/ShowTable";
+import ShowTableOnly from "../page/TablePage/ShowTableOnly";
 
 import ShowCustomer from "../page/CustomerPage/ShowCustomer";
 
@@ -81,7 +82,19 @@ const ContentCustom = () => {
   const OMCashierRoute = ({ ...props }) => {
     if (!user) {
       return <Redirect to="/login" />;
-    } else if (user.jabatan === "Operational Manager") {
+    } else if (
+      user.jabatan === "Operational Manager" ||
+      user.jabatan === "Cashier"
+    ) {
+      return <Route {...props} />;
+    } else {
+      return <Redirect to="/" />;
+    }
+  };
+  const CashierWaiterRoute = ({ ...props }) => {
+    if (!user) {
+      return <Redirect to="/login" />;
+    } else if (user.jabatan === "Waiter" || user.jabatan === "Cashier") {
       return <Route {...props} />;
     } else {
       return <Redirect to="/" />;
@@ -171,6 +184,11 @@ const ContentCustom = () => {
       />
 
       <OMRoute exact path="/showTable" component={ShowTable} />
+      <CashierWaiterRoute
+        exact
+        path="/showTableOnly"
+        component={ShowTableOnly}
+      />
 
       <OMRoute exact path="/showMenu" component={ShowMenu} />
       <OMRoute exact path="/addMenu" component={AddMenu} />

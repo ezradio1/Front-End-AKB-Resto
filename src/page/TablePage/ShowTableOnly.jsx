@@ -14,7 +14,7 @@ import {
   Dropdown,
   Spin,
 } from "antd";
-import "./style.css";
+// import "./style.css";
 import { DownOutlined, LoadingOutlined } from "@ant-design/icons";
 import TableHijau from "../../asset/icon/tableHijau.png";
 import TableMerah from "../../asset/icon/tableMerah.png";
@@ -27,7 +27,7 @@ const tableLoading = {
 };
 const { Search } = Input;
 
-const ShowTable = () => {
+const ShowTableOnly = () => {
   const [user, setUser] = useContext(UserContext);
   const [meja, setMeja] = useState(null);
   const [valNoMeja, setvalNoMeja] = useState(0);
@@ -195,52 +195,6 @@ const ShowTable = () => {
     );
   };
 
-  const DeleteMeja = (val, nomor, status) => {
-    if (status === "Terisi") {
-      message.error("Meja terisi tidak bisa dihapus!");
-    } else {
-      setLoading(true);
-      console.log("Delete Meja = " + val);
-      let newObj;
-      myAxios
-        .put(`deleteMeja/${val}`, newObj, {
-          headers: {
-            Authorization: "Bearer " + mytoken,
-          },
-        })
-        .then((res) => {
-          setLoading(false);
-          message.success("Nomor Meja " + nomor + " berhasil dihapus!");
-          getMeja();
-        })
-        .catch((err) => {
-          setLoading(false);
-          message.error("Hapus Karyawan Gagal : " + err.response.data.message);
-        });
-    }
-  };
-
-  const EditMeja = (val, id) => {
-    console.log("Edit Meja " + val);
-
-    setjudulModal("Edit Data Meja");
-    setbuttonModal("Edit Meja");
-    setVisible(true);
-    setIdMeja(id);
-    setvalNoMeja(parseInt(val));
-    form.setFieldsValue({
-      nomor_meja: parseInt(val),
-    });
-  };
-  const openModal = () => {
-    setVisible(true);
-    setjudulModal("Tambah Data Meja");
-    setbuttonModal("Tambah Meja");
-    form.setFieldsValue({
-      nomor_meja: 0,
-    });
-  };
-
   useEffect(() => {
     console.log("Show Meja " + user);
 
@@ -270,17 +224,8 @@ const ShowTable = () => {
         }}
       ></div>
 
-      <Row align="middle" justify="center" style={{ width: "100%" }}>
-        <Col xs={24} md={4}>
-          <Button
-            type="primary"
-            onClick={openModal}
-            style={{ width: "160px", marginTop: "10px" }}
-          >
-            Tambah Data Meja
-          </Button>
-        </Col>
-        <Col xs={24} md={3}>
+      <Row align="middle" justify="space-between" style={{ width: "100%" }}>
+        <Col xs={24} md={1}>
           <Button
             type="primary"
             onClick={hapusFilter}
@@ -381,44 +326,16 @@ const ShowTable = () => {
           {meja.map((val, index) => {
             return (
               <Col xs={12} md={4} style={{ marginTop: "10px" }}>
-                <div className="flip-card">
-                  <div className="flip-card-inner">
+                <div>
+                  <div className="flip-card">
                     <div className="flip-card-front">
-                      <h1>{val.nomor_meja}</h1>
+                      <h1 style={{ textAlign: "center" }}>{val.nomor_meja}</h1>
                       {val.status !== "Kosong" && (
                         <img src={TableMerah} alt="" />
                       )}
                       {val.status === "Kosong" && (
                         <img src={TableHijau} alt="" />
                       )}
-                    </div>
-                    <div className="flip-card-back">
-                      <div style={{ marginTop: "25%" }} className="myButton">
-                        <Button
-                          type="primary"
-                          style={{
-                            width: "125px",
-                          }}
-                          onClick={() => EditMeja(val.nomor_meja, val.id)}
-                          loading={loading}
-                        >
-                          Ubah Meja
-                        </Button>
-                        <br />
-                        <Button
-                          type="danger"
-                          style={{
-                            width: "125px",
-                            marginTop: "10px",
-                          }}
-                          onClick={() =>
-                            DeleteMeja(val.id, val.nomor_meja, val.status)
-                          }
-                          loading={loading}
-                        >
-                          Hapus Meja
-                        </Button>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -431,4 +348,4 @@ const ShowTable = () => {
   );
 };
 
-export default ShowTable;
+export default ShowTableOnly;

@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import ResizableAntdTable from 'resizable-antd-table';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { Component } from "react";
+import ResizableAntdTable from "resizable-antd-table";
+import "bootstrap/dist/css/bootstrap.min.css";
 import {
   Input,
   Table,
@@ -11,29 +11,25 @@ import {
   Modal,
   Select,
   DatePicker,
-  Tag
-} from 'antd';
+  Tag,
+  Spin,
+} from "antd";
 
-import moment from 'moment';
-import Moment from 'moment';
+import moment from "moment";
+import Moment from "moment";
 import {
   SearchOutlined,
   DeleteTwoTone,
   EditTwoTone,
   LoadingOutlined,
-} from '@ant-design/icons';
-import { UserContext } from '../../context/UserContext';
-import myAxios from '../../myAxios';
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+} from "@ant-design/icons";
+import { UserContext } from "../../context/UserContext";
+import myAxios from "../../myAxios";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+const tableLoading = {
+  indicator: <Spin indicator={antIcon} />,
+};
 
 class ShowBahan extends Component {
   constructor(props) {
@@ -46,19 +42,20 @@ class ShowBahan extends Component {
       filteredInfo: null,
       sortedInfo: null,
       idEdit: null,
-      searchText: '',
-      searchedColumn: '',
-      judulModal: '',
-      buttonModal: '',
+      searchText: "",
+      searchedColumn: "",
+      judulModal: "",
+      buttonModal: "",
       loading: false,
+      loadingAct: false,
       validated: false,
 
       nama_bahan: null,
-      unit: '',
+      unit: "",
 
-      harga: '',
+      harga: "",
       tanggal: null,
-      jumlah: '',
+      jumlah: "",
       suffix: null,
     };
   }
@@ -68,10 +65,10 @@ class ShowBahan extends Component {
   openModal = () => {
     this.setState({
       modalVisible: true,
-      buttonModal: 'Tambah Bahan',
-      judulModal: 'Tambah Data Bahan',
-      nama_bahan: '',
-      unit: '',
+      buttonModal: "Tambah Bahan",
+      judulModal: "Tambah Data Bahan",
+      nama_bahan: "",
+      unit: "",
     });
     console.log(this.state.modalVisible);
   };
@@ -91,7 +88,7 @@ class ShowBahan extends Component {
   };
 
   onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+    console.log("Failed:", errorInfo);
   };
 
   handleChangeInput = (evt) => {
@@ -105,7 +102,7 @@ class ShowBahan extends Component {
     const tanggal = evt._d;
     console.log(tanggal);
     this.setState({
-      tanggal: Moment(tanggal).format('YYYY-MM-DD'),
+      tanggal: Moment(tanggal).format("YYYY-MM-DD"),
     });
   };
 
@@ -115,51 +112,52 @@ class ShowBahan extends Component {
       modalStokVisible: false,
       modalKeluarVisible: false,
       nama_bahan: null,
-      jumlah: '',
-      harga:'',
-      tanggal:null,
-      unit: ''
-
+      jumlah: "",
+      harga: "",
+      tanggal: null,
+      unit: "",
     });
   };
 
   editBahan = (modalVisible, index) => {
-    console.log('id handle  = ' + index);
+    console.log("id handle  = " + index);
     this.setState({
-      nama_bahan: '',
-      unit: '',
+      nama_bahan: "",
+      unit: "",
       idEdit: index,
+      loadingAct: true,
     });
     myAxios
       .get(`showBahan/${index}`, {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
       })
       .then((res) => {
         const data = res.data.data;
         this.setState({
           modalVisible,
-          judulModal: 'Edit Data Bahan',
-          buttonModal: 'Edit Bahan',
+          judulModal: "Edit Data Bahan",
+          buttonModal: "Edit Bahan",
           nama_bahan: data.nama_bahan,
           unit: data.unit,
+          loadingAct: false,
         });
-        console.log('Data Bahan = ');
+        console.log("Data Bahan = ");
         console.log(res.data.data);
       });
 
-    console.log('ID Edit Adalah : ' + this.state.nama_bahan);
+    console.log("ID Edit Adalah : " + this.state.nama_bahan);
   };
 
   handleChange = (pagination, filters, sorter) => {
-    console.log('Various parameters', pagination, filters, sorter);
+    console.log("Various parameters", pagination, filters, sorter);
     this.setState({
       filteredInfo: filters,
       sortedInfo: null,
-      sortDirection: 'asc',
-      searchText: '',
-      searchedColumn: '',
+      sortDirection: "asc",
+      searchText: "",
+      searchedColumn: "",
     });
   };
 
@@ -171,7 +169,7 @@ class ShowBahan extends Component {
     myAxios
       .get(`showBahan`, {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
       })
       .then((res) => {
@@ -180,7 +178,7 @@ class ShowBahan extends Component {
           bahan: data,
           loading: false,
         });
-        console.log('Data Bahan = ');
+        console.log("Data Bahan = ");
         console.log(res.data.data);
       });
 
@@ -188,7 +186,7 @@ class ShowBahan extends Component {
   };
 
   componentDidMount() {
-    this.setState({ loading: true });
+    this.setState({ loading: tableLoading });
     const user = this.context;
     if (this.state.bahan === null) {
       this.getBahan();
@@ -196,25 +194,27 @@ class ShowBahan extends Component {
   }
 
   DeleteItem(param) {
-    const mytoken = localStorage.getItem('token');
-    console.log('Delete Item ' + param + mytoken);
+    const mytoken = localStorage.getItem("token");
+    console.log("Delete Item " + param + mytoken);
+    this.setState({ loadingAct: true });
     let newObj = {};
     myAxios
       .put(`deleteBahan/${param}`, newObj, {
         headers: {
-          Authorization: 'Bearer ' + mytoken,
+          Authorization: "Bearer " + mytoken,
         },
       })
       .then((res) => {
         let filter = this.state.bahan.filter((el) => {
           return el.id !== param;
         });
-        this.setState({ bahan: filter });
+        this.setState({ bahan: filter, loadingAct: false });
         console.log(res);
-        message.success(res.data.data.nama_bahan + ' berhasil dihapus!');
+        message.success(res.data.data.nama_bahan + " berhasil dihapus!");
       })
       .catch((err) => {
-        message.error('Gagal Menghapus : ' + err);
+        this.setState({ loadingAct: false });
+        message.error("Gagal Menghapus : " + err);
       });
   }
 
@@ -238,28 +238,30 @@ class ShowBahan extends Component {
           onPressEnter={() =>
             this.handleSearch(selectedKeys, confirm, dataIndex)
           }
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
         />
         <Space>
           <Button
-            type='primary'
+            type="primary"
             onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
-            size='small'
-            style={{ width: 90 }}>
+            size="small"
+            style={{ width: 90 }}
+          >
             Search
           </Button>
           <Button
             onClick={() => this.handleReset(clearFilters)}
-            size='small'
-            style={{ width: 90 }}>
+            size="small"
+            style={{ width: 90 }}
+          >
             Reset
           </Button>
         </Space>
       </div>
     ),
     filterIcon: (filtered) => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
@@ -267,7 +269,7 @@ class ShowBahan extends Component {
             .toString()
             .toLowerCase()
             .includes(value.toLowerCase())
-        : '',
+        : "",
     onFilterDropdownVisibleChange: (visible) => {
       if (visible) {
         setTimeout(() => this.searchInput.select(), 100);
@@ -278,11 +280,11 @@ class ShowBahan extends Component {
   handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     console.log(
-      'data:' +
+      "data:" +
         selectedKeys[0] +
-        'confirmnya : ' +
+        "confirmnya : " +
         confirm +
-        'datin :' +
+        "datin :" +
         dataIndex
     );
     this.setState({
@@ -293,7 +295,7 @@ class ShowBahan extends Component {
 
   handleReset = (clearFilters) => {
     clearFilters();
-    this.setState({ searchText: '' });
+    this.setState({ searchText: "" });
   };
 
   onChangeTak = (evt) => {
@@ -308,14 +310,14 @@ class ShowBahan extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    console.log('Id = ' + this.state.idEdit);
-    if (this.state.nama_bahan === '' || this.state.unit === '') {
-      message.error('Masukan input yang valid!');
+    console.log("Id = " + this.state.idEdit);
+    if (this.state.nama_bahan === "" || this.state.unit === "") {
+      message.error("Masukan input yang valid!");
     } else {
       if (this.state.idEdit === null) {
         this.setState({ loading: true });
-        console.log('MASUK TAMBAH MENU');
-        console.log('Handle Submit + ' + this.state.nama_bahan);
+        console.log("MASUK TAMBAH MENU");
+        console.log("Handle Submit + " + this.state.nama_bahan);
         let newObj = {
           nama_bahan: this.state.nama_bahan,
           jumlah: 0,
@@ -324,25 +326,26 @@ class ShowBahan extends Component {
         myAxios
           .post(`bahan`, newObj, {
             headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('token'),
+              Authorization: "Bearer " + localStorage.getItem("token"),
             },
           })
           .then((res) => {
-            message.success(newObj.nama_bahan + ' berhasil ditambahkan!');
+            message.success(newObj.nama_bahan + " berhasil ditambahkan!");
             let data = res.data.data;
             this.setState({
               modalVisible: false,
-              nama_bahan: '',
-              unit: '',
+              nama_bahan: "",
+              unit: "",
               loading: false,
               bahan: [...this.state.bahan, data],
             });
           })
           .catch((err) => {
-            message.error('Tambah Bahan Gagal : ' + err.response.data.message);
+            this.setState({ loading: false });
+            message.error("Tambah Bahan Gagal : " + err.response.data.message);
           });
       } else {
-        console.log('MASUK EDIT MENU');
+        console.log("MASUK EDIT MENU");
         this.setState({ loading: true });
         let newObj = {
           nama_bahan: this.state.nama_bahan,
@@ -351,26 +354,27 @@ class ShowBahan extends Component {
         myAxios
           .put(`editBahan/${this.state.idEdit}`, newObj, {
             headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('token'),
+              Authorization: "Bearer " + localStorage.getItem("token"),
             },
           })
           .then((res) => {
-            message.success(newObj.nama_bahan + ' berhasil diubah!');
+            message.success(newObj.nama_bahan + " berhasil diubah!");
             let data = res.data.data;
             const temp = this.state.bahan.filter((i) => {
               return i.id !== data.id;
             });
             this.setState({
               modalVisible: false,
-              nama_bahan: '',
-              unit: '',
+              nama_bahan: "",
+              unit: "",
               idEdit: null,
               loading: false,
             });
             this.getBahan();
           })
           .catch((err) => {
-            message.error('Ubah Bahan Gagal : ' + err.response.data.message);
+            this.setState({ loading: false });
+            message.error("Ubah Bahan Gagal : " + err.response.data.message);
           });
       }
     }
@@ -381,16 +385,16 @@ class ShowBahan extends Component {
 
     if (
       this.state.nama_bahan === null ||
-      this.state.tanggal === '' ||
-      this.state.harga === '' ||
-      this.state.jumlah === ''
+      this.state.tanggal === "" ||
+      this.state.harga === "" ||
+      this.state.jumlah === ""
     ) {
-      message.error('Masukan input yang valid!');
+      message.error("Masukan input yang valid!");
     } else {
       this.setState({
         loading: true,
       });
-      console.log('MASUK TAMBAH STOK MENU');
+      console.log("MASUK TAMBAH STOK MENU");
       const temp = this.state.bahan.filter((i) => {
         return i.nama_bahan == this.state.nama_bahan;
       });
@@ -403,18 +407,18 @@ class ShowBahan extends Component {
       myAxios
         .post(`riwayatBahanMasuk`, newObj, {
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token'),
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
         })
         .then((res) => {
-          message.success(newObj.nama_bahan + ' berhasil tambah stok!');
+          message.success(newObj.nama_bahan + " berhasil tambah stok!");
           let data = res.data.data;
           this.setState({
             modalStokVisible: false,
-            nama_bahan: '',
-            harga: '',
-            jumlah: '',
-            tanggal: '',
+            nama_bahan: "",
+            harga: "",
+            jumlah: "",
+            tanggal: "",
             loading: false,
           });
           this.getBahan();
@@ -424,7 +428,7 @@ class ShowBahan extends Component {
             loading: false,
           });
           message.error(
-            'Tambah Stok Bahan Gagal : ' + err.response.data.message
+            "Tambah Stok Bahan Gagal : " + err.response.data.message
           );
         });
     }
@@ -435,15 +439,15 @@ class ShowBahan extends Component {
 
     if (
       this.state.nama_bahan === null ||
-      this.state.tanggal === '' ||
-      this.state.jumlah === ''
+      this.state.tanggal === "" ||
+      this.state.jumlah === ""
     ) {
-      message.error('Masukan input yang valid!');
+      message.error("Masukan input yang valid!");
     } else {
       this.setState({
         loading: true,
       });
-      console.log('MASUK TAMBAH BAHAN BUANG');
+      console.log("MASUK TAMBAH BAHAN BUANG");
       const temp = this.state.bahan.filter((i) => {
         return i.nama_bahan == this.state.nama_bahan;
       });
@@ -451,22 +455,22 @@ class ShowBahan extends Component {
         tanggal: this.state.tanggal,
         jumlah: this.state.jumlah,
         id_bahan: temp[0].id,
-        status: 'Buang',
+        status: "Buang",
       };
       myAxios
         .post(`riwayatBahanKeluar`, newObj, {
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token'),
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
         })
         .then((res) => {
-          message.success(newObj.nama_bahan + ' berhasil dibuang!');
+          message.success(newObj.nama_bahan + " berhasil dibuang!");
           let data = res.data.data;
           this.setState({
             modalKeluarVisible: false,
-            nama_bahan: '',
-            jumlah: '',
-            tanggal: '',
+            nama_bahan: "",
+            jumlah: "",
+            tanggal: "",
             loading: false,
           });
           this.getBahan();
@@ -476,7 +480,7 @@ class ShowBahan extends Component {
             loading: false,
           });
           message.error(
-            'Tambah Bahan Buang Gagal : ' + err.response.data.message
+            "Tambah Bahan Buang Gagal : " + err.response.data.message
           );
         });
     }
@@ -488,100 +492,109 @@ class ShowBahan extends Component {
     filteredInfo = filteredInfo || {};
     const columns = [
       {
-        title: 'Nama Bahan',
-        dataIndex: 'nama_bahan',
-        key: 'nama_bahan',
-        ...this.getColumnSearchProps('nama_bahan'),
+        title: "Nama Bahan",
+        dataIndex: "nama_bahan",
+        key: "nama_bahan",
+        ...this.getColumnSearchProps("nama_bahan"),
         filteredValue: filteredInfo.nama_bahan || null,
         sorter: (a, b) => a.nama_bahan.length - b.nama_bahan.length,
         ellipsis: true,
       },
       {
-        title: 'Jumlah Stok',
-        dataIndex: 'jumlah',
-        key: 'jumlah',
-        filters: [{ text: 'Bahan Habis', value: 0 }],
+        title: "Jumlah Stok",
+        dataIndex: "jumlah",
+        key: "jumlah",
+        filters: [{ text: "Bahan Habis", value: 0 }],
         filteredValue: filteredInfo.jumlah || null,
         onFilter: (value, record) => record.jumlah == value,
         sorter: (a, b) => a.jumlah.length - b.jumlah.length,
         ellipsis: true,
       },
       {
-        title: 'Unit',
-        dataIndex: 'unit',
-        key: 'unit',
+        title: "Unit",
+        dataIndex: "unit",
+        key: "unit",
         filters: [
-          { text: 'Gram', value: 'gram' },
-          { text: 'Mililiter', value: 'ml' },
-          { text: 'Botol', value: 'botol' },
+          { text: "Gram", value: "gram" },
+          { text: "Mililiter", value: "ml" },
+          { text: "Botol", value: "botol" },
         ],
         filteredValue: filteredInfo.unit || null,
         onFilter: (value, record) => record.unit.includes(value),
         sorter: (a, b) => a.unit.length - b.unit.length,
       },
       {
-        align: 'center',
-        title: 'Action',
-        dataIndex: 'id',
-        key: 'id',
+        align: "center",
+        dataIndex: "id",
+        key: "id",
 
         render: (dataIndex) => (
-          <div>
-            <EditTwoTone
-              twoToneColor='#d94a4b'
-              style={{ marginRight: '5px' }}
-              onClick={() => this.editBahan(true, dataIndex)}
-            />
-            <Popconfirm
-              placement='left'
-              title={'Apakah anda yakin ingin menghapus ?'}
-              onConfirm={() => this.DeleteItem(dataIndex)}
-              okText='Yes'
-              cancelText='No'>
-              <DeleteTwoTone twoToneColor='#d94a4b' />
-            </Popconfirm>
-          </div>
+          <>
+            {!this.state.loadingAct && (
+              <div>
+                <EditTwoTone
+                  twoToneColor="blue"
+                  style={{ marginRight: "5px" }}
+                  onClick={() => this.editBahan(true, dataIndex)}
+                />
+                <Popconfirm
+                  placement="left"
+                  title={"Apakah anda yakin ingin menghapus ?"}
+                  onConfirm={() => this.DeleteItem(dataIndex)}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <DeleteTwoTone twoToneColor="red" />
+                </Popconfirm>
+              </div>
+            )}
+            {this.state.loadingAct && <Spin indicator={antIcon} />}
+          </>
         ),
       },
     ];
 
     return (
-      <div style={{ padding: '25px 30px' }}>
+      <div style={{ padding: "25px 30px" }}>
         <Modal
+          style={{ fontFamily: "poppins" }}
           visible={this.state.modalVisible}
           title={this.state.judulModal}
           onCancel={this.handleCancel}
-          footer={[]}>
+          footer={[]}
+        >
           <form onSubmit={this.handleSubmit}>
             <label>Nama Bahan</label>
             <Input
-              placeholder='Nama Bahan'
-              name='nama_bahan'
+              placeholder="Nama Bahan"
+              name="nama_bahan"
               value={this.state.nama_bahan}
               onChange={this.handleChangeInput}
-              autoComplete='off'
+              autoComplete="off"
             />
-            <label style={{ marginTop: '15px' }}>Unit Bahan</label>
+            <label style={{ marginTop: "15px" }}>Unit Bahan</label>
             <Input
-              placeholder='Unit'
-              name='unit'
+              placeholder="Unit"
+              name="unit"
               value={this.state.unit}
               onChange={this.handleChangeInput}
-              autoComplete='off'
+              autoComplete="off"
             />
             <Button
               loading={this.state.loading}
-              type='primary'
+              type="primary"
               style={{
-                marginTop: '20px',
-                width: '100%',
-              }}>
+                marginTop: "20px",
+                width: "100%",
+              }}
+            >
               <button
                 style={{
-                  width: '100%',
-                  border: 'transparent',
-                  backgroundColor: 'transparent',
-                }}>
+                  width: "100%",
+                  border: "transparent",
+                  backgroundColor: "transparent",
+                }}
+              >
                 {this.state.buttonModal}
               </button>
             </Button>
@@ -590,13 +603,18 @@ class ShowBahan extends Component {
 
         <Modal
           visible={this.state.modalStokVisible}
-          title='Tambah Bahan Masuk'
+          title="Tambah Bahan Masuk"
           onCancel={this.handleCancel}
-          footer={[]}>
+          footer={[]}
+        >
           <form onSubmit={this.handleSubmitStok}>
             <label>Nama Bahan</label>
             {this.state.bahan !== null && (
-              <Select style={{ width: '100%' }} onChange={this.onChangeTak} value={this.state.nama_bahan}>
+              <Select
+                style={{ width: "100%" }}
+                onChange={this.onChangeTak}
+                value={this.state.nama_bahan}
+              >
                 {this.state.bahan.map((val, item) => (
                   <Select.Option key={val.nama_bahan} value={val.nama_bahan}>
                     {val.nama_bahan}
@@ -605,49 +623,51 @@ class ShowBahan extends Component {
               </Select>
             )}
 
-            <label style={{ marginTop: '15px' }}>Tanggal Masuk</label>
+            <label style={{ marginTop: "15px" }}>Tanggal Masuk</label>
             <DatePicker
-              name='tanggal'
+              name="tanggal"
               onChange={this.handleChangeInputTanggal}
-              placeholder='Masukan Tanggal Masuk'
-              format='YYYY / MM / DD'
+              placeholder="Masukan Tanggal Masuk"
+              format="YYYY / MM / DD"
               disabledDate={(current) => {
                 return current > moment();
               }}
             />
 
-            <label style={{ marginTop: '15px' }}>Jumlah Masuk</label>
+            <label style={{ marginTop: "15px" }}>Jumlah Masuk</label>
 
             <Input
-              type='number'
+              type="number"
               suffix={this.state.suffix}
-              name='jumlah'
+              name="jumlah"
               value={this.state.jumlah}
               onChange={this.handleChangeInput}
-              autoComplete='off'
+              autoComplete="off"
             />
-            <label style={{ marginTop: '15px' }}>Harga</label>
+            <label style={{ marginTop: "15px" }}>Harga</label>
             <Input
-              type='number'
-              prefix='Rp. '
-              name='harga'
+              type="number"
+              prefix="Rp. "
+              name="harga"
               value={this.state.harga}
               onChange={this.handleChangeInput}
-              autoComplete='off'
+              autoComplete="off"
             />
             <Button
               loading={this.state.loading}
-              type='primary'
+              type="primary"
               style={{
-                marginTop: '20px',
-                width: '100%',
-              }}>
+                marginTop: "20px",
+                width: "100%",
+              }}
+            >
               <button
                 style={{
-                  width: '100%',
-                  border: 'transparent',
-                  backgroundColor: 'transparent',
-                }}>
+                  width: "100%",
+                  border: "transparent",
+                  backgroundColor: "transparent",
+                }}
+              >
                 Tambah Stok Bahan
               </button>
             </Button>
@@ -656,13 +676,14 @@ class ShowBahan extends Component {
 
         <Modal
           visible={this.state.modalKeluarVisible}
-          title='Buang Stok Bahan'
+          title="Buang Stok Bahan"
           onCancel={this.handleCancel}
-          footer={[]}>
+          footer={[]}
+        >
           <form onSubmit={this.handleSubmitKeluar}>
             <label>Nama Bahan</label>
             {this.state.bahan !== null && (
-              <Select style={{ width: '100%' }} onChange={this.onChangeTak}>
+              <Select style={{ width: "100%" }} onChange={this.onChangeTak}>
                 {this.state.bahan.map((val, item) => (
                   <Select.Option key={val.nama_bahan} value={val.nama_bahan}>
                     {val.nama_bahan}
@@ -671,41 +692,43 @@ class ShowBahan extends Component {
               </Select>
             )}
 
-            <label style={{ marginTop: '15px' }}>Tanggal Buang</label>
+            <label style={{ marginTop: "15px" }}>Tanggal Buang</label>
             <DatePicker
-              name='tanggal'
+              name="tanggal"
               onChange={this.handleChangeInputTanggal}
-              placeholder='Masukan Tanggal Buang'
-              format='YYYY / MM / DD'
+              placeholder="Masukan Tanggal Buang"
+              format="YYYY / MM / DD"
               disabledDate={(current) => {
                 return current > moment();
               }}
             />
 
-            <label style={{ marginTop: '15px' }}>Jumlah Buang</label>
+            <label style={{ marginTop: "15px" }}>Jumlah Buang</label>
 
             <Input
-              type='number'
+              type="number"
               suffix={this.state.suffix}
-              name='jumlah'
+              name="jumlah"
               value={this.state.jumlah}
               onChange={this.handleChangeInput}
-              autoComplete='off'
+              autoComplete="off"
             />
 
             <Button
               loading={this.state.loading}
-              type='primary'
+              type="primary"
               style={{
-                marginTop: '20px',
-                width: '100%',
-              }}>
+                marginTop: "20px",
+                width: "100%",
+              }}
+            >
               <button
                 style={{
-                  width: '100%',
-                  border: 'transparent',
-                  backgroundColor: 'transparent',
-                }}>
+                  width: "100%",
+                  border: "transparent",
+                  backgroundColor: "transparent",
+                }}
+              >
                 Buang Stok Bahan
               </button>
             </Button>
@@ -714,41 +737,47 @@ class ShowBahan extends Component {
 
         <h1
           style={{
-            fontSize: 'x-large',
-            color: '#001529',
-            textTransform: 'uppercase',
-          }}>
+            fontSize: "x-large",
+            color: "#001529",
+            textTransform: "uppercase",
+          }}
+        >
           <strong>data bahan</strong>
         </h1>
         <div
           style={{
-            border: '1px solid #8C98AD',
-            marginTop: '-10px',
-            marginBottom: '15px',
-          }}></div>
+            border: "1px solid #8C98AD",
+            marginTop: "-10px",
+            marginBottom: "15px",
+          }}
+        ></div>
         <Space style={{ marginBottom: 16 }}>
           <Button
-            type='primary'
-            style={{ width: 'auto', borderRadius: '7px' }}
-            onClick={this.clearFilters}>
+            type="primary"
+            style={{ width: "auto", borderRadius: "7px" }}
+            onClick={this.clearFilters}
+          >
             Hapus Filter
           </Button>
           <Button
-            style={{ width: 'auto', borderRadius: '7px' }}
-            type='primary'
-            onClick={this.openModal}>
+            style={{ width: "auto", borderRadius: "7px" }}
+            type="primary"
+            onClick={this.openModal}
+          >
             Tambah Data Bahan
           </Button>
           <Button
-            style={{ width: 'auto', borderRadius: '7px' }}
-            type='primary'
-            onClick={this.openModalStok}>
+            style={{ width: "auto", borderRadius: "7px" }}
+            type="primary"
+            onClick={this.openModalStok}
+          >
             Tambah Bahan Masuk
           </Button>
           <Button
-            style={{ width: 'auto', borderRadius: '7px' }}
-            type='primary'
-            onClick={this.openModalKeluar}>
+            style={{ width: "auto", borderRadius: "7px" }}
+            type="primary"
+            onClick={this.openModalKeluar}
+          >
             Buang Stok Bahan
           </Button>
         </Space>
