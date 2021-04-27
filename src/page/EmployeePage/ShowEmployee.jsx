@@ -200,6 +200,7 @@ class ShowEmployee extends Component {
         filteredValue: filteredInfo.nama || null,
         sorter: (a, b) => a.nama.length - b.nama.length,
         ellipsis: true,
+        width: "13%",
       },
       {
         title: "Email",
@@ -216,9 +217,9 @@ class ShowEmployee extends Component {
           { text: "Laki-Laki", value: "Laki-Laki" },
           { text: "Perempuan", value: "Perempuan" },
         ],
+        sorter: (a, b) => a.jenisKelamin.length - b.jenisKelamin.length,
         filteredValue: filteredInfo.jenisKelamin || null,
         onFilter: (value, record) => record.jenisKelamin.includes(value),
-        sorter: (a, b) => a.jenisKelamin.length - b.jenisKelamin.length,
       },
       {
         title: "Jabatan",
@@ -236,27 +237,16 @@ class ShowEmployee extends Component {
         sorter: (a, b) => a.jabatan.length - b.jabatan.length,
         ellipsis: true,
         width: 170,
-        render(jabatan) {
-          return (
-            <>
-              <Tag
-                color={
-                  jabatan === "Owner" || jabatan === "Operational Manager"
-                    ? "#3F51B5"
-                    : "#f50"
-                }
-              >
-                {jabatan}
-              </Tag>
-            </>
-          );
-        },
       },
       {
         title: "Telepon",
         dataIndex: "telepon",
         key: "telepon",
         ellipsis: true,
+        width: "13%",
+        ...this.getColumnSearchProps("telepon"),
+        filteredValue: filteredInfo.telepon || null,
+        onFilter: (value, record) => record.telepon.includes(value),
       },
       {
         title: "Status",
@@ -270,9 +260,12 @@ class ShowEmployee extends Component {
         onFilter: (value, record) => record.status.includes(value),
         sorter: (a, b) => a.status.length - b.status.length,
         ellipsis: true,
+        align: "center",
         render: (status) => (
           <>
-            <Tag color={status === "Resign" ? "red" : "blue"}>{status}</Tag>
+            <Tag color={status === "Resign" ? "#A90603" : "#00664B"}>
+              {status.toUpperCase()}
+            </Tag>
           </>
         ),
       },
@@ -285,21 +278,18 @@ class ShowEmployee extends Component {
         sorter: (a, b) =>
           a.tanggal_bergabung.length - b.tanggal_bergabung.length,
         ellipsis: true,
-        width: 160,
+        width: "14%",
       },
       {
         align: "center",
-        title: "Action",
         dataIndex: "id",
         key: "id",
+        width: "7%",
 
         render: (dataIndex) => (
           <div>
             <Link className="link" to={`/editEmployee/${dataIndex}`}>
-              <EditTwoTone
-                twoToneColor="#d94a4b"
-                style={{ marginRight: "5px" }}
-              />
+              <EditTwoTone twoToneColor="blue" style={{ marginRight: "5px" }} />
             </Link>
           </div>
         ),

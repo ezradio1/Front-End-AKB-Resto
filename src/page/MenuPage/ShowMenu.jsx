@@ -95,12 +95,21 @@ class ShowMenu extends Component {
         })
         .then((res) => {
           const data = res.data.data;
+          // while (data) {
+          //   // data.takaran_saji = `${data.takaran_saji} ${data.bahanUnit}`;
+          // }
+
+          for (var i = 0; i < data.length; i++) {
+            data[
+              i
+            ].takaran_saji = `${data[i].takaran_saji} ${data[i].bahanUnit}`;
+          }
           this.setState({
             menu: data,
             loading: false,
           });
           console.log("Data Menu = ");
-          console.log(res.data.data);
+          console.log(data[0]);
         });
     }
     console.log(this.state.menu);
@@ -249,7 +258,7 @@ class ShowMenu extends Component {
         dataIndex: "unit",
         key: "unit",
         filters: [
-          { text: "Plate", value: "graPlatem" },
+          { text: "Plate", value: "Plate" },
           { text: "Bowl", value: "Bowl" },
           { text: "Mini Bowl", value: "Mini Bowl" },
           { text: "Bottle", value: "Bottle" },
@@ -266,7 +275,7 @@ class ShowMenu extends Component {
         title: "Harga",
         dataIndex: "harga_menu",
         key: "harga_menu",
-        sorter: (a, b) => a.harga_menu.length - b.harga_menu.length,
+        sorter: (a, b) => a.harga_menu - b.harga_menu,
         ellipsis: true,
         width: "9%",
         align: "center",
@@ -305,7 +314,6 @@ class ShowMenu extends Component {
         ),
       },
       {
-        title: "Action",
         dataIndex: "id",
         key: "id",
         align: "center",
@@ -313,10 +321,7 @@ class ShowMenu extends Component {
         render: (dataIndex) => (
           <div>
             <Link className="link" to={`/editMenu/${dataIndex}`}>
-              <EditTwoTone
-                // twoToneColor="#d94a4b"
-                style={{ marginRight: "5px" }}
-              />
+              <EditTwoTone twoToneColor="blue" style={{ marginRight: "5px" }} />
             </Link>
             <Popconfirm
               placement="left"

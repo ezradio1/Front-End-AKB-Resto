@@ -65,7 +65,7 @@ const LayoutCustom = () => {
       })
       .then((res) => {
         setUser(null);
-        message.success("Logout Berhasil!");
+        message.success("Berhasil keluar!");
         localStorage.removeItem("user");
         localStorage.removeItem("token");
         localStorage.removeItem("nama");
@@ -77,7 +77,7 @@ const LayoutCustom = () => {
   };
 
   const menu = (
-    <Menu>
+    <Menu style={{ fontFamily: "poppins" }}>
       <Menu.Item icon={<UserOutlined />}>
         <Link to="/changePass">Ubah Kata Sandi</Link>
       </Menu.Item>
@@ -191,7 +191,11 @@ const LayoutCustom = () => {
                 )}
                 {user && (
                   <>
-                    <Dropdown overlay={menu} placement="bottomRight">
+                    <Dropdown
+                      overlay={menu}
+                      placement="bottomRight"
+                      trigger={["click"]}
+                    >
                       <img
                         style={{
                           width: "65px",

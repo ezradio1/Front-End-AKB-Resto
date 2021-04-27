@@ -507,8 +507,13 @@ class ShowBahan extends Component {
         filters: [{ text: "Bahan Habis", value: 0 }],
         filteredValue: filteredInfo.jumlah || null,
         onFilter: (value, record) => record.jumlah == value,
-        sorter: (a, b) => a.jumlah.length - b.jumlah.length,
+        sorter: (a, b) => a.jumlah - b.jumlah,
         ellipsis: true,
+        render: (jumlah) => (
+          <>
+            <Tag color={jumlah == 0 ? "#A90603" : "#00664B"}>{jumlah}</Tag>
+          </>
+        ),
       },
       {
         title: "Unit",

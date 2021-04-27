@@ -53,7 +53,7 @@ const ShowTable = () => {
   };
 
   const menu = (
-    <Menu>
+    <Menu style={{ fontFamily: "poppins" }}>
       <Menu.Item>
         <a
           target="_blank"
@@ -125,7 +125,6 @@ const ShowTable = () => {
         })
         .catch((err) => {
           setLoading(false);
-          setVisible(false);
           console.log(err.response.data.message);
           message.error("Tambah Meja Gagal : " + err.response.data.message);
         });
@@ -155,7 +154,6 @@ const ShowTable = () => {
           })
           .catch((err) => {
             setLoading(false);
-            setVisible(false);
             console.log(err.response.data.message);
             message.error("Edit Meja Gagal : " + err.response.data.message);
           });
@@ -169,7 +167,7 @@ const ShowTable = () => {
 
   const onChange = (e) => {
     const temp = tempmeja.filter((i) => {
-      return i.nomor_meja == e.target.value;
+      return i.nomor_meja.includes(e.target.value);
     });
     console.log("temp adalah " + temp.length);
     console.log("target = " + e.target.value);
@@ -180,7 +178,7 @@ const ShowTable = () => {
       setSearch(false);
       setMeja(
         tempmeja.filter((i) => {
-          return i.nomor_meja == e.target.value;
+          return i.nomor_meja.includes(e.target.value);
         })
       );
       if (temp == 0) {
@@ -275,7 +273,7 @@ const ShowTable = () => {
           <Button
             type="primary"
             onClick={openModal}
-            style={{ width: "160px", marginTop: "10px" }}
+            style={{ marginTop: "10px" }}
           >
             Tambah Data Meja
           </Button>
@@ -284,17 +282,14 @@ const ShowTable = () => {
           <Button
             type="primary"
             onClick={hapusFilter}
-            style={{ width: "120px", marginTop: "10px" }}
+            style={{ marginTop: "10px" }}
           >
             Hapus Filter
           </Button>
         </Col>
         <Col xs={24} md={2}>
           <Dropdown overlay={menu}>
-            <Button
-              type="primary"
-              style={{ width: "100px", marginTop: "10px" }}
-            >
+            <Button type="primary" style={{ marginTop: "10px" }}>
               Filter <DownOutlined />
             </Button>
           </Dropdown>
@@ -331,7 +326,7 @@ const ShowTable = () => {
             rules={[
               {
                 required: true,
-                message: "Masukan Nomor Meja!",
+                message: "Masukan nomor meja!",
                 type: "number",
                 min: 1,
                 max: 999,

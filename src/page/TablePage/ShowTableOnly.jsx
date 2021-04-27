@@ -169,7 +169,7 @@ const ShowTableOnly = () => {
 
   const onChange = (e) => {
     const temp = tempmeja.filter((i) => {
-      return i.nomor_meja == e.target.value;
+      return i.nomor_meja.includes(e.target.value);
     });
     console.log("temp adalah " + temp.length);
     console.log("target = " + e.target.value);
@@ -180,7 +180,7 @@ const ShowTableOnly = () => {
       setSearch(false);
       setMeja(
         tempmeja.filter((i) => {
-          return i.nomor_meja == e.target.value;
+          return i.nomor_meja.includes(e.target.value);
         })
       );
       if (temp == 0) {

@@ -43,8 +43,10 @@ const EditMenu = () => {
   const [suffixBahan, setSuffixBahan] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
+  const [menu, setMenu] = useState(null);
   const [form] = Form.useForm();
   const { userId } = useParams();
+  const [bahanSin, setBahanSin] = useState(null);
 
   let history = useHistory();
 
@@ -61,6 +63,8 @@ const EditMenu = () => {
         })
         .then((res) => {
           const data = res.data.data;
+          console.log(data);
+          setMenu(data);
           if (imgPrev === null) {
             setImgPrev(`http://192.168.1.3:8000/photo/${data.gambar}`);
             console.log("gambar");
@@ -78,8 +82,8 @@ const EditMenu = () => {
                   return i.id == data.id_bahan;
                 });
                 setBahan(dataBahan);
-
                 const getNamaBahan = temp[0].nama_bahan;
+                setBahanSin(getNamaBahan);
                 form.setFieldsValue({
                   nama_menu: data.nama_menu,
                   kategori: data.kategori,
@@ -144,7 +148,6 @@ const EditMenu = () => {
     formData.append("unit", values.unit);
     formData.append("kategori", values.kategori);
     formData.append("takaran_saji", values.takaran_saji);
-    formData.append("nama_menu", values.nama_menu);
     formData.append("harga_menu", values.harga_menu);
     formData.append("keterangan", values.keterangan);
     formData.append("id_bahan", idBahan);
@@ -166,7 +169,18 @@ const EditMenu = () => {
   };
 
   const resetButton = () => {
-    history.push("/showMenu");
+    console.log(menu);
+    form.setFieldsValue({
+      nama_menu: menu.nama_menu,
+      kategori: menu.kategori,
+      unit: menu.unit,
+      bahan: menu.bahan,
+      takaran_saji: menu.takaran_saji,
+      harga_menu: menu.harga_menu,
+      kategori: menu.kategori,
+      keterangan: menu.keterangan,
+      nama_bahan: bahanSin,
+    });
   };
 
   const onChangeTak = (evt) => {
@@ -226,7 +240,7 @@ const EditMenu = () => {
               name="nama_menu"
               label="Nama Menu"
               labelAlign="left"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Nama menu wajib diisi" }]}
             >
               <Input autoComplete="off" />
             </Form.Item>
@@ -234,7 +248,7 @@ const EditMenu = () => {
               name="kategori"
               label="Kategori"
               labelAlign="left"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Kategori wajib diisi" }]}
             >
               <Select>
                 <Select.Option value="Makanan Utama">
@@ -250,22 +264,16 @@ const EditMenu = () => {
               name="unit"
               label="Unit"
               labelAlign="left"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Unit wajib diisi!" }]}
             >
-              <Select>
-                <Select.Option value="Plate">Plate</Select.Option>
-                <Select.Option value="Bowl">Bowl</Select.Option>
-                <Select.Option value="Mini Bowl">Mini Bowl</Select.Option>
-                <Select.Option value="Glass">Glass</Select.Option>
-                <Select.Option value="Bottle">Bottle</Select.Option>
-              </Select>
+              <Input autoComplete="off" />
             </Form.Item>
             {namaBahan != null && (
               <Form.Item
                 name="nama_bahan"
                 label="Bahan"
                 labelAlign="left"
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: "Nama bahan wajib diisi!" }]}
               >
                 <Select onChange={onChangeTak}>
                   {namaBahan.map((val, item) => (
@@ -303,7 +311,7 @@ const EditMenu = () => {
               name="keterangan"
               label="Deskripsi"
               labelAlign="left"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Keterangan wajib diisi!" }]}
             >
               <TextArea rows={4} />
             </Form.Item>
@@ -330,7 +338,7 @@ const EditMenu = () => {
             <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
               <div className="addEmployee">
                 <Button loading={loading} type="primary" htmlType="submit">
-                  Submit
+                  Simpan
                 </Button>
                 <Button
                   loading={loading}
@@ -339,7 +347,7 @@ const EditMenu = () => {
                   onClick={resetButton}
                   style={{ minWidth: "80px" }}
                 >
-                  Cancel
+                  Reset
                 </Button>
               </div>
             </Form.Item>

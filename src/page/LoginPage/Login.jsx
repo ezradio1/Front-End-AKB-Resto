@@ -68,6 +68,7 @@ const Login = () => {
       })
       .catch((err) => {
         setLoading(false);
+        console.log(err);
         message.error(err.response.data.message);
       });
   };
@@ -101,7 +102,13 @@ const Login = () => {
             <Form.Item
               justify="center"
               name="email"
-              rules={[{ required: true, message: "Masukan email anda!" }]}
+              rules={[
+                {
+                  required: true,
+                  message: "Masukan email yang valid!",
+                  type: "email",
+                },
+              ]}
             >
               <Input
                 size="large"
@@ -117,7 +124,9 @@ const Login = () => {
               rules={[
                 {
                   required: true,
-                  message: "Masukan kata sandi anda!",
+                  message: "Kata sandi harus terdiri dari 6-16 karakter!",
+                  min: 6,
+                  max: 16,
                 },
               ]}
             >
@@ -135,7 +144,7 @@ const Login = () => {
               className="btnLogin"
             >
               <Button type="primary" htmlType="submit" loading={loading}>
-                <b>LOGIN</b>
+                <b>Masuk</b>
               </Button>
             </Col>
 

@@ -9,6 +9,7 @@ import {
   message,
   Upload,
   Image,
+  InputNumber,
 } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { useParams, useForm, useHistory } from "react-router-dom";
@@ -84,7 +85,6 @@ const AddMenu = () => {
     formData.append("unit", values.unit);
     formData.append("kategori", values.kategori);
     formData.append("takaran_saji", values.takaran_saji);
-    formData.append("nama_menu", values.nama_menu);
     formData.append("harga_menu", values.harga_menu);
     formData.append("keterangan", values.keterangan);
     formData.append("id_bahan", idBahan);
@@ -200,7 +200,7 @@ const AddMenu = () => {
               name="nama_menu"
               label="Nama Menu"
               labelAlign="left"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Nama menu wajib diisi" }]}
             >
               <Input autoComplete="off" />
             </Form.Item>
@@ -208,7 +208,7 @@ const AddMenu = () => {
               name="kategori"
               label="Kategori"
               labelAlign="left"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Kategori wajib diisi" }]}
             >
               <Select>
                 <Select.Option value="Makanan Utama">
@@ -224,22 +224,16 @@ const AddMenu = () => {
               name="unit"
               label="Unit"
               labelAlign="left"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Unit wajib diisi" }]}
             >
-              <Select>
-                <Select.Option value="Plate">Plate</Select.Option>
-                <Select.Option value="Bowl">Bowl</Select.Option>
-                <Select.Option value="Mini Bowl">Mini Bowl</Select.Option>
-                <Select.Option value="Glass">Glass</Select.Option>
-                <Select.Option value="Bottle">Bottle</Select.Option>
-              </Select>
+              <Input autoComplete="off" />
             </Form.Item>
             {namaBahan != null && (
               <Form.Item
                 name="nama_bahan"
                 label="Bahan"
                 labelAlign="left"
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: "Nama Bahan wajib diisi" }]}
               >
                 <Select onChange={onChangeTak}>
                   {namaBahan.map((val, item) => (
@@ -254,27 +248,38 @@ const AddMenu = () => {
               name="takaran_saji"
               label="Takaran Saji"
               labelAlign="left"
-              rules={[{ required: true }]}
+              rules={[
+                {
+                  required: true,
+                  message: "Takaran saji wajib diisi",
+                },
+              ]}
             >
-              <Input type="number" suffix={suffixBahan} />
+              <Input min="0" type="number" suffix={suffixBahan} />
             </Form.Item>
             <Form.Item
               name="harga_menu"
               label="Harga Menu"
               labelAlign="left"
-              rules={[{ required: true }]}
+              rules={[
+                {
+                  required: true,
+                  message: "Harga menu wajib diisi",
+                  min: 0,
+                },
+              ]}
             >
-              <Input type="number" prefix="Rp. " />
+              <Input type="number" prefix="Rp. " min="0" />
             </Form.Item>
             <Form.Item
               name="keterangan"
               label="Deskripsi"
               labelAlign="left"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Keterangan wajib diisi" }]}
             >
               <TextArea rows={4} />
             </Form.Item>
-            <Form.Item name="photo" label="Upload Foto" labelAlign="left">
+            <Form.Item name="photo" label="Unggah Gambar" labelAlign="left">
               <input
                 style={{ marginBottom: "10px" }}
                 type="file"
@@ -296,7 +301,7 @@ const AddMenu = () => {
             <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
               <div className="addEmployee">
                 <Button loading={loading} type="primary" htmlType="submit">
-                  Submit
+                  Simpan
                 </Button>
                 <Button
                   type="danger"
