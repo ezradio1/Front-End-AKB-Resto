@@ -26,6 +26,7 @@
     "react-highlight-words": "^0.17.0",
     "react-hook-form": "^6.15.5",
     "react-icons": "^4.2.0",
+    "react-iframe": "^1.8.0",
     "react-live-clock": "^5.0.16",
     "react-moment": "^1.1.1",
     "react-phone-number-input": "^3.1.18",
