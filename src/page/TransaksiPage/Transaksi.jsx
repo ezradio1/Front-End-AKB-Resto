@@ -669,21 +669,25 @@ class Transaksi extends Component {
       .get(`cetakNota/${idTransaksi}`, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('token'),
-          responseType: 'blob',
         },
+        responseType: 'blob',
       })
       .then((res) => {
         console.log(res);
         const url = window.URL.createObjectURL(new Blob([res.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'remaining_fee.pdf'); //or any other extension
+        link.setAttribute(
+          'download',
+          `STRK_${this.state.dataDetail.nomor_transaksi}.pdf`
+        ); //or any other extension
         document.body.appendChild(link);
         link.click();
         this.setState({
           modalVisible: false,
           loading: false,
         });
+
         message.success('Transaksi Berhasil!');
       })
       .catch((err) => {
