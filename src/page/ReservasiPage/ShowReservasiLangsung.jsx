@@ -121,7 +121,7 @@ class ShowReservasiLangsung extends Component {
       message.error('Data Reservasi "Selesai" tidak bisa diedit!');
     } else {
       window.location.pathname = `/showReservasiLangsung/editReservasiLangsung/${index}`;
-      this.setState({ cekStatus: false, loadingAct: false });
+      this.setState({ cekStatus: false });
     }
   };
 
@@ -294,7 +294,14 @@ class ShowReservasiLangsung extends Component {
   };
 
   openModalQr = (id) => {
-    let newObj = { id_reservasi: id };
+    console.log('hay');
+    console.log(id);
+    let filter = this.state.reservasi.filter((el) => {
+      return el.id === id;
+    });
+    let newObj = {
+      id_reservasi: id,
+    };
     this.setState({
       loadingQr: true,
       loadingAct: true,
@@ -308,15 +315,13 @@ class ShowReservasiLangsung extends Component {
       })
       .then((res) => {
         let data = res.data.data;
-        let objQr = {
-          id_transaksi: data.id_transaksi,
-          nomor_meja: data.nomor_meja,
-          nama_customer: data.nama_customer,
-        };
+        console.log(data);
+        console.log('qr di table');
+        let objQr = `${data.id_transaksi};${filter[0].nama_customer};${filter[0].nomor_meja}`;
         this.setState({
           modalQr: true,
           no_trans: data.nomor_transaksi,
-          objectQr: JSON.stringify(objQr),
+          objectQr: objQr,
           idEdit: id,
           loadingQr: false,
           printed: data.printed,
@@ -330,35 +335,6 @@ class ShowReservasiLangsung extends Component {
           loadingQr: false,
           loadingAct: false,
         });
-      });
-  };
-
-  onSubmitQr = (idEdit) => {
-    let newObj;
-    this.setState({ loading: true });
-    myAxios
-      .put(`updateStatusReservasi/${this.state.idEdit}`, newObj, {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
-        },
-      })
-      .then((res) => {
-        message.success('Berhasil Cetak Qr Pemesanan');
-        let data = res.data.data;
-        this.setState({
-          modalQr: false,
-          idEdit: null,
-          loading: false,
-        });
-        this.getReservasi();
-      })
-      .catch((err) => {
-        this.setState({
-          loading: false,
-        });
-        message.error(
-          'Cetak Qr Pemesanan Gagal : ' + err.response.data.message
-        );
       });
   };
 

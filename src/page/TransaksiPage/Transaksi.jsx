@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { FormInstance } from 'antd/lib/form';
+
 import {
   Input,
   Table,
@@ -17,7 +17,6 @@ import {
   Select,
   Dropdown,
   DatePicker,
-  InputNumber,
   Form,
 } from 'antd';
 
@@ -25,7 +24,6 @@ import {
   SearchOutlined,
   LoadingOutlined,
   DownOutlined,
-  InfoCircleOutlined,
 } from '@ant-design/icons';
 import Moment from 'moment';
 import { UserContext } from '../../context/UserContext';
@@ -33,26 +31,18 @@ import myAxios from '../../myAxios';
 import TableHijau from '../../asset/icon/tableHijau.png';
 import TableMerah from '../../asset/icon/tableMerah.png';
 
-import ReactToPrint from 'react-to-print';
-
-import { ComponentToPrint } from './Nota';
-
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },
 };
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
 
-const { Search } = Input;
-const { Option } = Select;
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const tableLoading = {
   indicator: <Spin indicator={antIcon} />,
 };
 
 class Transaksi extends Component {
+  formRef = React.createRef();
   constructor(props) {
     super(props);
     this.state = {
@@ -73,6 +63,8 @@ class Transaksi extends Component {
       meja: null,
       tempmeja: null,
       idMeja: null,
+      search: false,
+      searchTxt: '',
 
       dataPembayaran: {
         id_transaksi: null,
@@ -91,45 +83,6 @@ class Transaksi extends Component {
 
   static contextType = UserContext;
 
-  openModal = async (index) => {
-    this.setState({ detail: null });
-    if (this.state.detail == null) {
-      await this.getDetailransaksi(index);
-      let filter = this.state.transaksi.filter((el) => {
-        return el.id === index;
-      });
-      var item = filter[0];
-      console.log(item);
-      if (item.status === 'Pending') {
-        message.info('Transaksi Belum Selesai!');
-      } else {
-        this.setState({
-          modalVisible: true,
-          judulModal: 'Detail Transaksi Pembayaran',
-        });
-        console.log(this.state.modalVisible);
-      }
-    }
-  };
-
-  onFinish = (values) => {
-    console.log('Success:', values.curr);
-    console.log('Masuk On Finish');
-
-    this.setState({ modalVisible: false });
-  };
-
-  onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
-
-  handleChangeInput = (evt) => {
-    console.log(evt.target.value);
-    this.setState({
-      [evt.target.name]: evt.target.value,
-    });
-  };
-
   handleCancel = () => {
     this.setState({
       modalVisible: false,
@@ -143,36 +96,6 @@ class Transaksi extends Component {
         kembalian: 0,
       },
     });
-  };
-
-  editPelanggan = (modalVisible, index) => {
-    console.log('id handle  = ' + index);
-    this.setState({
-      nama_customer: '',
-      telepon: '',
-      email: '',
-      idEdit: index,
-    });
-    myAxios
-      .get(`showCustomer/${index}`, {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
-        },
-      })
-      .then((res) => {
-        const data = res.data.data;
-        data.telepon = data.telepon.slice(1);
-        this.setState({
-          modalVisible,
-          judulModal: 'Edit Data Pelanggan',
-          buttonModal: 'Edit Pelanggan',
-          nama_customer: data.nama_customer,
-          telepon: data.telepon,
-          email: data.email,
-        });
-        console.log('Data Pelanggan = ');
-        console.log(res.data.data);
-      });
   };
 
   handleChange = (pagination, filters, sorter) => {
@@ -215,6 +138,21 @@ class Transaksi extends Component {
         console.log(res.data.data);
       });
   };
+
+  convertToRupiah(angka) {
+    var rupiah = '';
+    var angkarev = angka.toString().split('').reverse().join('');
+    for (var i = 0; i < angkarev.length; i++)
+      if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + '.';
+    return (
+      'Rp. ' +
+      rupiah
+        .split('', rupiah.length - 1)
+        .reverse()
+        .join('')
+    );
+  }
+
   getDetailransaksi = (id) => {
     console.log('id' + id);
     myAxios
@@ -225,7 +163,16 @@ class Transaksi extends Component {
       })
       .then((res) => {
         const data = res.data.dataDetailTransaksi;
+
         const dataDetail = res.data.dataTransaksi;
+        console.log(dataDetail);
+        dataDetail.total_harga = this.convertToRupiah(dataDetail.total_harga);
+        dataDetail.service = this.convertToRupiah(dataDetail.service);
+        dataDetail.pajak = this.convertToRupiah(dataDetail.pajak);
+        dataDetail.hargaSetelah = this.convertToRupiah(
+          parseInt(dataDetail.hargaSetelah)
+        );
+        dataDetail.hargaInt = parseInt(dataDetail.hargaInt);
 
         this.setState({
           detail: data,
@@ -256,9 +203,22 @@ class Transaksi extends Component {
         );
         this.setState({
           meja: data,
-          tempMeja: data,
+          tempmeja: data,
         });
       });
+  };
+
+  hapusFilter = (values) => {
+    this.setState({ meja: this.state.tempmeja, searchTxt: '', search: false });
+  };
+
+  onFilter = (param) => {
+    console.log('TEMP MEJA = ' + param);
+    this.setState({
+      meja: this.state.tempmeja.filter((i) => {
+        return i.status == param;
+      }),
+    });
   };
 
   componentDidMount() {
@@ -267,29 +227,6 @@ class Transaksi extends Component {
     if (this.state.meja === null) {
       this.getMeja();
     }
-  }
-
-  DeleteItem(param) {
-    const mytoken = localStorage.getItem('token');
-    console.log('Delete Item ' + param + mytoken);
-    let newObj = {};
-    myAxios
-      .put(`deleteCustomer/${param}`, newObj, {
-        headers: {
-          Authorization: 'Bearer ' + mytoken,
-        },
-      })
-      .then((res) => {
-        let filter = this.state.customer.filter((el) => {
-          return el.id !== param;
-        });
-        this.setState({ transaksi: filter });
-        console.log(res);
-        message.success(res.data.data.nama_customer + ' berhasil dihapus!');
-      })
-      .catch((err) => {
-        message.error('Gagal Menghapus : ' + err);
-      });
   }
 
   getColumnSearchProps = (dataIndex) => ({
@@ -378,6 +315,7 @@ class Transaksi extends Component {
       },
     }));
   };
+
   onChangePemilik = (evt) => {
     this.setState((prevState) => ({
       dataPembayaran: {
@@ -386,6 +324,7 @@ class Transaksi extends Component {
       },
     }));
   };
+
   onChangeVerif = (evt) => {
     this.setState((prevState) => ({
       dataPembayaran: {
@@ -400,30 +339,24 @@ class Transaksi extends Component {
       dataPembayaran: { ...prevState.dataPembayaran, metode_pembayaran: evt },
     }));
   };
-  onChangeKembalian = (evt) => {
-    this.setState((prevState) => ({
-      dataPembayaran: {
-        ...prevState.dataPembayaran,
-        kembalian:
-          this.state.dataPembayaran.bayar - this.state.dataDetail.hargaSetelah,
-      },
-    }));
-  };
+
   onChangeJenis = (evt) => {
     this.setState((prevState) => ({
       dataPembayaran: { ...prevState.dataPembayaran, jenis_kartu: evt },
     }));
   };
+
   onChangeUang = (e) => {
     let evt = e.target.value;
     this.setState((prevState) => ({
       dataPembayaran: {
         ...prevState.dataPembayaran,
         bayar: evt,
-        kembalian: evt - this.state.dataDetail.hargaSetelah,
+        kembalian: evt - this.state.dataDetail.hargaInt,
       },
     }));
   };
+
   onChangeTanggalKadal = (evt) => {
     const tanggal = evt._d;
     this.setState((prevState) => ({
@@ -432,153 +365,6 @@ class Transaksi extends Component {
         tanggal_kadaluwarsa: Moment(tanggal).format('YYYY-MM-DD'),
       },
     }));
-  };
-
-  handleSubmit = (event) => {
-    event.preventDefault();
-    console.log('Id = ' + this.state.idEdit);
-    if (
-      this.state.nama_customer === '' ||
-      this.state.telepon === '' ||
-      this.state.email === ''
-    ) {
-      message.error('Masukan input yang valid!');
-    } else if (this.state.telepon[0] == 0 || this.state.telepon[0] != 8) {
-      message.error('Nomor telepon harus diawali dengan 8!');
-    } else if (
-      this.state.telepon.length < 10 ||
-      this.state.telepon.length > 14
-    ) {
-      message.error('Nomor telepon harus 10 - 14 digit!');
-    } else {
-      if (this.state.idEdit === null) {
-        this.setState({ loading: true });
-        console.log('MASUK TAMBAH MENU');
-        let newObj = {
-          nama_customer: this.state.nama_customer,
-          email: this.state.email,
-          telepon: '0' + this.state.telepon,
-        };
-        myAxios
-          .post(`customer`, newObj, {
-            headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('token'),
-            },
-          })
-          .then((res) => {
-            message.success(newObj.nama_customer + ' berhasil ditambahkan!');
-            let data = res.data.data;
-            this.setState({
-              modalVisible: false,
-              nama_customer: '',
-              telepon: '',
-              email: '',
-              loading: false,
-              customer: [...this.state.customer, data],
-            });
-          })
-          .catch((err) => {
-            message.error(
-              'Tambah Pelanggan Gagal : ' + err.response.data.message
-            );
-            this.setState({
-              loading: false,
-            });
-          });
-      } else {
-        console.log('MASUK EDIT PELANGGAN');
-        this.setState({ loading: true });
-        let newObj = {
-          nama_customer: this.state.nama_customer,
-          telepon: '0' + this.state.telepon,
-          email: this.state.email,
-        };
-        myAxios
-          .put(`editCustomer/${this.state.idEdit}`, newObj, {
-            headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('token'),
-            },
-          })
-          .then((res) => {
-            message.success(newObj.nama_customer + ' berhasil diubah!');
-            let data = res.data.data;
-            this.setState({
-              modalVisible: false,
-              nama_customer: '',
-              telepon: '',
-              email: '',
-              idEdit: null,
-              loading: false,
-            });
-            this.getTransaksi();
-          })
-          .catch((err) => {
-            this.setState({
-              loading: false,
-            });
-            message.error(
-              'Ubah Data Pelanggan Gagal : ' + err.response.data.message
-            );
-          });
-      }
-    }
-  };
-
-  handleSubmitStok = (event) => {
-    event.preventDefault();
-
-    if (
-      this.state.nama_bahan === '' ||
-      this.state.tanggal === '' ||
-      this.state.harga === '' ||
-      this.state.jumlah === ''
-    ) {
-      message.error('Masukan input yang valid!');
-    } else {
-      this.setState({
-        loading: true,
-      });
-      console.log('MASUK TAMBAH STOK MENU');
-      const temp = this.state.bahan.filter((i) => {
-        return i.nama_bahan == this.state.nama_bahan;
-      });
-      let newObj = {
-        tanggal: this.state.tanggal,
-        jumlah: this.state.jumlah,
-        harga: this.state.harga,
-        id_bahan: temp[0].id,
-      };
-      myAxios
-        .post(`riwayatBahanMasuk`, newObj, {
-          headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token'),
-          },
-        })
-        .then((res) => {
-          message.success(newObj.nama_bahan + ' berhasil tambah stok!');
-          let data = res.data.data;
-          this.setState({
-            modalStokVisible: false,
-            nama_bahan: '',
-            harga: '',
-            tanggal: '',
-            loading: false,
-          });
-          this.getTransaksi();
-        })
-        .catch((err) => {
-          this.setState({
-            loading: false,
-          });
-          message.error(
-            'Tambah Stok Bahan Gagal : ' + err.response.data.message
-          );
-        });
-    }
-  };
-
-  handleSubmitKeluar = (event) => {
-    event.preventDefault();
   };
 
   openTransaksi = (val) => {
@@ -591,37 +377,38 @@ class Transaksi extends Component {
         id_meja: val.id_meja,
       },
     }));
+
     if (val.status === 'Pending') {
       message.error('Transaksi belum selesai!');
     } else {
-      console.log('masok');
       this.getDetailransaksi(val.id);
       this.setState({ modalVisible: true, idMeja: val.id });
-      var tanggal = Moment(new Date(), 'YYYY-MM-DD');
     }
   };
 
   onChangeMeja = (e) => {
-    // console.log(tempmeja);
+    // console.log(this.state.tempmeja);
     console.log('cek');
     var text = e.target.value;
-    // const temp = tempmeja.filter((i) => {
-    //   return (
-    //     i.nama_customer.toLowerCase().includes(text.toLowerCase()) ||
-    //     i.nomor_meja == e.target.value
-    //   );
-    // });
+    this.setState({ searchTxt: text });
+    const temp = this.state.tempmeja.filter((i) => {
+      return (
+        i.nama_customer.toLowerCase().includes(text.toLowerCase()) ||
+        i.nomor_meja.includes(e.target.value)
+      );
+    });
     // console.log('temp adalah ' + temp.length);
     console.log('target = ' + e.target.value);
     if (e.target.value == '') {
       // getTransaksi();
-      // setSearch(false);
+      this.setState({ search: false, meja: this.state.tempmeja });
     } else {
       // setSearch(false);
+      this.setState({ search: false, meja: temp });
       // setMeja(temp);
-      // if (temp == 0) {
-      //   setSearch(true);
-      // }
+      if (temp == 0) {
+        this.setState({ search: true });
+      }
     }
     // console.log(
     //   'ADALAH = ' +
@@ -664,7 +451,7 @@ class Transaksi extends Component {
           loading: false,
         });
       });
-
+    let newWin = window.open('', 'STRUK', 'resizable,scrollbars');
     myAxios
       .get(`cetakNota/${idTransaksi}`, {
         headers: {
@@ -674,15 +461,20 @@ class Transaksi extends Component {
       })
       .then((res) => {
         console.log(res);
-        const url = window.URL.createObjectURL(new Blob([res.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute(
-          'download',
-          `STRK_${this.state.dataDetail.nomor_transaksi}.pdf`
-        ); //or any other extension
-        document.body.appendChild(link);
-        link.click();
+        const url = window.URL.createObjectURL(res.data);
+        // const link = document.createElement('a');
+        // link.href = url;
+        // link.setAttribute(
+        //   'download',
+        //   `STRK_${this.state.dataDetail.nomor_transaksi}.pdf`
+        // ); //or any other extension
+        // link.target = '_blank';
+        newWin.location = url;
+        // newWin.focus();
+        // newWin.print();
+        // newWin.close();
+        // document.body.appendChild(link);
+        // link.click();
         this.setState({
           modalVisible: false,
           loading: false,
@@ -691,8 +483,8 @@ class Transaksi extends Component {
         message.success('Transaksi Berhasil!');
       })
       .catch((err) => {
-        message.error('Error cetak nota');
         this.setState({
+          modalVisible: false,
           loading: false,
         });
       });
@@ -703,13 +495,7 @@ class Transaksi extends Component {
     console.log(value);
     if (value === '' || value === undefined || value === null) {
       rule.message = 'Masukan Uang!';
-      this.formRef.setFields({
-        masuk: {
-          value: value,
-          errors: [new Error('forbid ha')],
-        },
-      });
-    } else if (value < this.state.dataDetail.hargaSetelah) {
+    } else if (value < this.state.dataDetail.hargaInt) {
       rule.message = 'Uang kurang!';
       this.formRef.setFields({
         masuk: {
@@ -747,90 +533,7 @@ class Transaksi extends Component {
     let { sortedInfo, filteredInfo } = this.state;
     sortedInfo = sortedInfo || {};
     filteredInfo = filteredInfo || {};
-    const columns = [
-      {
-        title: 'Nomor Transaksi',
-        dataIndex: 'nomor_transaksi',
-        key: 'nomor_transaksi',
-        ...this.getColumnSearchProps('nomor_transaksi'),
-        filteredValue: filteredInfo.nomor_transaksi || null,
-        sorter: (a, b) => a.nomor_transaksi.length - b.nomor_transaksi.length,
-        ellipsis: true,
-      },
-      {
-        title: 'Tanggal',
-        dataIndex: 'tanggal_transaksi',
-        key: 'tanggal_transaksi',
-        ...this.getColumnSearchProps('tanggal_transaksi'),
-        filteredValue: filteredInfo.tanggal_transaksi || null,
-        sorter: (a, b) =>
-          a.tanggal_transaksi.length - b.tanggal_transaksi.length,
-        ellipsis: true,
-      },
-      {
-        title: 'Pelanggan',
-        dataIndex: 'nama_customer',
-        key: 'nama_customer',
-        ...this.getColumnSearchProps('nama_customer'),
-        filteredValue: filteredInfo.nama_customer || null,
-        sorter: (a, b) => a.nama_customer.length - b.nama_customer.length,
-        ellipsis: true,
-      },
-      {
-        title: 'Nomor Meja',
-        dataIndex: 'nomor_meja',
-        key: 'nomor_meja',
-        ...this.getColumnSearchProps('nomor_meja'),
-        onFilter: (value, record) => record.nomor_meja == value,
-        filteredValue: filteredInfo.nomor_meja || null,
-        sorter: (a, b) => a.nomor_meja.length - b.nomor_meja.length,
-        ellipsis: true,
-      },
-      {
-        title: 'Nama Kasir',
-        dataIndex: 'nama_karyawan',
-        key: 'nama_karyawan',
-        ...this.getColumnSearchProps('nama_karyawan'),
-        onFilter: (value, record) => record.nama_karyawan == value,
-        filteredValue: filteredInfo.nama_karyawan || null,
-        sorter: (a, b) => a.nama_karyawan.length - b.nama_karyawan.length,
-        ellipsis: true,
-      },
-      {
-        title: 'Total',
-        dataIndex: 'total_harga',
-        key: 'total_harga',
-        onFilter: (value, record) => record.total_harga == value,
-        filteredValue: filteredInfo.total_harga || null,
-        sorter: (a, b) => a.total_harga.length - b.total_harga.length,
-        ellipsis: true,
-        width: '10%',
-      },
 
-      {
-        title: '',
-        dataIndex: 'id',
-        key: 'id',
-        width: '5%',
-
-        render: (dataIndex) => (
-          <div>
-            <Tooltip
-              placement='bottom'
-              title='Lihat Detail Transaksi'
-              color='#1f1f1f'
-              key='white'>
-              <InfoCircleOutlined
-                type='primary'
-                style={{ marginRight: '5px', borderRadius: 5 }}
-                onClick={() => this.openModal(dataIndex)}>
-                Detail
-              </InfoCircleOutlined>
-            </Tooltip>
-          </div>
-        ),
-      },
-    ];
     const columnsDetail = [
       {
         title: 'Nama Menu',
@@ -868,23 +571,9 @@ class Transaksi extends Component {
             visible={this.state.modalVisible}
             title='Detail Transaksi'
             onCancel={this.handleCancel}
-            footer={
-              [
-                // <Button key='back' onClick={this.handleCancel} type='danger'>
-                //   Batal
-                // </Button>,
-                // <Button
-                //   key='submit'
-                //   type='primary'
-                //   loading={this.state.loading}
-                //   onClick={this.handleOk}>
-                //   Bayar
-                // </Button>,
-              ]
-            }
+            footer={[]}
             width={1400}>
             <Form
-              {...layout}
               ref={this.formRef}
               name='control-ref'
               onFinish={this.handleOk}>
@@ -892,7 +581,6 @@ class Transaksi extends Component {
                 <Col xs={24} md={14}>
                   <Table
                     pagination='topLeft'
-                    loading={this.state.loading}
                     loadingIndicator={antIcon}
                     scroll={{ x: 400, y: 500 }}
                     columns={columnsDetail}
@@ -977,14 +665,14 @@ class Transaksi extends Component {
                     </Col>
                     <Col xs={10} md={10}>
                       <label style={{ color: 'grey' }}>
-                        Rp. {this.state.dataDetail.total_harga},00
+                        {this.state.dataDetail.total_harga},00
                       </label>
                     </Col>
                   </Row>
                   <Row>
                     <Col xs={12} md={12}>
                       <strong>
-                        <label>Biaya Layanan</label>
+                        <label>Biaya Service 5%</label>
                       </strong>
                     </Col>
                     <Col xs={2} md={2}>
@@ -992,14 +680,14 @@ class Transaksi extends Component {
                     </Col>
                     <Col xs={10} md={10}>
                       <label style={{ color: 'grey' }}>
-                        Rp. {this.state.dataDetail.service},00
+                        {this.state.dataDetail.service},00
                       </label>
                     </Col>
                   </Row>
                   <Row>
                     <Col xs={12} md={12}>
                       <strong>
-                        <label>Biaya Pajak</label>
+                        <label>Biaya Pajak 10%</label>
                       </strong>
                     </Col>
                     <Col xs={2} md={2}>
@@ -1007,7 +695,7 @@ class Transaksi extends Component {
                     </Col>
                     <Col xs={10} md={10}>
                       <label style={{ color: 'grey' }}>
-                        Rp. {this.state.dataDetail.pajak},00
+                        {this.state.dataDetail.pajak},00
                       </label>
                     </Col>
                   </Row>
@@ -1022,7 +710,7 @@ class Transaksi extends Component {
                     </Col>
                     <Col xs={10} md={10}>
                       <label style={{ color: 'grey' }}>
-                        Rp. {this.state.dataDetail.hargaSetelah},00
+                        {this.state.dataDetail.hargaSetelah},00
                       </label>
                     </Col>
                   </Row>
@@ -1344,6 +1032,7 @@ class Transaksi extends Component {
                 placeholder='Cari nomor meja atau nama pelanggan disini ..'
                 icons='search'
                 onChange={this.onChangeMeja}
+                value={this.state.searchTxt}
                 style={{ marginTop: '10px' }}
               />
             </Col>
@@ -1366,7 +1055,7 @@ class Transaksi extends Component {
               {this.state.meja.map((val, index) => {
                 return (
                   <Col xs={12} md={4} style={{ marginTop: '10px' }}>
-                    <Tooltip title={val.nomor_transaksi} placement='bottom'>
+                    <Tooltip title={val.nama_customer} placement='bottom'>
                       <div onClick={() => this.openTransaksi(val)}>
                         <div className='flip-card'>
                           <div className='flip-card-front'>

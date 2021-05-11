@@ -147,6 +147,11 @@ const EditReservasiTakLangsung = () => {
           console.log(temp);
           setCust(data.id);
           setModal(true);
+          setReservasi({
+            nomor_meja: val.nomor_meja,
+            tanggal_reservasi: tglSesi.tanggal_reservasi,
+            sesi_reservasi: tglSesi.sesi_reservasi,
+          });
           setidMeja(val.id);
           var tanggal = Moment(reservasi.tanggal_reservasi, 'YYYY-MM-DD');
           form.setFieldsValue({
@@ -240,16 +245,16 @@ const EditReservasiTakLangsung = () => {
       .then((res) => {
         setLoading(false);
         setModal(false);
-        setReservasi(newObj);
+        // setReservasi(newObj);
         setSubTitle(
-          `Reservasi tanggal ${dateShow} sesi ${values.sesi_reservasi} atas nama ${values.nama_customer} dengan Nomor Meja ${values.nomor_meja}  berhasil diedit pada ${dateShowNow}`
+          `Reservasi tanggal ${dateShow} sesi ${values.sesi_reservasi} atas nama ${values.nama_customer} dengan Nomor Meja ${values.nomor_meja}  berhasil diubah pada ${dateShowNow}`
         );
       })
       .catch((err) => {
         setSubTitle(null);
         setLoading(false);
         console.log(err.response.data.message);
-        message.error('Tambah Reservasi Gagal : ' + err.response.data.message);
+        message.error('Edit Reservasi Gagal : ' + err.response.data.message);
       });
   };
 
@@ -277,6 +282,7 @@ const EditReservasiTakLangsung = () => {
         setMeja(data);
         setTempModal(true);
         setReservasi({
+          nomor_meja: '-',
           tanggal_reservasi: values.tanggal_reservasi,
           sesi_reservasi: values.sesi_reservasi,
         });
@@ -321,24 +327,24 @@ const EditReservasiTakLangsung = () => {
       });
   };
 
-  const getReservasi = () => {
-    myAxios
-      .get(`showReservasi/${userId}`, {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
-        },
-      })
-      .then((res) => {
-        var data = res.data.data;
-        console.log('cek reserv');
-        console.log(data);
-        if (data.status === 'Selesai') {
-          history.push('/showReservasiTakLangsung');
-        } else {
-          setReservasi(data);
-        }
-      });
-  };
+  // const getReservasi = () => {
+  //   myAxios
+  //     .get(`showReservasi/${userId}`, {
+  //       headers: {
+  //         Authorization: 'Bearer ' + localStorage.getItem('token'),
+  //       },
+  //     })
+  //     .then((res) => {
+  //       var data = res.data.data;
+  //       console.log('cek reserv');
+  //       console.log(data);
+  //       if (data.status === 'Selesai') {
+  //         history.push('/showReservasiTakLangsung');
+  //       } else {
+  //         setReservasi(data);
+  //       }
+  //     });
+  // };
 
   useEffect(() => {
     if (reservasi === null) {
@@ -356,7 +362,9 @@ const EditReservasiTakLangsung = () => {
           if (reserv.status === 'Selesai') {
             history.push('/showReservasiTakLangsung');
           } else {
-            setReservasi(reserv);
+            if (reservasi == null) {
+              setReservasi(reserv);
+            }
             var date = Moment(reserv.tanggal_reservasi).format('YYYY-MM-DD');
             var tanggal = Moment(reserv.tanggal_reservasi, 'YYYY-MM-DD');
             let newObj = {
@@ -436,6 +444,11 @@ const EditReservasiTakLangsung = () => {
     setmodalTanggal(false);
     setModal(false);
     form.resetFields();
+    setReservasi({
+      nomor_meja: '-',
+      tanggal_reservasi: tglSesi.tanggal_reservasi,
+      sesi_reservasi: tglSesi.sesi_reservasi,
+    });
   };
 
   const onCancelModalTanggal = () => {
@@ -466,7 +479,7 @@ const EditReservasiTakLangsung = () => {
         <Result
           className='result'
           status='success'
-          title='Reservasi berhasil ditambahkan!'
+          title='Reservasi berhasil diubah!'
           subTitle={subTitle}
           extra={[
             <Button
@@ -539,7 +552,7 @@ const EditReservasiTakLangsung = () => {
               color: '#001529',
               textTransform: 'uppercase',
             }}>
-            <strong>Edit Reservasi Tidak Langsung</strong>
+            <strong>Ubah Reservasi Tidak Langsung</strong>
           </h1>
           <div
             style={{
@@ -569,7 +582,7 @@ const EditReservasiTakLangsung = () => {
                 type='primary'
                 onClick={() => setmodalTanggal(true)}
                 style={{ marginTop: '10px' }}>
-                Edit Tanggal dan Sesi
+                Ubah Tanggal dan Sesi
               </Button>
             </Col>
           </Row>
@@ -601,6 +614,15 @@ const EditReservasiTakLangsung = () => {
                     Tanggal Reservasi
                   </p>
                 </Col>
+                <Col md={1}>
+                  <p
+                    style={{
+                      color: '#3C8065',
+                      fontWeight: 'bold',
+                    }}>
+                    :
+                  </p>
+                </Col>
                 <Col>
                   <input
                     style={{
@@ -608,7 +630,6 @@ const EditReservasiTakLangsung = () => {
                       borderColor: 'transparent',
                       color: '#3C8065',
                       marginBottom: '-10px',
-                      fontWeight: 'bold',
                     }}
                     value={Moment(reservasi.tanggal_reservasi).format('LL')}>
                     {/* <p
@@ -634,13 +655,21 @@ const EditReservasiTakLangsung = () => {
                     Nomor Meja
                   </p>
                 </Col>
+                <Col md={1}>
+                  <p
+                    style={{
+                      color: '#3C8065',
+                      fontWeight: 'bold',
+                    }}>
+                    :
+                  </p>
+                </Col>
                 <Col>
                   <input
                     style={{
                       backgroundColor: 'transparent',
                       borderColor: 'transparent',
                       color: '#3C8065',
-                      fontWeight: 'bold',
                     }}
                     value={reservasi.nomor_meja}></input>
                 </Col>
@@ -656,6 +685,15 @@ const EditReservasiTakLangsung = () => {
                     Sesi Reservasi
                   </p>
                 </Col>
+                <Col md={1}>
+                  <p
+                    style={{
+                      color: '#3C8065',
+                      fontWeight: 'bold',
+                    }}>
+                    :
+                  </p>
+                </Col>
                 <Col>
                   <input
                     style={{
@@ -663,7 +701,6 @@ const EditReservasiTakLangsung = () => {
                       borderColor: 'transparent',
                       color: '#3C8065',
                       marginBottom: '-10px',
-                      fontWeight: 'bold',
                     }}
                     value={reservasi.sesi_reservasi}></input>
                 </Col>
@@ -671,7 +708,7 @@ const EditReservasiTakLangsung = () => {
             </Card>
           )}
           <Modal
-            title='Tambah Reservasi Tidak Langsung'
+            title='Ubah Reservasi Tidak Langsung'
             centered
             visible={modal}
             onCancel={onCancelModal}
@@ -772,7 +809,7 @@ const EditReservasiTakLangsung = () => {
                     width: '100%',
                     margin: 'auto',
                   }}>
-                  Tambah Reservasi
+                  Ubah Reservasi
                 </Button>
               </Form.Item>
             </Form>
@@ -846,7 +883,7 @@ const EditReservasiTakLangsung = () => {
                         width: '100%',
                         margin: 'auto',
                       }}>
-                      Submit
+                      Ubah
                     </Button>
                   </Col>
                 </Row>

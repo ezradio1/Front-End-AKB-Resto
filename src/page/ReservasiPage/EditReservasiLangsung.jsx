@@ -154,6 +154,7 @@ const EditReservasiLangsung = () => {
           var data = res.data.data;
           console.log('customer');
           setCust(data.id);
+
           console.log(data);
           form.setFieldsValue({
             nomor_meja: val.nomor_meja,
@@ -283,7 +284,7 @@ const EditReservasiLangsung = () => {
         setSubTitle(null);
         setLoading(false);
         console.log(err.response.data.message);
-        message.error('Tambah Reservasi Gagal : ' + err.response.data.message);
+        message.error('Edit Reservasi Gagal : ' + err.response.data.message);
       });
   };
 

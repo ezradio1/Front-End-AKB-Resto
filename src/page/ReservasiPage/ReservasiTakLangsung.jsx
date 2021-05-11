@@ -56,6 +56,7 @@ const ReservasiTakLangsung = () => {
   const [modal, setModal] = useState(false);
 
   const [form] = Form.useForm();
+  const [formReserv] = Form.useForm();
 
   const [togle, setTogle] = useState(false);
   const [display, setDisplay] = useState(false);
@@ -135,7 +136,7 @@ const ReservasiTakLangsung = () => {
       var tanggal = Moment(tglSesi, 'YYYY-MM-DD');
       // setnoMeja(val.nomor_meja);
       console.log(tglSesi);
-      form.setFieldsValue({
+      formReserv.setFieldsValue({
         nomor_meja: val.nomor_meja,
         tanggal: tglSesi.tanggal_reservasi,
         sesi_reservasi: tglSesi.sesi_reservasi,
@@ -198,6 +199,7 @@ const ReservasiTakLangsung = () => {
         var temp = [];
         console.log('Data Customerku = ');
         console.log(temp);
+        setOptions(data);
       });
   };
 
@@ -252,8 +254,10 @@ const ReservasiTakLangsung = () => {
 
     let newObj = {
       tanggal_reservasi: date,
-      sesi_reservasi: values.sesi_reservasi,
+      sesi_reservasi: values.sesi,
     };
+    console.log(newObj);
+    console.log('tak ');
     myAxios
       .post(`tampilMejaReservasi`, newObj, {
         headers: {
@@ -304,7 +308,7 @@ const ReservasiTakLangsung = () => {
     console.log(value);
     if (value === '' || value === undefined) {
       rule.message = 'Nomor Telepon Wajib diisi!';
-      form.setFields({
+      formReserv.setFields({
         telepon: {
           value: value,
           errors: [new Error('forbid ha')],
@@ -312,7 +316,7 @@ const ReservasiTakLangsung = () => {
       });
     } else if (value[0] == 0 || value[0] != 8) {
       rule.message = 'Nomor Telepon Harus diawali dengan 8!';
-      form.setFields({
+      formReserv.setFields({
         telepon: {
           value: value,
           errors: [new Error('forbid ha')],
@@ -320,7 +324,7 @@ const ReservasiTakLangsung = () => {
       });
     } else if (value.length < 10) {
       rule.message = 'Nomor Telepon Harus lebih dari 10!';
-      form.setFields({
+      formReserv.setFields({
         telepon: {
           value: value,
           errors: [new Error('forbid ha')],
@@ -328,7 +332,7 @@ const ReservasiTakLangsung = () => {
       });
     } else if (value.length > 14) {
       rule.message = 'Nomor Telepon Harus kurang dari 14!';
-      form.setFields({
+      formReserv.setFields({
         telepon: {
           value: value,
           errors: [new Error('forbid ha')],
@@ -358,7 +362,7 @@ const ReservasiTakLangsung = () => {
       return i.id == value;
     });
     const newTemp = temp[0];
-    form.setFieldsValue({
+    formReserv.setFieldsValue({
       nama_customer: newTemp.nama_customer,
       telepon: newTemp.telepon.slice(1),
       email: newTemp.email,
@@ -370,6 +374,7 @@ const ReservasiTakLangsung = () => {
     setmodalTanggal(false);
     setModal(false);
     form.resetFields();
+    formReserv.resetFields();
   };
 
   const onCancelModalTanggal = () => {
@@ -411,7 +416,7 @@ const ReservasiTakLangsung = () => {
         <Result
           className='result'
           status='success'
-          title='Reservasi berhasil ditambahkan!'
+          title='Reservasi tidak langsung berhasil ditambahkan!'
           subTitle={subTitle}
           extra={[
             <Button
@@ -420,9 +425,7 @@ const ReservasiTakLangsung = () => {
               onClick={() => history.push('/showReservasiTakLangsung')}>
               Kembali ke Reservasi
             </Button>,
-            <Button type='primary' key='console' onClick={openModalQr}>
-              Cetak Qr Pemesanan
-            </Button>,
+
             <Modal
               visible={modalQr}
               title='Cetak QR Code Pesanan'
@@ -566,7 +569,7 @@ const ReservasiTakLangsung = () => {
             width={400}>
             <Form
               name='nest-messages'
-              form={form}
+              form={formReserv}
               initialValues={{ remember: false }}
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}>
@@ -600,20 +603,33 @@ const ReservasiTakLangsung = () => {
                     onBlur={onBlur}
                     onSearch={onSearch}
                     // filterOption={(input, option) =>
-                    //   option.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                    //   0
+                    //   option.children
+                    //     .toLowerCase()
+                    //     .indexOf(input.toLowerCase()) >= 0
                     // }
                   >
                     {options.map((val, item) => (
-                      <Option key={val.id} value={val.id}>
+                      <Option
+                        key={val.id}
+                        value={val.id}
+                        style={{ fontWeight: 'bold' }}>
+                        {val.nama_customer}
                         <div>
-                          <p>
-                            <strong>{val.nama_customer}</strong>
-                          </p>
-                          <p style={{ fontSize: '11px', marginTop: '-20px' }}>
+                          <p
+                            style={{
+                              fontSize: '11px',
+                              marginTop: '-5px',
+                              fontWeight: 'normal',
+                            }}>
                             {val.email}
                           </p>
-                          <p style={{ fontSize: '11px', marginTop: '-20px' }}>
+                          <p
+                            style={{
+                              fontSize: '11px',
+                              marginTop: '-20px',
+                              marginBottom: '0',
+                              fontWeight: 'normal',
+                            }}>
                             {val.telepon}
                           </p>
                         </div>
