@@ -1055,7 +1055,7 @@ class Transaksi extends Component {
               {this.state.meja.map((val, index) => {
                 return (
                   <Col xs={12} md={4} style={{ marginTop: '10px' }}>
-                    <Tooltip title={val.nama_customer} placement='bottom'>
+                    <Tooltip title={val.nomor_transaksi} placement='bottom'>
                       <div onClick={() => this.openTransaksi(val)}>
                         <div className='flip-card'>
                           <div className='flip-card-front'>

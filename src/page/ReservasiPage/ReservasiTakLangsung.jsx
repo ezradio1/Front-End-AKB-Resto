@@ -79,6 +79,7 @@ const ReservasiTakLangsung = () => {
 
   const onFilter = (param) => {
     console.log('TEMP MEJA = ' + param);
+    console.log('TEMP MEJA = ' + tempmeja);
     setMeja(
       tempmeja.filter((i) => {
         return i.status == param;
@@ -165,28 +166,6 @@ const ReservasiTakLangsung = () => {
     </Menu>
   );
 
-  const getMeja = () => {
-    myAxios
-      .get(`showMeja`, {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
-        },
-      })
-      .then((res) => {
-        var data = res.data.data;
-
-        data.sort((a, b) =>
-          parseInt(a.nomor_meja) > parseInt(b.nomor_meja)
-            ? 1
-            : parseInt(b.nomor_meja) > parseInt(a.nomor_meja)
-            ? -1
-            : 0
-        );
-        setMeja(data);
-        settempMeja(data);
-      });
-  };
-
   const getCustomer = () => {
     myAxios
       .get(`showCustomer`, {
@@ -271,6 +250,7 @@ const ReservasiTakLangsung = () => {
         setLoading(false);
         setmodalTanggal(false);
         setMeja(data);
+        settempMeja(data);
         setTempModal(true);
         setTglSesi({
           tanggal_reservasi: values.tanggal_reservasi,

@@ -578,7 +578,7 @@ const ReservasiLangsung = () => {
                         <div>
                           <p
                             style={{
-                              fontSize: '11px',
+                              fontSize: '12px',
                               marginTop: '-5px',
                               fontWeight: 'normal',
                             }}>
@@ -586,7 +586,7 @@ const ReservasiLangsung = () => {
                           </p>
                           <p
                             style={{
-                              fontSize: '11px',
+                              fontSize: '12px',
                               marginTop: '-20px',
                               marginBottom: '0',
                               fontWeight: 'normal',

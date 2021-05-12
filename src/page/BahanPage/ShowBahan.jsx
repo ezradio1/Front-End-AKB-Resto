@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import ResizableAntdTable from 'resizable-antd-table';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   Input,
+  Form,
   Table,
   Button,
   Space,
@@ -26,6 +28,21 @@ import {
 import { UserContext } from '../../context/UserContext';
 import myAxios from '../../myAxios';
 
+const layout = {
+  labelCol: {
+    span: 8,
+  },
+  wrapperCol: {
+    span: 16,
+  },
+};
+const tailLayout = {
+  wrapperCol: {
+    offset: 8,
+    span: 16,
+  },
+};
+const { Option } = Select;
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const tableLoading = {
   indicator: <Spin indicator={antIcon} />,
@@ -38,7 +55,9 @@ class ShowBahan extends Component {
       modalVisible: false,
       modalStokVisible: false,
       modalVisible: false,
+      modalEditVisible: false,
       bahan: null,
+      bahanAll: null,
       filteredInfo: null,
       sortedInfo: null,
       idEdit: null,
@@ -57,9 +76,13 @@ class ShowBahan extends Component {
       tanggal: null,
       jumlah: '',
       suffix: null,
+
+      editTemp: null,
     };
   }
-
+  formRef = React.createRef();
+  formRefMasuk = React.createRef();
+  formRefKeluar = React.createRef();
   static contextType = UserContext;
 
   openModal = () => {
@@ -81,10 +104,11 @@ class ShowBahan extends Component {
   };
 
   openModalKeluar = () => {
+    this.getBahan();
     this.setState({
       modalKeluarVisible: true,
+      nama_bahan: '',
     });
-    console.log(this.state.modalVisible);
   };
 
   onFinishFailed = (errorInfo) => {
@@ -111,7 +135,8 @@ class ShowBahan extends Component {
       modalVisible: false,
       modalStokVisible: false,
       modalKeluarVisible: false,
-      nama_bahan: null,
+      modalEditVisible: false,
+      nama_bahan: '',
       jumlah: '',
       harga: '',
       tanggal: null,
@@ -119,33 +144,35 @@ class ShowBahan extends Component {
     });
   };
 
+  handleCancelMasuk = () => {
+    this.formRefMasuk.current.resetFields();
+    this.setState({
+      modalStokVisible: false,
+    });
+  };
+
+  handleCancelKeluar = () => {
+    this.formRefKeluar.current.resetFields();
+    this.setState({
+      modalKeluarVisible: false,
+    });
+  };
+
   editBahan = (modalVisible, index) => {
     console.log('id handle  = ' + index);
-    this.setState({
-      nama_bahan: '',
-      unit: '',
-      idEdit: index,
-      loadingAct: true,
+    let filter = this.state.bahanAll.filter((el) => {
+      return el.id === index;
     });
-    myAxios
-      .get(`showBahan/${index}`, {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
-        },
-      })
-      .then((res) => {
-        const data = res.data.data;
-        this.setState({
-          modalVisible,
-          judulModal: 'Edit Data Bahan',
-          buttonModal: 'Edit Bahan',
-          nama_bahan: data.nama_bahan,
-          unit: data.unit,
-          loadingAct: false,
-        });
-        console.log('Data Bahan = ');
-        console.log(res.data.data);
-      });
+    console.log(filter[0]);
+    console.log('editBahan');
+    console.log(filter[0]);
+    this.setState({
+      modalEditVisible: modalVisible,
+      nama_bahan: filter[0].nama_bahan,
+      unit: filter[0].unit,
+      idEdit: index,
+      loadingAct: false,
+    });
 
     console.log('ID Edit Adalah : ' + this.state.nama_bahan);
   };
@@ -165,9 +192,29 @@ class ShowBahan extends Component {
     this.setState({ filteredInfo: null });
   };
 
-  getBahan = () => {
+  getDataAll = () => {
     myAxios
       .get(`showBahan`, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token'),
+        },
+      })
+      .then((res) => {
+        const data = res.data.data;
+        this.setState({
+          bahanAll: data,
+          loading: false,
+        });
+        console.log('Data Bahan = ');
+        console.log(res.data.data);
+      });
+
+    console.log(this.state.bahan);
+  };
+
+  getBahan = () => {
+    myAxios
+      .get(`showBahanMakananUtama`, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('token'),
         },
@@ -189,7 +236,7 @@ class ShowBahan extends Component {
     this.setState({ loading: tableLoading });
     const user = this.context;
     if (this.state.bahan === null) {
-      this.getBahan();
+      this.getDataAll();
     }
   }
 
@@ -297,9 +344,11 @@ class ShowBahan extends Component {
   };
 
   onChangeTak = (evt) => {
-    const bahan = this.state.bahan.filter((i) => {
-      return i.nama_bahan == evt;
+    const bahan = this.state.bahanAll.filter((i) => {
+      return i.id == evt;
     });
+    console.log('onchangetak');
+    console.log(evt);
     this.setState({
       nama_bahan: evt,
       suffix: bahan[0].unit,
@@ -307,181 +356,247 @@ class ShowBahan extends Component {
   };
 
   handleSubmit = (event) => {
+    console.log(event);
+    // event.preventDefault();
+    // console.log('Id = ' + this.state.idEdit);
+    // if (this.state.nama_bahan === '' || this.state.unit === '') {
+    //   message.error('Masukan input yang valid!');
+    // } else {
+    //   if (this.state.idEdit === null) {
+    //     this.setState({ loading: true });
+    //     console.log('MASUK TAMBAH MENU');
+    //     console.log('Handle Submit + ' + this.state.nama_bahan);
+    let newObj = {
+      nama_bahan: event.nama_bahan,
+      jumlah: 0,
+      unit: event.unit,
+    };
+    myAxios
+      .post(`bahan`, newObj, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token'),
+        },
+      })
+      .then((res) => {
+        message.success(newObj.nama_bahan + ' berhasil ditambahkan!');
+        let data = res.data.data;
+        this.setState({
+          modalVisible: false,
+          nama_bahan: '',
+          unit: '',
+          loading: false,
+          bahanAll: [...this.state.bahanAll, data],
+        });
+        this.formRef.current.resetFields();
+      })
+      .catch((err) => {
+        this.setState({ loading: false });
+        message.error('Tambah Bahan Gagal : ' + err.response.data.message);
+      });
+    //   } else {
+    //     console.log('MASUK EDIT MENU');
+    //     this.setState({ loading: true });
+    //     let newObj = {
+    //       nama_bahan: this.state.nama_bahan,
+    //       unit: this.state.unit,
+    //     };
+    //     myAxios
+    //       .put(`editBahan/${this.state.idEdit}`, newObj, {
+    //         headers: {
+    //           Authorization: 'Bearer ' + localStorage.getItem('token'),
+    //         },
+    //       })
+    //       .then((res) => {
+    //         message.success(newObj.nama_bahan + ' berhasil diubah!');
+    //         let data = res.data.data;
+    //         const temp = this.state.bahan.filter((i) => {
+    //           return i.id !== data.id;
+    //         });
+    //         this.setState({
+    //           modalVisible: false,
+    //           nama_bahan: '',
+    //           unit: '',
+    //           idEdit: null,
+    //           loading: false,
+    //         });
+    //         this.getBahan();
+    //       })
+    //       .catch((err) => {
+    //         this.setState({ loading: false });
+    //         message.error('Ubah Bahan Gagal : ' + err.response.data.message);
+    //       });
+    //   }
+    // }
+  };
+
+  handleSubmitEdit = (event) => {
+    console.log(event);
     event.preventDefault();
     console.log('Id = ' + this.state.idEdit);
     if (this.state.nama_bahan === '' || this.state.unit === '') {
       message.error('Masukan input yang valid!');
     } else {
-      if (this.state.idEdit === null) {
-        this.setState({ loading: true });
-        console.log('MASUK TAMBAH MENU');
-        console.log('Handle Submit + ' + this.state.nama_bahan);
-        let newObj = {
-          nama_bahan: this.state.nama_bahan,
-          jumlah: 0,
-          unit: this.state.unit,
-        };
-        myAxios
-          .post(`bahan`, newObj, {
-            headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('token'),
-            },
-          })
-          .then((res) => {
-            message.success(newObj.nama_bahan + ' berhasil ditambahkan!');
-            let data = res.data.data;
-            this.setState({
-              modalVisible: false,
-              nama_bahan: '',
-              unit: '',
-              loading: false,
-              bahan: [...this.state.bahan, data],
-            });
-          })
-          .catch((err) => {
-            this.setState({ loading: false });
-            message.error('Tambah Bahan Gagal : ' + err.response.data.message);
+      console.log('MASUK EDIT MENU');
+      this.setState({ loading: true });
+      let newObj = {
+        nama_bahan: this.state.nama_bahan,
+        unit: this.state.unit,
+      };
+      myAxios
+        .put(`editBahan/${this.state.idEdit}`, newObj, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('token'),
+          },
+        })
+        .then((res) => {
+          message.success(newObj.nama_bahan + ' berhasil diubah!');
+          this.setState({
+            modalEditVisible: false,
+            nama_bahan: '',
+            unit: '',
+            idEdit: null,
+            loading: false,
           });
-      } else {
-        console.log('MASUK EDIT MENU');
-        this.setState({ loading: true });
-        let newObj = {
-          nama_bahan: this.state.nama_bahan,
-          unit: this.state.unit,
-        };
-        myAxios
-          .put(`editBahan/${this.state.idEdit}`, newObj, {
-            headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('token'),
-            },
-          })
-          .then((res) => {
-            message.success(newObj.nama_bahan + ' berhasil diubah!');
-            let data = res.data.data;
-            const temp = this.state.bahan.filter((i) => {
-              return i.id !== data.id;
-            });
-            this.setState({
-              modalVisible: false,
-              nama_bahan: '',
-              unit: '',
-              idEdit: null,
-              loading: false,
-            });
-            this.getBahan();
-          })
-          .catch((err) => {
-            this.setState({ loading: false });
-            message.error('Ubah Bahan Gagal : ' + err.response.data.message);
-          });
-      }
+          this.getDataAll();
+        })
+        .catch((err) => {
+          this.setState({ loading: false });
+          message.error('Ubah Bahan Gagal : ' + err);
+        });
     }
   };
 
   handleSubmitStok = (event) => {
-    event.preventDefault();
-
-    if (
-      this.state.nama_bahan === null ||
-      this.state.tanggal === '' ||
-      this.state.harga === '' ||
-      this.state.jumlah === ''
-    ) {
-      message.error('Masukan input yang valid!');
-    } else {
-      this.setState({
-        loading: true,
-      });
-      console.log('MASUK TAMBAH STOK MENU');
-      const temp = this.state.bahan.filter((i) => {
-        return i.nama_bahan == this.state.nama_bahan;
-      });
-      let newObj = {
-        tanggal: this.state.tanggal,
-        jumlah: this.state.jumlah,
-        harga: this.state.harga,
-        id_bahan: temp[0].id,
-      };
-      myAxios
-        .post(`riwayatBahanMasuk`, newObj, {
-          headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token'),
-          },
-        })
-        .then((res) => {
-          message.success(newObj.nama_bahan + ' berhasil tambah stok!');
-          let data = res.data.data;
-          this.setState({
-            modalStokVisible: false,
-            nama_bahan: '',
-            harga: '',
-            jumlah: '',
-            tanggal: '',
-            loading: false,
-          });
-          this.getBahan();
-        })
-        .catch((err) => {
-          this.setState({
-            loading: false,
-          });
-          message.error(
-            'Tambah Stok Bahan Gagal : ' + err.response.data.message
-          );
+    console.log(event);
+    let newObj = {
+      tanggal: Moment(event.tanggal).format('YYYY-MM-DD'),
+      jumlah: event.jumlah,
+      harga: event.harga,
+      id_bahan: event.id_bahan,
+    };
+    console.log(newObj);
+    myAxios
+      .post(`riwayatBahanMasuk`, newObj, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token'),
+        },
+      })
+      .then((res) => {
+        const temp = this.state.bahanAll.filter((i) => {
+          return i.id == event.id_bahan;
         });
-    }
+
+        message.success(temp[0].nama_bahan + ' berhasil tambah stok!');
+        this.setState({
+          modalStokVisible: false,
+          loading: false,
+        });
+        this.formRefMasuk.current.resetFields();
+        this.getDataAll();
+      })
+      .catch((err) => {
+        this.setState({
+          loading: false,
+        });
+        message.error('Tambah Stok Bahan Gagal : ' + err.response.data.message);
+      });
   };
 
   handleSubmitKeluar = (event) => {
-    event.preventDefault();
+    this.setState({
+      loading: true,
+    });
+    let newObj = {
+      tanggal: Moment(event.tanggal).format('YYYY-MM-DD'),
+      jumlah: event.jumlah,
+      id_bahan: event.id_bahan,
+      status: 'Buang',
+    };
+    console.log(newObj);
+    myAxios
+      .post(`riwayatBahanKeluar`, newObj, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token'),
+        },
+      })
+      .then((res) => {
+        const temp = this.state.bahanAll.filter((i) => {
+          return i.id == event.id_bahan;
+        });
+        message.success(temp[0].nama_bahan + ' berhasil dibuang!');
+        this.setState({
+          modalKeluarVisible: false,
+          loading: false,
+        });
+        this.formRefKeluar.current.resetFields();
+        this.getDataAll();
+      })
+      .catch((err) => {
+        this.setState({
+          loading: false,
+        });
+        message.error('Buang Bahan Gagal : ' + err.response.data.message);
+      });
+  };
 
-    if (
-      this.state.nama_bahan === null ||
-      this.state.tanggal === '' ||
-      this.state.jumlah === ''
-    ) {
-      message.error('Masukan input yang valid!');
-    } else {
-      this.setState({
-        loading: true,
-      });
-      console.log('MASUK TAMBAH BAHAN BUANG');
-      const temp = this.state.bahan.filter((i) => {
-        return i.nama_bahan == this.state.nama_bahan;
-      });
-      let newObj = {
-        tanggal: this.state.tanggal,
-        jumlah: this.state.jumlah,
-        id_bahan: temp[0].id,
-        status: 'Buang',
-      };
-      myAxios
-        .post(`riwayatBahanKeluar`, newObj, {
-          headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token'),
+  checkActionCode = async (rule, value, callback) => {
+    console.log('value ' + value);
+    console.log(value);
+    let filter = this.state.bahan.filter((el) => {
+      return el.id === this.state.nama_bahan;
+    });
+    console.log(this.state.nama_bahan);
+    console.log('filter');
+    if (this.state.nama_bahan != '') {
+      if (value === 0 || value === '' || value === undefined) {
+        rule.message = 'Jumlah wajib diisi!';
+        this.formRefKeluar.current.setFields({
+          jumlah: {
+            value: value,
+            errors: [new Error('forbid ha')],
           },
-        })
-        .then((res) => {
-          message.success(newObj.nama_bahan + ' berhasil dibuang!');
-          let data = res.data.data;
-          this.setState({
-            modalKeluarVisible: false,
-            nama_bahan: '',
-            jumlah: '',
-            tanggal: '',
-            loading: false,
-          });
-          this.getBahan();
-        })
-        .catch((err) => {
-          this.setState({
-            loading: false,
-          });
-          message.error(
-            'Tambah Bahan Buang Gagal : ' + err.response.data.message
-          );
+        });
+      } else if (filter[0].jumlah < value) {
+        rule.message = 'Jumlah buang tidak boleh melebihi jumlah sekarang!';
+        this.formRefKeluarm.current.setFields({
+          jumlah: {
+            value: value,
+            errors: [new Error('forbid ha')],
+          },
+        });
+      }
+    } else {
+      await callback();
+    }
+  };
+  onGenderChange = (value) => {
+    switch (value) {
+      case 'male':
+        this.formRef.current.setFieldsValue({
+          note: 'Hi, man!',
+        });
+        return;
+
+      case 'female':
+        this.formRef.current.setFieldsValue({
+          note: 'Hi, lady!',
+        });
+        return;
+
+      case 'other':
+        this.formRef.current.setFieldsValue({
+          note: 'Hi there!',
         });
     }
+  };
+  onReset = () => {
+    this.formRef.current.resetFields();
+  };
+  onFill = () => {
+    this.formRef.current.setFieldsValue({
+      note: 'Hello world!',
+      gender: 'male',
+    });
   };
 
   render() {
@@ -564,7 +679,57 @@ class ShowBahan extends Component {
           title={this.state.judulModal}
           onCancel={this.handleCancel}
           footer={[]}>
-          <form onSubmit={this.handleSubmit}>
+          <Form
+            ref={this.formRef}
+            name='control-ref'
+            onFinish={this.handleSubmit}>
+            <label>Nama Bahan</label>
+            <Form.Item
+              name='nama_bahan'
+              initialValue=''
+              rules={[
+                {
+                  required: true,
+                  message: 'Nama bahan wajib diisi',
+                },
+              ]}>
+              <Input placeholder='Masukan nama bahan' />
+            </Form.Item>
+            <label>Unit</label>
+            <Form.Item
+              name='unit'
+              initialValue=''
+              rules={[
+                {
+                  required: true,
+                  message: 'Unit wajib diisi',
+                },
+              ]}>
+              <Input placeholder='Masukan unit' />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                loading={this.state.loading}
+                htmlType='submit'
+                type='primary'
+                style={{
+                  marginTop: '20px',
+                  width: '100%',
+                }}>
+                {this.state.buttonModal}
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
+
+        <Modal
+          style={{ fontFamily: 'poppins' }}
+          visible={this.state.modalEditVisible}
+          title='Edit Data Bahan'
+          onCancel={this.handleCancel}
+          footer={[]}>
+          <form onSubmit={this.handleSubmitEdit}>
             <label>Nama Bahan</label>
             <Input
               placeholder='Nama Bahan'
@@ -594,7 +759,7 @@ class ShowBahan extends Component {
                   border: 'transparent',
                   backgroundColor: 'transparent',
                 }}>
-                {this.state.buttonModal}
+                Edit Bahan
               </button>
             </Button>
           </form>
@@ -603,128 +768,194 @@ class ShowBahan extends Component {
         <Modal
           visible={this.state.modalStokVisible}
           title='Tambah Bahan Masuk'
-          onCancel={this.handleCancel}
+          onCancel={this.handleCancelMasuk}
           footer={[]}>
-          <form onSubmit={this.handleSubmitStok}>
+          <Form
+            ref={this.formRefMasuk}
+            name='control-ref'
+            onFinish={this.handleSubmitStok}>
             <label>Nama Bahan</label>
-            {this.state.bahan !== null && (
-              <Select
-                style={{ width: '100%' }}
-                onChange={this.onChangeTak}
-                value={this.state.nama_bahan}>
-                {this.state.bahan.map((val, item) => (
-                  <Select.Option key={val.nama_bahan} value={val.nama_bahan}>
-                    {val.nama_bahan}
-                  </Select.Option>
-                ))}
-              </Select>
+            {this.state.bahanAll !== null && (
+              <Form.Item
+                name='id_bahan'
+                rules={[
+                  {
+                    required: true,
+                    message: 'Nama bahan wajib diisi',
+                  },
+                ]}>
+                <Select
+                  placeholder='Masukan nama bahan'
+                  style={{ width: '100%' }}
+                  onChange={this.onChangeTak}
+                  // value={this.state.nama_bahan}
+                >
+                  {this.state.bahanAll.map((val, item) => (
+                    <Select.Option key={val.id} value={val.id}>
+                      {val.nama_bahan}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
             )}
 
-            <label style={{ marginTop: '15px' }}>Tanggal Masuk</label>
-            <DatePicker
+            <label>Tanggal Masuk</label>
+            <Form.Item
               name='tanggal'
-              onChange={this.handleChangeInputTanggal}
-              placeholder='Masukan Tanggal Masuk'
-              format='YYYY / MM / DD'
-              disabledDate={(current) => {
-                return current > moment();
-              }}
-            />
+              rules={[
+                {
+                  required: true,
+                  message: 'Tanggal masuk wajib diisi',
+                },
+              ]}>
+              <DatePicker
+                // name='tanggal'
+                // onChange={this.handleChangeInputTanggal}
+                placeholder='Masukan Tanggal Masuk'
+                format='YYYY / MM / DD'
+                disabledDate={(current) => {
+                  return current > moment();
+                }}
+              />
+            </Form.Item>
 
-            <label style={{ marginTop: '15px' }}>Jumlah Masuk</label>
-
-            <Input
-              type='number'
-              suffix={this.state.suffix}
+            <label>Jumlah Masuk</label>
+            <Form.Item
               name='jumlah'
-              value={this.state.jumlah}
-              onChange={this.handleChangeInput}
-              autoComplete='off'
-            />
-            <label style={{ marginTop: '15px' }}>Harga</label>
-            <Input
-              type='number'
-              prefix='Rp. '
+              rules={[
+                {
+                  required: true,
+                  message: 'Jumlah wajib diisi',
+                },
+              ]}>
+              <Input
+                type='number'
+                suffix={this.state.suffix}
+                placeholder='Masukan jumlah'
+                // name='jumlah'
+                // value={this.state.jumlah}
+                // onChange={this.handleChangeInput}
+                autoComplete='off'
+              />
+            </Form.Item>
+            <label>Harga</label>
+            <Form.Item
               name='harga'
-              value={this.state.harga}
-              onChange={this.handleChangeInput}
-              autoComplete='off'
-            />
-            <Button
-              loading={this.state.loading}
-              type='primary'
-              style={{
-                marginTop: '20px',
-                width: '100%',
-              }}>
-              <button
+              rules={[
+                {
+                  required: true,
+                  message: 'Harga wajib diisi',
+                },
+              ]}>
+              <Input
+                type='number'
+                prefix='Rp. '
+                placeholder='Masukan harga'
+                // name='harga'
+                // value={this.state.harga}
+                // onChange={this.handleChangeInput}
+                autoComplete='off'
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                loading={this.state.loading}
+                type='primary'
+                htmlType='submit'
                 style={{
+                  marginTop: '20px',
                   width: '100%',
-                  border: 'transparent',
-                  backgroundColor: 'transparent',
                 }}>
                 Tambah Stok Bahan
-              </button>
-            </Button>
-          </form>
+              </Button>
+            </Form.Item>
+          </Form>
         </Modal>
 
         <Modal
           visible={this.state.modalKeluarVisible}
           title='Buang Stok Bahan'
-          onCancel={this.handleCancel}
+          onCancel={this.handleCancelKeluar}
           footer={[]}>
-          <form onSubmit={this.handleSubmitKeluar}>
+          <Form
+            ref={this.formRefKeluar}
+            name='control-ref'
+            onFinish={this.handleSubmitKeluar}>
             <label>Nama Bahan</label>
             {this.state.bahan !== null && (
-              <Select style={{ width: '100%' }} onChange={this.onChangeTak}>
-                {this.state.bahan.map((val, item) => (
-                  <Select.Option key={val.nama_bahan} value={val.nama_bahan}>
-                    {val.nama_bahan}
-                  </Select.Option>
-                ))}
-              </Select>
+              <Form.Item
+                name='id_bahan'
+                rules={[
+                  {
+                    required: true,
+                    message: 'Nama bahan wajib diisi',
+                  },
+                ]}>
+                <Select
+                  placeholder='Masukan nama bahan'
+                  style={{ width: '100%' }}
+                  onChange={this.onChangeTak}>
+                  {this.state.bahan.map((val, item) => (
+                    <Select.Option key={val.nama_bahan} value={val.id}>
+                      {val.nama_bahan}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
             )}
 
-            <label style={{ marginTop: '15px' }}>Tanggal Buang</label>
-            <DatePicker
+            <label>Tanggal Buang</label>
+            <Form.Item
               name='tanggal'
-              onChange={this.handleChangeInputTanggal}
-              placeholder='Masukan Tanggal Buang'
-              format='YYYY / MM / DD'
-              disabledDate={(current) => {
-                return current > moment();
-              }}
-            />
+              rules={[
+                {
+                  required: true,
+                  message: 'Tanggal buang wajib diisi',
+                },
+              ]}>
+              <DatePicker
+                placeholder='Masukan tanggal buang'
+                format='YYYY / MM / DD'
+                // name='tanggal'
+                // onChange={this.handleChangeInputTanggal}
+                disabledDate={(current) => {
+                  return current > moment();
+                }}
+              />
+            </Form.Item>
 
-            <label style={{ marginTop: '15px' }}>Jumlah Buang</label>
-
-            <Input
-              type='number'
-              suffix={this.state.suffix}
+            <label>Jumlah Buang</label>
+            <Form.Item
               name='jumlah'
-              value={this.state.jumlah}
-              onChange={this.handleChangeInput}
-              autoComplete='off'
-            />
-
-            <Button
-              loading={this.state.loading}
-              type='primary'
-              style={{
-                marginTop: '20px',
-                width: '100%',
-              }}>
-              <button
+              rules={[
+                {
+                  required: true,
+                  validator: this.checkActionCode,
+                },
+              ]}>
+              <Input
+                type='number'
+                placeholder='Masukan jumlah buang'
+                suffix={this.state.suffix}
+                // name='jumlah'
+                // value={this.state.jumlah}
+                // onChange={this.handleChangeInput}
+                autoComplete='off'
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                loading={this.state.loading}
+                type='primary'
+                htmlType='submit'
                 style={{
+                  marginTop: '20px',
                   width: '100%',
-                  border: 'transparent',
-                  backgroundColor: 'transparent',
                 }}>
                 Buang Stok Bahan
-              </button>
-            </Button>
-          </form>
+              </Button>
+            </Form.Item>
+          </Form>
         </Modal>
 
         <h1
@@ -772,7 +1003,7 @@ class ShowBahan extends Component {
           loadingIndicator={antIcon}
           scroll={{ x: 900, y: 1000 }}
           columns={columns}
-          dataSource={this.state.bahan}
+          dataSource={this.state.bahanAll}
           onChange={this.handleChange}
         />
       </div>
