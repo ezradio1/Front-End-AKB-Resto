@@ -601,24 +601,25 @@ const ReservasiLangsung = () => {
                 </>
               )}
               <Row justify='space-between'>
-                <Col>
+                <Col md={11}>
                   <label>Nomor Meja</label>
                   <Form.Item name='nomor_meja' labelAlign='left'>
                     <Input
                       disabled
                       autoComplete='off'
-                      style={{ borderRadius: '5px', width: '90%' }}
+                      style={{ borderRadius: '5px' }}
                     />
                   </Form.Item>
                 </Col>
-                <Col>
+                <Col md={1}></Col>
+                <Col md={12}>
                   <label>Tanggal Reservasi</label>
                   <Form.Item name='tanggal' labelAlign='left'>
                     <DatePicker
                       disabled
                       name='tanggal'
                       disabled
-                      style={{ borderRadius: '5px', width: '160px' }}
+                      style={{ borderRadius: '5px' }}
                     />
                   </Form.Item>
                 </Col>

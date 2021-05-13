@@ -277,42 +277,51 @@ class ShowReservasiTakLangsung extends Component {
   };
 
   openModalQr = (id) => {
-    let newObj = { id_reservasi: id };
     let filter = this.state.reservasi.filter((el) => {
       return el.id === id;
     });
-    this.setState({
-      modalQr: true,
-      loadingQr: true,
-      loadingAct: true,
-    });
-    myAxios
-      .post(`transaksi`, newObj, {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
-        },
-      })
-      .then((res) => {
-        let data = res.data.data;
-        let objQr = `${data.id_transaksi};${filter[0].nama_customer};${filter[0].nomor_meja}`;
-        this.setState({
-          modalQr: true,
-          no_trans: data.nomor_transaksi,
-          objectQr: objQr,
-          idEdit: id,
-          loadingQr: false,
-          printed: data.printed,
-          loadingAct: false,
-        });
-        this.getReservasi();
-      })
-      .catch((err) => {
-        message.error('Tambah Bahan Gagal : ' + err.response.data.message);
-        this.setState({
-          loadingQr: false,
-          loadingAct: false,
-        });
+    if (
+      Moment(filter[0].tanggal_reservasi).format('YYYY-MM-DD') ==
+      Moment().format('YYYY-MM-DD')
+    ) {
+      let newObj = { id_reservasi: id };
+      let filter = this.state.reservasi.filter((el) => {
+        return el.id === id;
       });
+      this.setState({
+        loadingQr: true,
+        loadingAct: true,
+      });
+      myAxios
+        .post(`transaksi`, newObj, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('token'),
+          },
+        })
+        .then((res) => {
+          let data = res.data.data;
+          let objQr = `${data.id_transaksi};${filter[0].nama_customer};${filter[0].nomor_meja}`;
+          this.setState({
+            modalQr: true,
+            no_trans: data.nomor_transaksi,
+            objectQr: objQr,
+            idEdit: id,
+            loadingQr: false,
+            printed: data.printed,
+            loadingAct: false,
+          });
+          this.getReservasi();
+        })
+        .catch((err) => {
+          message.error('Tambah Bahan Gagal : ' + err.response.data.message);
+          this.setState({
+            loadingQr: false,
+            loadingAct: false,
+          });
+        });
+    } else {
+      message.info('Tanggal reservasi bukan hari ini!');
+    }
   };
 
   handleSubmit = (event) => {

@@ -91,18 +91,6 @@ const ReservasiTakLangsung = () => {
     setmodalQr(false);
   };
 
-  const openModalQr = (id) => {
-    console.log('data qr');
-    setmodalQr(true);
-    setobjectQr(JSON.stringify(reservasi));
-
-    // this.setState({
-    //   modalQr: true,
-    //   objectQr: JSON.stringify(filter[0]),
-    //   idEdit: id,
-    // });
-  };
-
   const onSubmitQr = (idEdit) => {
     let newObj;
     this.setState({ loading: true });
@@ -630,8 +618,8 @@ const ReservasiTakLangsung = () => {
                     />
                   </Form.Item>
                 </Col>
-                <Col md={2}></Col>
-                <Col md={11}>
+                <Col md={1}></Col>
+                <Col md={12}>
                   <label>Tanggal Reservasi</label>
                   <Form.Item name='tanggal' labelAlign='left'>
                     <DatePicker

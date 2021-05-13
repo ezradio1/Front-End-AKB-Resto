@@ -236,6 +236,7 @@ const EditReservasiTakLangsung = () => {
       tipe: togle,
       id_customer: cust,
     };
+
     myAxios
       .put(`updateReservasi/${userId}`, newObj, {
         headers: {
@@ -245,7 +246,6 @@ const EditReservasiTakLangsung = () => {
       .then((res) => {
         setLoading(false);
         setModal(false);
-        // setReservasi(newObj);
         setSubTitle(
           `Reservasi tanggal ${dateShow} sesi ${values.sesi_reservasi} atas nama ${values.nama_customer} dengan Nomor Meja ${values.nomor_meja}  berhasil diubah pada ${dateShowNow}`
         );

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
   Table,
   Button,
@@ -8,18 +8,18 @@ import {
   message,
   Image,
   Spin,
-} from "antd";
-import { Link } from "react-router-dom";
+} from 'antd';
+import { Link } from 'react-router-dom';
 
 import {
   SearchOutlined,
   DeleteTwoTone,
   EditTwoTone,
   LoadingOutlined,
-} from "@ant-design/icons";
-import { UserContext } from "../../context/UserContext";
-import myAxios from "../../myAxios";
-import NoImg from "../../asset/icon/no-img.png";
+} from '@ant-design/icons';
+import { UserContext } from '../../context/UserContext';
+import myAxios from '../../myAxios';
+import NoImg from '../../asset/icon/no-img.png';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const tableLoading = {
@@ -36,8 +36,8 @@ class ShowMenu extends Component {
       sortedInfo: null,
       currId: null,
       token: null,
-      searchText: "",
-      searchedColumn: "",
+      searchText: '',
+      searchedColumn: '',
     };
   }
 
@@ -48,13 +48,13 @@ class ShowMenu extends Component {
   static contextType = UserContext;
 
   handleChange = (pagination, filters, sorter) => {
-    console.log("Various parameters", pagination, filters, sorter);
+    console.log('Various parameters', pagination, filters, sorter);
     this.setState({
       filteredInfo: filters,
       sortedInfo: null,
-      sortDirection: "asc",
-      searchText: "",
-      searchedColumn: "",
+      sortDirection: 'asc',
+      searchText: '',
+      searchedColumn: '',
     });
   };
 
@@ -72,8 +72,8 @@ class ShowMenu extends Component {
   setAgeSort = () => {
     this.setState({
       sortedInfo: {
-        order: "descend",
-        columnKey: "year",
+        order: 'descend',
+        columnKey: 'year',
       },
     });
   };
@@ -83,14 +83,14 @@ class ShowMenu extends Component {
       loading: tableLoading,
     });
     const user = this.context;
-    console.log("CEK " + user.object);
-    this.setState({ token: localStorage.getItem("token") });
-    console.log("SYALALA : " + localStorage.getItem("token"));
+    console.log('CEK ' + user.object);
+    this.setState({ token: localStorage.getItem('token') });
+    console.log('SYALALA : ' + localStorage.getItem('token'));
     if (this.state.menu === null) {
       myAxios
         .get(`showMenu`, {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            Authorization: 'Bearer ' + localStorage.getItem('token'),
           },
         })
         .then((res) => {
@@ -108,7 +108,7 @@ class ShowMenu extends Component {
             menu: data,
             loading: false,
           });
-          console.log("Data Menu = ");
+          console.log('Data Menu = ');
           console.log(data[0]);
         });
     }
@@ -116,13 +116,13 @@ class ShowMenu extends Component {
   }
 
   DeleteItem(param) {
-    const mytoken = localStorage.getItem("token");
-    console.log("Delete Item " + param + mytoken);
+    const mytoken = localStorage.getItem('token');
+    console.log('Delete Item ' + param + mytoken);
     let newObj = {};
     myAxios
       .put(`deleteMenu/${param}`, newObj, {
         headers: {
-          Authorization: "Bearer " + mytoken,
+          Authorization: 'Bearer ' + mytoken,
         },
       })
       .then((res) => {
@@ -133,10 +133,10 @@ class ShowMenu extends Component {
           menu: filter,
         });
         console.log(res);
-        message.success(res.data.data.nama_menu + " berhasil dihapus!");
+        message.success(res.data.data.nama_menu + ' berhasil dihapus!');
       })
       .catch((err) => {
-        message.error("Gagal Menghapus : " + err);
+        message.error('Gagal Menghapus : ' + err);
       });
   }
 
@@ -160,30 +160,28 @@ class ShowMenu extends Component {
           onPressEnter={() =>
             this.handleSearch(selectedKeys, confirm, dataIndex)
           }
-          style={{ width: 188, marginBottom: 8, display: "block" }}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
         />
         <Space>
           <Button
-            type="primary"
+            type='primary'
             onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90 }}
-          >
+            size='small'
+            style={{ width: 90 }}>
             Search
           </Button>
           <Button
             onClick={() => this.handleReset(clearFilters)}
-            size="small"
-            style={{ width: 90 }}
-          >
+            size='small'
+            style={{ width: 90 }}>
             Reset
           </Button>
         </Space>
       </div>
     ),
     filterIcon: (filtered) => (
-      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
@@ -191,7 +189,7 @@ class ShowMenu extends Component {
             .toString()
             .toLowerCase()
             .includes(value.toLowerCase())
-        : "",
+        : '',
     onFilterDropdownVisibleChange: (visible) => {
       if (visible) {
         setTimeout(() => this.searchInput.select(), 100);
@@ -202,11 +200,11 @@ class ShowMenu extends Component {
   handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     console.log(
-      "data:" +
+      'data:' +
         selectedKeys[0] +
-        "confirmnya : " +
+        'confirmnya : ' +
         confirm +
-        "datin :" +
+        'datin :' +
         dataIndex
     );
     this.setState({
@@ -217,7 +215,7 @@ class ShowMenu extends Component {
 
   handleReset = (clearFilters) => {
     clearFilters();
-    this.setState({ searchText: "" });
+    this.setState({ searchText: '' });
   };
 
   render() {
@@ -226,140 +224,144 @@ class ShowMenu extends Component {
     filteredInfo = filteredInfo || {};
     const columns = [
       {
-        title: "Nama Menu",
-        dataIndex: "nama_menu",
-        key: "nama_menu",
-        ...this.getColumnSearchProps("nama_menu"),
+        title: 'Nama Menu',
+        dataIndex: 'nama_menu',
+        key: 'nama_menu',
+        ...this.getColumnSearchProps('nama_menu'),
         filteredValue: filteredInfo.nama_menu || null,
         sorter: (a, b) => a.nama_menu.length - b.nama_menu.length,
         ellipsis: true,
-        width: "15%",
-        align: "center",
+        width: '15%',
+        align: 'center',
       },
       {
-        title: "Kategori",
-        dataIndex: "kategori",
-        key: "kategori",
+        title: 'Kategori',
+        dataIndex: 'kategori',
+        key: 'kategori',
         sorter: (a, b) => a.kategori.length - b.kategori.length,
         ellipsis: true,
-        align: "center",
+        align: 'center',
       },
       {
-        title: "Takaran Saji",
-        dataIndex: "takaran_saji",
-        key: "takaran_saji",
+        title: 'Takaran Saji',
+        dataIndex: 'takaran_saji',
+        key: 'takaran_saji',
         sorter: (a, b) => a.takaran_saji.length - b.takaran_saji.length,
         ellipsis: true,
-        width: "12%",
-        align: "center",
+        width: '12%',
+        align: 'center',
       },
       {
-        title: "Unit",
-        dataIndex: "unit",
-        key: "unit",
+        title: 'Unit',
+        dataIndex: 'unit',
+        key: 'unit',
         filters: [
-          { text: "Plate", value: "Plate" },
-          { text: "Bowl", value: "Bowl" },
-          { text: "Mini Bowl", value: "Mini Bowl" },
-          { text: "Bottle", value: "Bottle" },
-          { text: "Glass", value: "Glass" },
+          { text: 'Plate', value: 'Plate' },
+          { text: 'Bowl', value: 'Bowl' },
+          { text: 'Mini Bowl', value: 'Mini Bowl' },
+          { text: 'Bottle', value: 'Bottle' },
+          { text: 'Glass', value: 'Glass' },
         ],
         filteredValue: filteredInfo.unit || null,
         onFilter: (value, record) => record.unit.includes(value),
         sorter: (a, b) => a.unit.length - b.unit.length,
         ellipsis: true,
-        width: "9%",
-        align: "center",
+        width: '9%',
+        align: 'center',
       },
       {
-        title: "Harga",
-        dataIndex: "harga_menu",
-        key: "harga_menu",
+        title: 'Harga',
+        dataIndex: 'harga_menu',
+        key: 'harga_menu',
         sorter: (a, b) => a.harga_menu - b.harga_menu,
         ellipsis: true,
-        width: "9%",
-        align: "center",
+        width: '9%',
+        align: 'center',
       },
       {
-        title: "Deskripsi",
-        dataIndex: "keterangan",
-        key: "keterangan",
+        title: 'Deskripsi',
+        dataIndex: 'keterangan',
+        key: 'keterangan',
         sorter: (a, b) => a.keterangan.length - b.keterangan.length,
         ellipsis: true,
-        align: "center",
+        align: 'center',
       },
       {
-        title: "Bahan",
-        dataIndex: "nama_bahan",
-        key: "nama_bahan",
+        title: 'Bahan',
+        dataIndex: 'nama_bahan',
+        key: 'nama_bahan',
         sorter: (a, b) => a.nama_bahan.length - b.nama_bahan.length,
         ellipsis: true,
-        align: "center",
+        align: 'center',
       },
       {
-        title: "Gambar",
-        dataIndex: "gambar",
-        key: "gambar",
+        title: 'Penilaian',
+        dataIndex: 'rating',
+        key: 'rating',
+        sorter: (a, b) => a.rating - b.rating,
         ellipsis: true,
-        align: "center",
+        align: 'center',
+      },
+      {
+        title: 'Gambar',
+        dataIndex: 'gambar',
+        key: 'gambar',
+        ellipsis: true,
+        align: 'center',
 
         render: (dataIndex) => (
           <div>
             <Image
               fallback={NoImg}
-              style={{ width: "90px", height: "80px", objectFit: "cover" }}
-              src={`http://192.168.1.3:8000/photo/${dataIndex}`}
+              style={{ width: '90px', height: '80px', objectFit: 'cover' }}
+              src={`http://192.168.1.5:8000/photo/${dataIndex}`}
             />
           </div>
         ),
       },
       {
-        dataIndex: "id",
-        key: "id",
-        align: "center",
+        dataIndex: 'id',
+        key: 'id',
+        align: 'center',
 
         render: (dataIndex) => (
           <div>
-            <Link className="link" to={`/editMenu/${dataIndex}`}>
-              <EditTwoTone twoToneColor="blue" style={{ marginRight: "5px" }} />
+            <Link className='link' to={`/editMenu/${dataIndex}`}>
+              <EditTwoTone twoToneColor='blue' style={{ marginRight: '5px' }} />
             </Link>
             <Popconfirm
-              placement="left"
-              title={"Apakah anda yakin ingin menghapus ?"}
+              placement='left'
+              title={'Apakah anda yakin ingin menghapus ?'}
               onConfirm={() => this.DeleteItem(dataIndex)}
-              okText="Yes"
-              cancelText="No"
-            >
-              <DeleteTwoTone twoToneColor="red" />
+              okText='Yes'
+              cancelText='No'>
+              <DeleteTwoTone twoToneColor='red' />
             </Popconfirm>
           </div>
         ),
       },
     ];
     return (
-      <div style={{ padding: "25px 30px" }}>
+      <div style={{ padding: '25px 30px' }}>
         <h1
           style={{
-            fontSize: "x-large",
-            color: "#001529",
-            textTransform: "uppercase",
-          }}
-        >
+            fontSize: 'x-large',
+            color: '#001529',
+            textTransform: 'uppercase',
+          }}>
           <strong>data menu</strong>
         </h1>
         <div
           style={{
-            border: "1px solid #8C98AD",
-            marginTop: "-10px",
-            marginBottom: "15px",
-          }}
-        ></div>
+            border: '1px solid #8C98AD',
+            marginTop: '-10px',
+            marginBottom: '15px',
+          }}></div>
         <Space style={{ marginBottom: 16 }}>
           <Button
-            type="primary"
-            style={{ width: "auto", borderRadius: "7px" }}
-            onClick={this.clearFilters}
-          >
+            type='primary'
+            style={{ width: 'auto', borderRadius: '7px' }}
+            onClick={this.clearFilters}>
             Hapus Filter
           </Button>
           {/* <Button type='primary' onClick={() => this.setModalVisible(true)}>
