@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import axios from 'axios';
+import React, { Component } from "react";
+import axios from "axios";
 import {
   Table,
   Button,
@@ -9,17 +9,17 @@ import {
   message,
   Tag,
   Spin,
-} from 'antd';
-import { Link } from 'react-router-dom';
-import moment from 'moment';
+} from "antd";
+import { Link } from "react-router-dom";
+import moment from "moment";
 
 import {
   SearchOutlined,
   LoadingOutlined,
   EditTwoTone,
-} from '@ant-design/icons';
-import { UserContext } from '../../context/UserContext';
-import myAxios from '../../myAxios';
+} from "@ant-design/icons";
+import { UserContext } from "../../context/UserContext";
+import myAxios from "../../myAxios";
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const tableLoading = {
   indicator: <Spin indicator={antIcon} />,
@@ -34,21 +34,21 @@ class RiwayatMasuk extends Component {
       sortedInfo: null,
       currId: null,
       token: null,
-      searchText: '',
-      searchedColumn: '',
+      searchText: "",
+      searchedColumn: "",
       loading: false,
     };
   }
   static contextType = UserContext;
 
   handleChange = (pagination, filters, sorter) => {
-    console.log('Various parameters', pagination, filters, sorter);
+    console.log("Various parameters", pagination, filters, sorter);
     this.setState({
       filteredInfo: filters,
       sortedInfo: null,
-      sortDirection: 'asc',
-      searchText: '',
-      searchedColumn: '',
+      sortDirection: "asc",
+      searchText: "",
+      searchedColumn: "",
     });
   };
 
@@ -66,51 +66,51 @@ class RiwayatMasuk extends Component {
   setAgeSort = () => {
     this.setState({
       sortedInfo: {
-        order: 'descend',
-        columnKey: 'year',
+        order: "descend",
+        columnKey: "year",
       },
     });
   };
 
   componentDidMount() {
     const user = this.context;
-    console.log('CEK ' + user.object);
-    this.setState({ token: localStorage.getItem('token'), loading: true });
-    console.log('SYALALA : ' + localStorage.getItem('token'));
+    console.log("CEK " + user.object);
+    this.setState({ token: localStorage.getItem("token"), loading: true });
+    console.log("SYALALA : " + localStorage.getItem("token"));
     this.setState({ loading: tableLoading });
     if (this.state.riwMasuk === null) {
       myAxios
         .get(`showRiwayatBahanMasuk`, {
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token'),
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
         })
         .then((res) => {
           const data = res.data.data;
           data.map((el) => {
-            el.tanggal = moment(el.tanggal).format('D MMM YY');
+            el.tanggal = moment(el.tanggal).format("D MMM YY");
           });
           this.setState({
             riwMasuk: data,
             loading: false,
           });
-          console.log('Data riwMasuk = ');
+          console.log("Data riwMasuk = ");
           console.log(res.data.data);
         })
         .catch((err) => {
           this.setState({
             loading: false,
           });
-          message.error('Gagal Ambil : ' + err);
-          console.log('error  : ' + err);
+          message.error("Gagal Ambil : " + err);
+          console.log("error  : " + err);
         });
     }
     console.log(this.state.riwMasuk);
   }
 
   DeleteItem(param) {
-    const mytoken = localStorage.getItem('token');
-    console.log('Delete Item ' + param + mytoken);
+    const mytoken = localStorage.getItem("token");
+    console.log("Delete Item " + param + mytoken);
     let newObj = {};
     axios
       .put(
@@ -118,7 +118,7 @@ class RiwayatMasuk extends Component {
         newObj,
         {
           headers: {
-            Authorization: 'Bearer ' + mytoken,
+            Authorization: "Bearer " + mytoken,
           },
         }
       )
@@ -127,10 +127,10 @@ class RiwayatMasuk extends Component {
           return el.id === param;
         });
         console.log(res);
-        message.success(res.data.data.nama + ' berhasil dinonaktifkan!');
+        message.success(res.data.data.nama + " berhasil dinonaktifkan!");
       })
       .catch((err) => {
-        message.error('Gagal Menghapus : ' + err);
+        message.error("Gagal Menghapus : " + err);
       });
   }
 
@@ -154,28 +154,30 @@ class RiwayatMasuk extends Component {
           onPressEnter={() =>
             this.handleSearch(selectedKeys, confirm, dataIndex)
           }
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
         />
         <Space>
           <Button
-            type='primary'
+            type="primary"
             onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
-            size='small'
-            style={{ width: 90 }}>
+            size="small"
+            style={{ width: 90 }}
+          >
             Search
           </Button>
           <Button
             onClick={() => this.handleReset(clearFilters)}
-            size='small'
-            style={{ width: 90 }}>
+            size="small"
+            style={{ width: 90 }}
+          >
             Reset
           </Button>
         </Space>
       </div>
     ),
     filterIcon: (filtered) => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
@@ -183,7 +185,7 @@ class RiwayatMasuk extends Component {
             .toString()
             .toLowerCase()
             .includes(value.toLowerCase())
-        : '',
+        : "",
     onFilterDropdownVisibleChange: (visible) => {
       if (visible) {
         setTimeout(() => this.searchInput.select(), 100);
@@ -194,11 +196,11 @@ class RiwayatMasuk extends Component {
   handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     console.log(
-      'data:' +
+      "data:" +
         selectedKeys[0] +
-        'confirmnya : ' +
+        "confirmnya : " +
         confirm +
-        'datin :' +
+        "datin :" +
         dataIndex
     );
     this.setState({
@@ -209,7 +211,7 @@ class RiwayatMasuk extends Component {
 
   handleReset = (clearFilters) => {
     clearFilters();
-    this.setState({ searchText: '' });
+    this.setState({ searchText: "" });
   };
 
   render() {
@@ -218,34 +220,33 @@ class RiwayatMasuk extends Component {
     filteredInfo = filteredInfo || {};
     const columns = [
       {
-        title: 'Tanggal Masuk',
-        dataIndex: 'tanggal',
-        key: 'tanggal',
-        ...this.getColumnSearchProps('tanggal'),
+        title: "Tanggal Masuk",
+        dataIndex: "tanggal",
+        key: "tanggal",
+        ...this.getColumnSearchProps("tanggal"),
         filteredValue: filteredInfo.tanggal || null,
         sorter: (a, b) => a.tanggal.length - b.tanggal.length,
         ellipsis: true,
       },
       {
-        title: 'Bahan',
-        dataIndex: 'nama_bahan',
-        key: 'nama_bahan',
-        ...this.getColumnSearchProps('nama_bahan'),
+        title: "Bahan",
+        dataIndex: "nama_bahan",
+        key: "nama_bahan",
+        ...this.getColumnSearchProps("nama_bahan"),
         filteredValue: filteredInfo.nama_bahan || null,
-        onFilter: (value, record) => record.nama_bahan.includes(value),
         sorter: (a, b) => a.nama_bahan.length - b.nama_bahan.length,
       },
       {
-        title: 'Jumlah',
-        dataIndex: 'jumlah',
-        key: 'jumlah',
+        title: "Jumlah",
+        dataIndex: "jumlah",
+        key: "jumlah",
         sorter: (a, b) => a.jumlah - b.jumlah,
         ellipsis: true,
       },
       {
-        title: 'Harga',
-        dataIndex: 'harga',
-        key: 'harga',
+        title: "Harga",
+        dataIndex: "harga",
+        key: "harga",
         filteredValue: filteredInfo.harga || null,
         onFilter: (value, record) => record.harga.includes(value),
         sorter: (a, b) => a.harga - b.harga,
@@ -269,26 +270,29 @@ class RiwayatMasuk extends Component {
       // },
     ];
     return (
-      <div style={{ padding: '25px 30px' }}>
+      <div style={{ padding: "25px 30px" }}>
         <h1
           style={{
-            fontSize: 'x-large',
-            color: '#001529',
-            textTransform: 'uppercase',
-          }}>
+            fontSize: "x-large",
+            color: "#001529",
+            textTransform: "uppercase",
+          }}
+        >
           <strong>data riwayat bahan masuk</strong>
         </h1>
         <div
           style={{
-            border: '1px solid #8C98AD',
-            marginTop: '-10px',
-            marginBottom: '15px',
-          }}></div>
+            border: "1px solid #8C98AD",
+            marginTop: "-10px",
+            marginBottom: "15px",
+          }}
+        ></div>
         <Space style={{ marginBottom: 16 }}>
           <Button
-            type='primary'
-            style={{ width: 'auto', borderRadius: '7px' }}
-            onClick={this.clearFilters}>
+            type="primary"
+            style={{ width: "auto", borderRadius: "7px" }}
+            onClick={this.clearFilters}
+          >
             Hapus Filter
           </Button>
         </Space>

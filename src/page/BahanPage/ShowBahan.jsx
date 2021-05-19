@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import ResizableAntdTable from 'resizable-antd-table';
+import React, { Component } from "react";
+import ResizableAntdTable from "resizable-antd-table";
 
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 import {
   Input,
   Form,
@@ -15,18 +15,18 @@ import {
   DatePicker,
   Tag,
   Spin,
-} from 'antd';
+} from "antd";
 
-import moment from 'moment';
-import Moment from 'moment';
+import moment from "moment";
+import Moment from "moment";
 import {
   SearchOutlined,
   DeleteTwoTone,
   EditTwoTone,
   LoadingOutlined,
-} from '@ant-design/icons';
-import { UserContext } from '../../context/UserContext';
-import myAxios from '../../myAxios';
+} from "@ant-design/icons";
+import { UserContext } from "../../context/UserContext";
+import myAxios from "../../myAxios";
 
 const layout = {
   labelCol: {
@@ -61,20 +61,20 @@ class ShowBahan extends Component {
       filteredInfo: null,
       sortedInfo: null,
       idEdit: null,
-      searchText: '',
-      searchedColumn: '',
-      judulModal: '',
-      buttonModal: '',
+      searchText: "",
+      searchedColumn: "",
+      judulModal: "",
+      buttonModal: "",
       loading: false,
       loadingAct: false,
       validated: false,
 
       nama_bahan: null,
-      unit: '',
+      unit: "",
 
-      harga: '',
+      harga: "",
       tanggal: null,
-      jumlah: '',
+      jumlah: "",
       suffix: null,
 
       editTemp: null,
@@ -88,10 +88,10 @@ class ShowBahan extends Component {
   openModal = () => {
     this.setState({
       modalVisible: true,
-      buttonModal: 'Tambah Bahan',
-      judulModal: 'Tambah Data Bahan',
-      nama_bahan: '',
-      unit: '',
+      buttonModal: "Tambah Bahan",
+      judulModal: "Tambah Data Bahan",
+      nama_bahan: "",
+      unit: "",
     });
     console.log(this.state.modalVisible);
   };
@@ -107,12 +107,12 @@ class ShowBahan extends Component {
     this.getBahan();
     this.setState({
       modalKeluarVisible: true,
-      nama_bahan: '',
+      nama_bahan: "",
     });
   };
 
   onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+    console.log("Failed:", errorInfo);
   };
 
   handleChangeInput = (evt) => {
@@ -126,7 +126,7 @@ class ShowBahan extends Component {
     const tanggal = evt._d;
     console.log(tanggal);
     this.setState({
-      tanggal: Moment(tanggal).format('YYYY-MM-DD'),
+      tanggal: Moment(tanggal).format("YYYY-MM-DD"),
     });
   };
 
@@ -136,11 +136,11 @@ class ShowBahan extends Component {
       modalStokVisible: false,
       modalKeluarVisible: false,
       modalEditVisible: false,
-      nama_bahan: '',
-      jumlah: '',
-      harga: '',
+      nama_bahan: "",
+      jumlah: "",
+      harga: "",
       tanggal: null,
-      unit: '',
+      unit: "",
     });
   };
 
@@ -159,12 +159,12 @@ class ShowBahan extends Component {
   };
 
   editBahan = (modalVisible, index) => {
-    console.log('id handle  = ' + index);
+    console.log("id handle  = " + index);
     let filter = this.state.bahanAll.filter((el) => {
       return el.id === index;
     });
     console.log(filter[0]);
-    console.log('editBahan');
+    console.log("editBahan");
     console.log(filter[0]);
     this.setState({
       modalEditVisible: modalVisible,
@@ -174,17 +174,17 @@ class ShowBahan extends Component {
       loadingAct: false,
     });
 
-    console.log('ID Edit Adalah : ' + this.state.nama_bahan);
+    console.log("ID Edit Adalah : " + this.state.nama_bahan);
   };
 
   handleChange = (pagination, filters, sorter) => {
-    console.log('Various parameters', pagination, filters, sorter);
+    console.log("Various parameters", pagination, filters, sorter);
     this.setState({
       filteredInfo: filters,
       sortedInfo: null,
-      sortDirection: 'asc',
-      searchText: '',
-      searchedColumn: '',
+      sortDirection: "asc",
+      searchText: "",
+      searchedColumn: "",
     });
   };
 
@@ -196,7 +196,7 @@ class ShowBahan extends Component {
     myAxios
       .get(`showBahan`, {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
       })
       .then((res) => {
@@ -205,7 +205,7 @@ class ShowBahan extends Component {
           bahanAll: data,
           loading: false,
         });
-        console.log('Data Bahan = ');
+        console.log("Data Bahan = ");
         console.log(res.data.data);
       });
 
@@ -216,7 +216,7 @@ class ShowBahan extends Component {
     myAxios
       .get(`showBahanMakananUtama`, {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
       })
       .then((res) => {
@@ -225,7 +225,7 @@ class ShowBahan extends Component {
           bahan: data,
           loading: false,
         });
-        console.log('Data Bahan = ');
+        console.log("Data Bahan = ");
         console.log(res.data.data);
       });
 
@@ -241,14 +241,14 @@ class ShowBahan extends Component {
   }
 
   DeleteItem(param) {
-    const mytoken = localStorage.getItem('token');
-    console.log('Delete Item ' + param + mytoken);
+    const mytoken = localStorage.getItem("token");
+    console.log("Delete Item " + param + mytoken);
     this.setState({ loadingAct: true });
     let newObj = {};
     myAxios
       .put(`deleteBahan/${param}`, newObj, {
         headers: {
-          Authorization: 'Bearer ' + mytoken,
+          Authorization: "Bearer " + mytoken,
         },
       })
       .then((res) => {
@@ -257,11 +257,11 @@ class ShowBahan extends Component {
         });
         this.setState({ bahan: filter, loadingAct: false });
         console.log(res);
-        message.success(res.data.data.nama_bahan + ' berhasil dihapus!');
+        message.success(res.data.data.nama_bahan + " berhasil dihapus!");
       })
       .catch((err) => {
         this.setState({ loadingAct: false });
-        message.error('Gagal Menghapus : ' + err);
+        message.error("Gagal Menghapus : " + err);
       });
   }
 
@@ -285,28 +285,30 @@ class ShowBahan extends Component {
           onPressEnter={() =>
             this.handleSearch(selectedKeys, confirm, dataIndex)
           }
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
         />
         <Space>
           <Button
-            type='primary'
+            type="primary"
             onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
-            size='small'
-            style={{ width: 90 }}>
+            size="small"
+            style={{ width: 90 }}
+          >
             Search
           </Button>
           <Button
             onClick={() => this.handleReset(clearFilters)}
-            size='small'
-            style={{ width: 90 }}>
+            size="small"
+            style={{ width: 90 }}
+          >
             Reset
           </Button>
         </Space>
       </div>
     ),
     filterIcon: (filtered) => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
@@ -314,7 +316,7 @@ class ShowBahan extends Component {
             .toString()
             .toLowerCase()
             .includes(value.toLowerCase())
-        : '',
+        : "",
     onFilterDropdownVisibleChange: (visible) => {
       if (visible) {
         setTimeout(() => this.searchInput.select(), 100);
@@ -325,11 +327,11 @@ class ShowBahan extends Component {
   handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     console.log(
-      'data:' +
+      "data:" +
         selectedKeys[0] +
-        'confirmnya : ' +
+        "confirmnya : " +
         confirm +
-        'datin :' +
+        "datin :" +
         dataIndex
     );
     this.setState({
@@ -340,14 +342,14 @@ class ShowBahan extends Component {
 
   handleReset = (clearFilters) => {
     clearFilters();
-    this.setState({ searchText: '' });
+    this.setState({ searchText: "" });
   };
 
   onChangeTak = (evt) => {
     const bahan = this.state.bahanAll.filter((i) => {
       return i.id == evt;
     });
-    console.log('onchangetak');
+    console.log("onchangetak");
     console.log(evt);
     this.setState({
       nama_bahan: evt,
@@ -374,16 +376,16 @@ class ShowBahan extends Component {
     myAxios
       .post(`bahan`, newObj, {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
       })
       .then((res) => {
-        message.success(newObj.nama_bahan + ' berhasil ditambahkan!');
+        message.success(newObj.nama_bahan + " berhasil ditambahkan!");
         let data = res.data.data;
         this.setState({
           modalVisible: false,
-          nama_bahan: '',
-          unit: '',
+          nama_bahan: "",
+          unit: "",
           loading: false,
           bahanAll: [...this.state.bahanAll, data],
         });
@@ -391,7 +393,7 @@ class ShowBahan extends Component {
       })
       .catch((err) => {
         this.setState({ loading: false });
-        message.error('Tambah Bahan Gagal : ' + err.response.data.message);
+        message.error("Tambah Bahan Gagal : " + err.response.data.message);
       });
     //   } else {
     //     console.log('MASUK EDIT MENU');
@@ -432,11 +434,11 @@ class ShowBahan extends Component {
   handleSubmitEdit = (event) => {
     console.log(event);
     event.preventDefault();
-    console.log('Id = ' + this.state.idEdit);
-    if (this.state.nama_bahan === '' || this.state.unit === '') {
-      message.error('Masukan input yang valid!');
+    console.log("Id = " + this.state.idEdit);
+    if (this.state.nama_bahan === "" || this.state.unit === "") {
+      message.error("Masukan input yang valid!");
     } else {
-      console.log('MASUK EDIT MENU');
+      console.log("MASUK EDIT MENU");
       this.setState({ loading: true });
       let newObj = {
         nama_bahan: this.state.nama_bahan,
@@ -445,15 +447,15 @@ class ShowBahan extends Component {
       myAxios
         .put(`editBahan/${this.state.idEdit}`, newObj, {
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token'),
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
         })
         .then((res) => {
-          message.success(newObj.nama_bahan + ' berhasil diubah!');
+          message.success(newObj.nama_bahan + " berhasil diubah!");
           this.setState({
             modalEditVisible: false,
-            nama_bahan: '',
-            unit: '',
+            nama_bahan: "",
+            unit: "",
             idEdit: null,
             loading: false,
           });
@@ -461,7 +463,7 @@ class ShowBahan extends Component {
         })
         .catch((err) => {
           this.setState({ loading: false });
-          message.error('Ubah Bahan Gagal : ' + err);
+          message.error("Ubah Bahan Gagal : " + err);
         });
     }
   };
@@ -469,16 +471,17 @@ class ShowBahan extends Component {
   handleSubmitStok = (event) => {
     console.log(event);
     let newObj = {
-      tanggal: Moment(event.tanggal).format('YYYY-MM-DD'),
+      tanggal: Moment(event.tanggal).format("YYYY-MM-DD"),
       jumlah: event.jumlah,
       harga: event.harga,
       id_bahan: event.id_bahan,
     };
+    this.setState({ loading: true });
     console.log(newObj);
     myAxios
       .post(`riwayatBahanMasuk`, newObj, {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
       })
       .then((res) => {
@@ -486,7 +489,7 @@ class ShowBahan extends Component {
           return i.id == event.id_bahan;
         });
 
-        message.success(temp[0].nama_bahan + ' berhasil tambah stok!');
+        message.success(temp[0].nama_bahan + " berhasil tambah stok!");
         this.setState({
           modalStokVisible: false,
           loading: false,
@@ -498,7 +501,7 @@ class ShowBahan extends Component {
         this.setState({
           loading: false,
         });
-        message.error('Tambah Stok Bahan Gagal : ' + err.response.data.message);
+        message.error("Tambah Stok Bahan Gagal : " + err.response.data.message);
       });
   };
 
@@ -507,23 +510,23 @@ class ShowBahan extends Component {
       loading: true,
     });
     let newObj = {
-      tanggal: Moment(event.tanggal).format('YYYY-MM-DD'),
+      tanggal: Moment(event.tanggal).format("YYYY-MM-DD"),
       jumlah: event.jumlah,
       id_bahan: event.id_bahan,
-      status: 'Buang',
+      status: "Buang",
     };
     console.log(newObj);
     myAxios
       .post(`riwayatBahanKeluar`, newObj, {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
       })
       .then((res) => {
         const temp = this.state.bahanAll.filter((i) => {
           return i.id == event.id_bahan;
         });
-        message.success(temp[0].nama_bahan + ' berhasil dibuang!');
+        message.success(temp[0].nama_bahan + " berhasil dibuang!");
         this.setState({
           modalKeluarVisible: false,
           loading: false,
@@ -535,33 +538,33 @@ class ShowBahan extends Component {
         this.setState({
           loading: false,
         });
-        message.error('Buang Bahan Gagal : ' + err.response.data.message);
+        message.error("Buang Bahan Gagal : " + err.response.data.message);
       });
   };
 
   checkActionCode = async (rule, value, callback) => {
-    console.log('value ' + value);
+    console.log("value " + value);
     console.log(value);
     let filter = this.state.bahan.filter((el) => {
       return el.id === this.state.nama_bahan;
     });
     console.log(this.state.nama_bahan);
-    console.log('filter');
-    if (this.state.nama_bahan != '') {
-      if (value === 0 || value === '' || value === undefined) {
-        rule.message = 'Jumlah wajib diisi!';
+    console.log("filter");
+    if (this.state.nama_bahan != "") {
+      if (value === 0 || value === "" || value === undefined) {
+        rule.message = "Jumlah wajib diisi!";
         this.formRefKeluar.current.setFields({
           jumlah: {
             value: value,
-            errors: [new Error('forbid ha')],
+            errors: [new Error("forbid ha")],
           },
         });
       } else if (filter[0].jumlah < value) {
-        rule.message = 'Jumlah buang tidak boleh melebihi jumlah sekarang!';
+        rule.message = "Jumlah buang tidak boleh melebihi jumlah sekarang!";
         this.formRefKeluarm.current.setFields({
           jumlah: {
             value: value,
-            errors: [new Error('forbid ha')],
+            errors: [new Error("forbid ha")],
           },
         });
       }
@@ -571,21 +574,21 @@ class ShowBahan extends Component {
   };
   onGenderChange = (value) => {
     switch (value) {
-      case 'male':
+      case "male":
         this.formRef.current.setFieldsValue({
-          note: 'Hi, man!',
+          note: "Hi, man!",
         });
         return;
 
-      case 'female':
+      case "female":
         this.formRef.current.setFieldsValue({
-          note: 'Hi, lady!',
+          note: "Hi, lady!",
         });
         return;
 
-      case 'other':
+      case "other":
         this.formRef.current.setFieldsValue({
-          note: 'Hi there!',
+          note: "Hi there!",
         });
     }
   };
@@ -594,8 +597,8 @@ class ShowBahan extends Component {
   };
   onFill = () => {
     this.formRef.current.setFieldsValue({
-      note: 'Hello world!',
-      gender: 'male',
+      note: "Hello world!",
+      gender: "male",
     });
   };
 
@@ -605,63 +608,64 @@ class ShowBahan extends Component {
     filteredInfo = filteredInfo || {};
     const columns = [
       {
-        title: 'Nama Bahan',
-        dataIndex: 'nama_bahan',
-        key: 'nama_bahan',
-        ...this.getColumnSearchProps('nama_bahan'),
+        title: "Nama Bahan",
+        dataIndex: "nama_bahan",
+        key: "nama_bahan",
+        ...this.getColumnSearchProps("nama_bahan"),
         filteredValue: filteredInfo.nama_bahan || null,
         sorter: (a, b) => a.nama_bahan.length - b.nama_bahan.length,
         ellipsis: true,
       },
       {
-        title: 'Jumlah Stok',
-        dataIndex: 'jumlah',
-        key: 'jumlah',
-        filters: [{ text: 'Bahan Habis', value: 0 }],
+        title: "Jumlah Stok",
+        dataIndex: "jumlah",
+        key: "jumlah",
+        filters: [{ text: "Bahan Habis", value: 0 }],
         filteredValue: filteredInfo.jumlah || null,
         onFilter: (value, record) => record.jumlah == value,
         sorter: (a, b) => a.jumlah - b.jumlah,
         ellipsis: true,
         render: (jumlah) => (
           <>
-            <Tag color={jumlah == 0 ? '#A90603' : '#00664B'}>{jumlah}</Tag>
+            <Tag color={jumlah == 0 ? "#A90603" : "#00664B"}>{jumlah}</Tag>
           </>
         ),
       },
       {
-        title: 'Unit',
-        dataIndex: 'unit',
-        key: 'unit',
+        title: "Unit",
+        dataIndex: "unit",
+        key: "unit",
         filters: [
-          { text: 'Gram', value: 'gram' },
-          { text: 'Mililiter', value: 'ml' },
-          { text: 'Botol', value: 'botol' },
+          { text: "Gram", value: "gram" },
+          { text: "Mililiter", value: "ml" },
+          { text: "Botol", value: "botol" },
         ],
         filteredValue: filteredInfo.unit || null,
         onFilter: (value, record) => record.unit.includes(value),
         sorter: (a, b) => a.unit.length - b.unit.length,
       },
       {
-        align: 'center',
-        dataIndex: 'id',
-        key: 'id',
+        align: "center",
+        dataIndex: "id",
+        key: "id",
 
         render: (dataIndex) => (
           <>
             {!this.state.loadingAct && (
               <div>
                 <EditTwoTone
-                  twoToneColor='blue'
-                  style={{ marginRight: '5px' }}
+                  twoToneColor="blue"
+                  style={{ marginRight: "5px" }}
                   onClick={() => this.editBahan(true, dataIndex)}
                 />
                 <Popconfirm
-                  placement='left'
-                  title={'Apakah anda yakin ingin menghapus ?'}
+                  placement="left"
+                  title={"Apakah anda yakin ingin menghapus ?"}
                   onConfirm={() => this.DeleteItem(dataIndex)}
-                  okText='Yes'
-                  cancelText='No'>
-                  <DeleteTwoTone twoToneColor='red' />
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <DeleteTwoTone twoToneColor="red" />
                 </Popconfirm>
               </div>
             )}
@@ -672,51 +676,56 @@ class ShowBahan extends Component {
     ];
 
     return (
-      <div style={{ padding: '25px 30px' }}>
+      <div style={{ padding: "25px 30px" }}>
         <Modal
-          style={{ fontFamily: 'poppins' }}
+          style={{ fontFamily: "poppins" }}
           visible={this.state.modalVisible}
           title={this.state.judulModal}
           onCancel={this.handleCancel}
-          footer={[]}>
+          footer={[]}
+        >
           <Form
             ref={this.formRef}
-            name='control-ref'
-            onFinish={this.handleSubmit}>
+            name="control-ref"
+            onFinish={this.handleSubmit}
+          >
             <label>Nama Bahan</label>
             <Form.Item
-              name='nama_bahan'
-              initialValue=''
+              name="nama_bahan"
+              initialValue=""
               rules={[
                 {
                   required: true,
-                  message: 'Nama bahan wajib diisi',
+                  message: "Nama bahan wajib diisi",
                 },
-              ]}>
-              <Input placeholder='Masukan nama bahan' />
+              ]}
+            >
+              <Input placeholder="Masukan nama bahan" />
             </Form.Item>
             <label>Unit</label>
             <Form.Item
-              name='unit'
-              initialValue=''
+              name="unit"
+              initialValue=""
               rules={[
                 {
                   required: true,
-                  message: 'Unit wajib diisi',
+                  message: "Unit wajib diisi",
                 },
-              ]}>
-              <Input placeholder='Masukan unit' />
+              ]}
+            >
+              <Input placeholder="Masukan unit" />
             </Form.Item>
 
             <Form.Item>
               <Button
                 loading={this.state.loading}
-                htmlType='submit'
-                type='primary'
+                htmlType="submit"
+                type="primary"
                 style={{
-                  marginTop: '20px',
-                  width: '100%',
-                }}>
+                  marginTop: "20px",
+                  width: "100%",
+                }}
+              >
                 {this.state.buttonModal}
               </Button>
             </Form.Item>
@@ -724,41 +733,44 @@ class ShowBahan extends Component {
         </Modal>
 
         <Modal
-          style={{ fontFamily: 'poppins' }}
+          style={{ fontFamily: "poppins" }}
           visible={this.state.modalEditVisible}
-          title='Edit Data Bahan'
+          title="Edit Data Bahan"
           onCancel={this.handleCancel}
-          footer={[]}>
+          footer={[]}
+        >
           <form onSubmit={this.handleSubmitEdit}>
             <label>Nama Bahan</label>
             <Input
-              placeholder='Nama Bahan'
-              name='nama_bahan'
+              placeholder="Nama Bahan"
+              name="nama_bahan"
               value={this.state.nama_bahan}
               onChange={this.handleChangeInput}
-              autoComplete='off'
+              autoComplete="off"
             />
-            <label style={{ marginTop: '15px' }}>Unit Bahan</label>
+            <label style={{ marginTop: "15px" }}>Unit Bahan</label>
             <Input
-              placeholder='Unit'
-              name='unit'
+              placeholder="Unit"
+              name="unit"
               value={this.state.unit}
               onChange={this.handleChangeInput}
-              autoComplete='off'
+              autoComplete="off"
             />
             <Button
               loading={this.state.loading}
-              type='primary'
+              type="primary"
               style={{
-                marginTop: '20px',
-                width: '100%',
-              }}>
+                marginTop: "20px",
+                width: "100%",
+              }}
+            >
               <button
                 style={{
-                  width: '100%',
-                  border: 'transparent',
-                  backgroundColor: 'transparent',
-                }}>
+                  width: "100%",
+                  border: "transparent",
+                  backgroundColor: "transparent",
+                }}
+              >
                 Edit Bahan
               </button>
             </Button>
@@ -766,27 +778,31 @@ class ShowBahan extends Component {
         </Modal>
 
         <Modal
+          style={{ fontFamily: "poppins" }}
           visible={this.state.modalStokVisible}
-          title='Tambah Bahan Masuk'
+          title="Tambah Bahan Masuk"
           onCancel={this.handleCancelMasuk}
-          footer={[]}>
+          footer={[]}
+        >
           <Form
             ref={this.formRefMasuk}
-            name='control-ref'
-            onFinish={this.handleSubmitStok}>
+            name="control-ref"
+            onFinish={this.handleSubmitStok}
+          >
             <label>Nama Bahan</label>
             {this.state.bahanAll !== null && (
               <Form.Item
-                name='id_bahan'
+                name="id_bahan"
                 rules={[
                   {
                     required: true,
-                    message: 'Nama bahan wajib diisi',
+                    message: "Nama bahan wajib diisi",
                   },
-                ]}>
+                ]}
+              >
                 <Select
-                  placeholder='Masukan nama bahan'
-                  style={{ width: '100%' }}
+                  placeholder="Masukan nama bahan"
+                  style={{ width: "100%" }}
                   onChange={this.onChangeTak}
                   // value={this.state.nama_bahan}
                 >
@@ -801,18 +817,19 @@ class ShowBahan extends Component {
 
             <label>Tanggal Masuk</label>
             <Form.Item
-              name='tanggal'
+              name="tanggal"
               rules={[
                 {
                   required: true,
-                  message: 'Tanggal masuk wajib diisi',
+                  message: "Tanggal masuk wajib diisi",
                 },
-              ]}>
+              ]}
+            >
               <DatePicker
                 // name='tanggal'
                 // onChange={this.handleChangeInputTanggal}
-                placeholder='Masukan Tanggal Masuk'
-                format='YYYY / MM / DD'
+                placeholder="Masukan Tanggal Masuk"
+                format="YYYY / MM / DD"
                 disabledDate={(current) => {
                   return current > moment();
                 }}
@@ -821,51 +838,55 @@ class ShowBahan extends Component {
 
             <label>Jumlah Masuk</label>
             <Form.Item
-              name='jumlah'
+              name="jumlah"
               rules={[
                 {
                   required: true,
-                  message: 'Jumlah wajib diisi',
+                  message: "Jumlah wajib diisi",
                 },
-              ]}>
+              ]}
+            >
               <Input
-                type='number'
+                type="number"
                 suffix={this.state.suffix}
-                placeholder='Masukan jumlah'
+                placeholder="Masukan jumlah"
+                min="0"
                 // name='jumlah'
                 // value={this.state.jumlah}
                 // onChange={this.handleChangeInput}
-                autoComplete='off'
+                autoComplete="off"
               />
             </Form.Item>
             <label>Harga</label>
             <Form.Item
-              name='harga'
+              name="harga"
               rules={[
                 {
                   required: true,
-                  message: 'Harga wajib diisi',
+                  message: "Harga wajib diisi",
                 },
-              ]}>
+              ]}
+            >
               <Input
-                type='number'
-                prefix='Rp. '
-                placeholder='Masukan harga'
+                type="number"
+                prefix="Rp. "
+                placeholder="Masukan harga"
                 // name='harga'
                 // value={this.state.harga}
                 // onChange={this.handleChangeInput}
-                autoComplete='off'
+                autoComplete="off"
               />
             </Form.Item>
             <Form.Item>
               <Button
                 loading={this.state.loading}
-                type='primary'
-                htmlType='submit'
+                type="primary"
+                htmlType="submit"
                 style={{
-                  marginTop: '20px',
-                  width: '100%',
-                }}>
+                  marginTop: "20px",
+                  width: "100%",
+                }}
+              >
                 Tambah Stok Bahan
               </Button>
             </Form.Item>
@@ -873,28 +894,33 @@ class ShowBahan extends Component {
         </Modal>
 
         <Modal
+          style={{ fontFamily: "poppins" }}
           visible={this.state.modalKeluarVisible}
-          title='Buang Stok Bahan'
+          title="Buang Stok Bahan"
           onCancel={this.handleCancelKeluar}
-          footer={[]}>
+          footer={[]}
+        >
           <Form
             ref={this.formRefKeluar}
-            name='control-ref'
-            onFinish={this.handleSubmitKeluar}>
+            name="control-ref"
+            onFinish={this.handleSubmitKeluar}
+          >
             <label>Nama Bahan</label>
             {this.state.bahan !== null && (
               <Form.Item
-                name='id_bahan'
+                name="id_bahan"
                 rules={[
                   {
                     required: true,
-                    message: 'Nama bahan wajib diisi',
+                    message: "Nama bahan wajib diisi",
                   },
-                ]}>
+                ]}
+              >
                 <Select
-                  placeholder='Masukan nama bahan'
-                  style={{ width: '100%' }}
-                  onChange={this.onChangeTak}>
+                  placeholder="Masukan nama bahan"
+                  style={{ width: "100%" }}
+                  onChange={this.onChangeTak}
+                >
                   {this.state.bahan.map((val, item) => (
                     <Select.Option key={val.nama_bahan} value={val.id}>
                       {val.nama_bahan}
@@ -906,16 +932,17 @@ class ShowBahan extends Component {
 
             <label>Tanggal Buang</label>
             <Form.Item
-              name='tanggal'
+              name="tanggal"
               rules={[
                 {
                   required: true,
-                  message: 'Tanggal buang wajib diisi',
+                  message: "Tanggal buang wajib diisi",
                 },
-              ]}>
+              ]}
+            >
               <DatePicker
-                placeholder='Masukan tanggal buang'
-                format='YYYY / MM / DD'
+                placeholder="Masukan tanggal buang"
+                format="YYYY / MM / DD"
                 // name='tanggal'
                 // onChange={this.handleChangeInputTanggal}
                 disabledDate={(current) => {
@@ -926,32 +953,34 @@ class ShowBahan extends Component {
 
             <label>Jumlah Buang</label>
             <Form.Item
-              name='jumlah'
+              name="jumlah"
               rules={[
                 {
                   required: true,
                   validator: this.checkActionCode,
                 },
-              ]}>
+              ]}
+            >
               <Input
-                type='number'
-                placeholder='Masukan jumlah buang'
+                type="number"
+                placeholder="Masukan jumlah buang"
                 suffix={this.state.suffix}
                 // name='jumlah'
                 // value={this.state.jumlah}
                 // onChange={this.handleChangeInput}
-                autoComplete='off'
+                autoComplete="off"
               />
             </Form.Item>
             <Form.Item>
               <Button
                 loading={this.state.loading}
-                type='primary'
-                htmlType='submit'
+                type="primary"
+                htmlType="submit"
                 style={{
-                  marginTop: '20px',
-                  width: '100%',
-                }}>
+                  marginTop: "20px",
+                  width: "100%",
+                }}
+              >
                 Buang Stok Bahan
               </Button>
             </Form.Item>
@@ -960,41 +989,47 @@ class ShowBahan extends Component {
 
         <h1
           style={{
-            fontSize: 'x-large',
-            color: '#001529',
-            textTransform: 'uppercase',
-          }}>
+            fontSize: "x-large",
+            color: "#001529",
+            textTransform: "uppercase",
+          }}
+        >
           <strong>data bahan</strong>
         </h1>
         <div
           style={{
-            border: '1px solid #8C98AD',
-            marginTop: '-10px',
-            marginBottom: '15px',
-          }}></div>
+            border: "1px solid #8C98AD",
+            marginTop: "-10px",
+            marginBottom: "15px",
+          }}
+        ></div>
         <Space style={{ marginBottom: 16 }}>
           <Button
-            type='primary'
-            style={{ width: 'auto', borderRadius: '7px' }}
-            onClick={this.clearFilters}>
+            type="primary"
+            style={{ width: "auto", borderRadius: "7px" }}
+            onClick={this.clearFilters}
+          >
             Hapus Filter
           </Button>
           <Button
-            style={{ width: 'auto', borderRadius: '7px' }}
-            type='primary'
-            onClick={this.openModal}>
+            style={{ width: "auto", borderRadius: "7px" }}
+            type="primary"
+            onClick={this.openModal}
+          >
             Tambah Data Bahan
           </Button>
           <Button
-            style={{ width: 'auto', borderRadius: '7px' }}
-            type='primary'
-            onClick={this.openModalStok}>
+            style={{ width: "auto", borderRadius: "7px" }}
+            type="primary"
+            onClick={this.openModalStok}
+          >
             Tambah Bahan Masuk
           </Button>
           <Button
-            style={{ width: 'auto', borderRadius: '7px' }}
-            type='primary'
-            onClick={this.openModalKeluar}>
+            style={{ width: "auto", borderRadius: "7px" }}
+            type="primary"
+            onClick={this.openModalKeluar}
+          >
             Buang Stok Bahan
           </Button>
         </Space>
