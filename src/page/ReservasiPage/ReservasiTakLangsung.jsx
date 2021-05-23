@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
-import { useParams, useForm, useHistory } from "react-router-dom";
+import React, { useContext, useEffect, useState, useRef } from 'react';
+import { useParams, useForm, useHistory } from 'react-router-dom';
 import {
   Form,
   Input,
@@ -18,17 +18,17 @@ import {
   Select,
   DatePicker,
   Result,
-} from "antd";
-import "./reserv.css";
-import QRCode from "react-qr-code";
-import { DownOutlined, LoadingOutlined } from "@ant-design/icons";
-import TableHijau from "../../asset/icon/tableHijau.png";
-import TableMerah from "../../asset/icon/tableMerah.png";
-import myAxios from "../../myAxios";
-import { UserContext } from "../../context/UserContext";
-import Moment from "moment";
-import { Subtitles } from "@material-ui/icons";
-import moment from "moment";
+} from 'antd';
+import './reserv.css';
+import QRCode from 'react-qr-code';
+import { DownOutlined, LoadingOutlined } from '@ant-design/icons';
+import TableHijau from '../../asset/icon/tableHijau.png';
+import TableMerah from '../../asset/icon/tableMerah.png';
+import myAxios from '../../myAxios';
+import { UserContext } from '../../context/UserContext';
+import Moment from 'moment';
+import { Subtitles } from '@material-ui/icons';
+import moment from 'moment';
 
 const layout = {
   labelCol: { span: 8 },
@@ -42,7 +42,7 @@ const { Option } = Select;
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const ReservasiTakLangsung = () => {
   let history = useHistory();
-  const mytoken = localStorage.getItem("token");
+  const mytoken = localStorage.getItem('token');
   const wrapperRef = useRef(null);
 
   const [user, setUser] = useContext(UserContext);
@@ -62,13 +62,13 @@ const ReservasiTakLangsung = () => {
   const [display, setDisplay] = useState(false);
   const [options, setOptions] = useState([]);
   const [cust, setCust] = useState(null);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
 
   const [reservasi, setReservasi] = useState(null);
   //QR CODE
   const [modalQr, setmodalQr] = useState(false);
   const [modalTanggal, setmodalTanggal] = useState(true);
-  const [objectQr, setobjectQr] = useState("");
+  const [objectQr, setobjectQr] = useState('');
   const [tempModal, setTempModal] = useState(false);
 
   //Simpan Data Tanggal Sesi
@@ -78,8 +78,8 @@ const ReservasiTakLangsung = () => {
   });
 
   const onFilter = (param) => {
-    console.log("TEMP MEJA = " + param);
-    console.log("TEMP MEJA = " + tempmeja);
+    console.log('TEMP MEJA = ' + param);
+    console.log('TEMP MEJA = ' + tempmeja);
     setMeja(
       tempmeja.filter((i) => {
         return i.status == param;
@@ -97,11 +97,11 @@ const ReservasiTakLangsung = () => {
     myAxios
       .put(`updateStatusReservasi/${this.state.idEdit}`, newObj, {
         headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
+          Authorization: 'Bearer ' + localStorage.getItem('token'),
         },
       })
       .then((res) => {
-        message.success("Berhasil Cetak Qr Pemesanan");
+        message.success('Berhasil Cetak Qr Pemesanan');
         let data = res.data.data;
         setmodalQr(false);
         setobjectQr(JSON.stringify(reservasi));
@@ -109,20 +109,20 @@ const ReservasiTakLangsung = () => {
       })
       .catch((err) => {
         message.error(
-          "Cetak Qr Pemesanan Gagal : " + err.response.data.message
+          'Cetak Qr Pemesanan Gagal : ' + err.response.data.message
         );
       });
   };
 
   const openReservasi = (val) => {
-    console.log("Get Meja");
+    console.log('Get Meja');
     console.log(val);
-    if (val.status === "Terisi") {
-      message.error("Meja sudah terisi!");
+    if (val.status === 'Terisi') {
+      message.error('Meja sudah terisi!');
     } else {
       setModal(true);
       setidMeja(val.id);
-      var tanggal = Moment(tglSesi, "YYYY-MM-DD");
+      var tanggal = Moment(tglSesi, 'YYYY-MM-DD');
       // setnoMeja(val.nomor_meja);
       console.log(tglSesi);
       formReserv.setFieldsValue({
@@ -137,19 +137,17 @@ const ReservasiTakLangsung = () => {
     <Menu>
       <Menu.Item>
         <a
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => onFilter("Kosong")}
-        >
+          target='_blank'
+          rel='noopener noreferrer'
+          onClick={() => onFilter('Kosong')}>
           Tampil Meja Kosong
         </a>
       </Menu.Item>
       <Menu.Item>
         <a
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => onFilter("Terisi")}
-        >
+          target='_blank'
+          rel='noopener noreferrer'
+          onClick={() => onFilter('Terisi')}>
           Tampil Meja Terisi
         </a>
       </Menu.Item>
@@ -160,13 +158,13 @@ const ReservasiTakLangsung = () => {
     myAxios
       .get(`showCustomer`, {
         headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
+          Authorization: 'Bearer ' + localStorage.getItem('token'),
         },
       })
       .then((res) => {
         const data = res.data.data;
         var temp = [];
-        console.log("Data Customerku = ");
+        console.log('Data Customerku = ');
         console.log(temp);
         setOptions(data);
       });
@@ -178,17 +176,17 @@ const ReservasiTakLangsung = () => {
 
   const onFinish = async (values) => {
     setLoading(true);
-    console.log("On Finish Reservasi Langsung");
-    var date = Moment(values.tanggal).format("YYYY-MM-DD");
-    var dateShow = Moment(values.tanggal).format("MMMM Do YYYY, h:mm:ss a");
-    var dateShowNow = Moment(new Date()).format("DD MMMM YYYY");
-    if (values.telepon === "" || values.telepon === undefined) {
-      values.telepon = "-";
+    console.log('On Finish Reservasi Langsung');
+    var date = Moment(values.tanggal).format('YYYY-MM-DD');
+    var dateShow = Moment(values.tanggal).format('MMMM Do YYYY, h:mm:ss a');
+    var dateShowNow = Moment(new Date()).format('DD MMMM YYYY');
+    if (values.telepon === '' || values.telepon === undefined) {
+      values.telepon = '-';
     } else {
-      values.telepon = "0" + values.telepon;
+      values.telepon = '0' + values.telepon;
     }
-    if (values.email === "" || values.email === undefined) {
-      values.email = "-";
+    if (values.email === '' || values.email === undefined) {
+      values.email = '-';
     }
     let newObj = {
       nama_customer: values.nama_customer,
@@ -200,13 +198,14 @@ const ReservasiTakLangsung = () => {
       id_karyawan: user.id_karyawan,
       tipe: togle,
       id_customer: cust,
+      jenis: 'taklangsung',
     };
-    console.log("neww");
+    console.log('neww');
     console.log(newObj);
     myAxios
       .post(`storeReservasiLangsung`, newObj, {
         headers: {
-          Authorization: "Bearer " + mytoken,
+          Authorization: 'Bearer ' + mytoken,
         },
       })
       .then((res) => {
@@ -221,30 +220,30 @@ const ReservasiTakLangsung = () => {
         setSubTitle(null);
         setLoading(false);
         console.log(err.response.data.message);
-        message.error("Tambah Reservasi Gagal : " + err.response.data.message);
+        message.error('Tambah Reservasi Gagal : ' + err.response.data.message);
       });
   };
 
   const onFinishTanggalSesi = (values) => {
     setLoading(true);
-    console.log("On Finish Input Tanggal dan Sesi");
-    var date = Moment(values.tanggal_reservasi).format("YYYY-MM-DD");
+    console.log('On Finish Input Tanggal dan Sesi');
+    var date = Moment(values.tanggal_reservasi).format('YYYY-MM-DD');
 
     let newObj = {
       tanggal_reservasi: date,
       sesi_reservasi: values.sesi,
     };
     console.log(newObj);
-    console.log("tak ");
+    console.log('tak ');
     myAxios
       .post(`tampilMejaReservasi`, newObj, {
         headers: {
-          Authorization: "Bearer " + mytoken,
+          Authorization: 'Bearer ' + mytoken,
         },
       })
       .then((res) => {
         var data = res.data.data;
-        console.log("data meja reserv");
+        console.log('data meja reserv');
         console.log(data);
         setLoading(false);
         setmodalTanggal(false);
@@ -254,28 +253,28 @@ const ReservasiTakLangsung = () => {
         setTglSesi({
           tanggal_reservasi: values.tanggal_reservasi,
           sesi_reservasi: values.sesi,
-          tgl_show: Moment(values.tanggal_reservasi).format("LL"),
+          tgl_show: Moment(values.tanggal_reservasi).format('LL'),
         });
-        message.info("Silahkan memilih meja yang kosong");
+        message.info('Silahkan memilih meja yang kosong');
       })
       .catch((err) => {
         setSubTitle(null);
         setLoading(false);
         console.log(err.response.data.message);
-        message.error("Gagal : " + err.response.data.message);
+        message.error('Gagal : ' + err.response.data.message);
       });
   };
 
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+    console.log('Failed:', errorInfo);
   };
 
   useEffect(() => {
-    console.log("const search");
+    console.log('const search');
     console.log(search);
-    console.log("Show Meja " + user);
+    console.log('Show Meja ' + user);
 
-    console.log("SYALALA : " + localStorage.getItem("token"));
+    console.log('SYALALA : ' + localStorage.getItem('token'));
     if (meja === null) {
       getCustomer();
     }
@@ -283,7 +282,7 @@ const ReservasiTakLangsung = () => {
   });
 
   const checkActionCode = async (rule, value, callback) => {
-    console.log("value " + value);
+    console.log('value ' + value);
     console.log(value);
     // if (value === "" || value === undefined) {
     //   rule.message = "Nomor Telepon Wajib diisi!";
@@ -295,29 +294,29 @@ const ReservasiTakLangsung = () => {
     //   });
     // } else
     if (value !== undefined) {
-      if (value !== "") {
+      if (value !== '') {
         if (value[0] == 0 || value[0] != 8) {
-          rule.message = "Nomor Telepon Harus diawali dengan 8!";
+          rule.message = 'Nomor Telepon Harus diawali dengan 8!';
           formReserv.setFields({
             telepon: {
               value: value,
-              errors: [new Error("forbid ha")],
+              errors: [new Error('forbid ha')],
             },
           });
         } else if (value.length < 10) {
-          rule.message = "Nomor Telepon Harus lebih dari 10!";
+          rule.message = 'Nomor Telepon Harus lebih dari 10!';
           formReserv.setFields({
             telepon: {
               value: value,
-              errors: [new Error("forbid ha")],
+              errors: [new Error('forbid ha')],
             },
           });
         } else if (value.length > 14) {
-          rule.message = "Nomor Telepon Harus kurang dari 14!";
+          rule.message = 'Nomor Telepon Harus kurang dari 14!';
           formReserv.setFields({
             telepon: {
               value: value,
-              errors: [new Error("forbid ha")],
+              errors: [new Error('forbid ha')],
             },
           });
         } else {
@@ -334,9 +333,9 @@ const ReservasiTakLangsung = () => {
     setTogle(evt);
     if (evt === false) {
       form.setFieldsValue({
-        nama_customer: "",
-        telepon: "",
-        email: "",
+        nama_customer: '',
+        telepon: '',
+        email: '',
       });
       setCust(null);
     }
@@ -349,12 +348,12 @@ const ReservasiTakLangsung = () => {
     });
     const newTemp = temp[0];
 
-    if (newTemp.telepon === "-") {
-      newTemp.telepon = "";
+    if (newTemp.telepon === '-') {
+      newTemp.telepon = '';
     }
 
-    if (newTemp.email === "-") {
-      newTemp.email = "";
+    if (newTemp.email === '-') {
+      newTemp.email = '';
     }
     formReserv.setFieldsValue({
       nama_customer: newTemp.nama_customer,
@@ -373,7 +372,7 @@ const ReservasiTakLangsung = () => {
 
   const onCancelModalTanggal = () => {
     if (tempModal === false) {
-      message.error("Silahkan isi data reservasi dahulu!");
+      message.error('Silahkan isi data reservasi dahulu!');
     } else {
       setmodalTanggal(false);
       form.resetFields();
@@ -381,15 +380,15 @@ const ReservasiTakLangsung = () => {
   };
 
   function onBlur() {
-    console.log("blur");
+    console.log('blur');
   }
 
   function onFocus() {
-    console.log("focus");
+    console.log('focus');
   }
 
   function onSearch(val) {
-    console.log("search:", val);
+    console.log('search:', val);
   }
 
   const onChangeTgl = (evt) => {
@@ -405,50 +404,47 @@ const ReservasiTakLangsung = () => {
   };
 
   return (
-    <div style={{ padding: "25px 30px" }}>
+    <div style={{ padding: '25px 30px' }}>
       {subTitle && (
         <Result
-          className="result"
-          status="success"
-          title="Reservasi tidak langsung berhasil ditambahkan!"
+          className='result'
+          status='success'
+          title='Reservasi tidak langsung berhasil ditambahkan!'
           subTitle={subTitle}
           extra={[
             <Button
-              type="primary"
-              key="console"
-              onClick={() => history.push("/showReservasiTakLangsung")}
-            >
+              type='primary'
+              key='console'
+              onClick={() => history.push('/showReservasiTakLangsung')}>
               Kembali ke Reservasi
             </Button>,
 
             <Modal
-              style={{ fontFamily: "poppins" }}
+              style={{ fontFamily: 'poppins' }}
               visible={modalQr}
-              title="Cetak QR Code Pesanan"
+              title='Cetak QR Code Pesanan'
               onCancel={handleCancel}
               footer={[]}
-              width={400}
-            >
-              <h1 style={{ textAlign: "center" }}>
+              width={400}>
+              <h1 style={{ textAlign: 'center' }}>
                 <QRCode
                   loading={loading}
-                  fgColor="#1F1F1F"
+                  fgColor='#1F1F1F'
                   style={{
-                    textAlign: "center",
-                    marginBottom: "15px",
+                    textAlign: 'center',
+                    marginBottom: '15px',
                   }}
                   value={objectQr}
                 />
                 <Button
-                  type="primary"
+                  type='primary'
                   onClick={onSubmitQr}
                   loading={loading}
                   style={{
-                    borderRadius: "5px",
-                    margin: "10px",
-                    width: "75%",
-                  }}
-                >
+                    borderRadius: '5px',
+                    margin: '10px',
+                    width: '75%',
+                  }}>
                   Cetak QR Code
                 </Button>
               </h1>
@@ -460,135 +456,123 @@ const ReservasiTakLangsung = () => {
         <>
           <h1
             style={{
-              fontSize: "x-large",
-              color: "#001529",
-              textTransform: "uppercase",
-            }}
-          >
+              fontSize: 'x-large',
+              color: '#001529',
+              textTransform: 'uppercase',
+            }}>
             <strong>Reservasi Tidak Langsung</strong>
           </h1>
           <div
             style={{
-              border: "1px solid #8C98AD",
-              marginTop: "-10px",
-              marginBottom: "5px",
-            }}
-          ></div>
+              border: '1px solid #8C98AD',
+              marginTop: '-10px',
+              marginBottom: '5px',
+            }}></div>
 
-          <Row justify="start" style={{ width: "100%" }}>
+          <Row justify='start' style={{ width: '100%' }}>
             <Col xs={24} md={3}>
               <Button
-                type="primary"
+                type='primary'
                 onClick={hapusFilter}
-                style={{ width: "120px", marginTop: "10px" }}
-              >
+                style={{ width: '120px', marginTop: '10px' }}>
                 Hapus Filter
               </Button>
             </Col>
             <Col xs={24} md={2}>
               <Dropdown overlay={menu}>
-                <Button type="primary" style={{ marginTop: "10px" }}>
+                <Button type='primary' style={{ marginTop: '10px' }}>
                   Filter <DownOutlined />
                 </Button>
               </Dropdown>
             </Col>
             <Col xs={24} md={3}>
               <Button
-                type="primary"
+                type='primary'
                 onClick={() => setmodalTanggal(true)}
-                style={{ marginTop: "10px" }}
-              >
+                style={{ marginTop: '10px' }}>
                 Edit Tanggal dan Sesi
               </Button>
             </Col>
           </Row>
           <Card
-            className="card-reservasi"
+            className='card-reservasi'
             style={{
               marginTop: 16,
               marginBottom: 16,
-              borderRadius: "8px",
-              border: "0.5px solid #3C8065",
-              backgroundColor: "#DFF0D8",
-            }}
-          >
+              borderRadius: '8px',
+              border: '0.5px solid #3C8065',
+              backgroundColor: '#DFF0D8',
+            }}>
             <h1
               style={{
-                color: "#3C8065",
-                marginTop: "-10px",
-                fontWeight: "bold",
-              }}
-            >
+                color: '#3C8065',
+                marginTop: '-10px',
+                fontWeight: 'bold',
+              }}>
               Data Reservasi
             </h1>
             <Row>
               <Col md={4}>
                 <p
                   style={{
-                    color: "#3C8065",
-                    fontWeight: "bold",
-                  }}
-                >
+                    color: '#3C8065',
+                    fontWeight: 'bold',
+                  }}>
                   Tanggal Reservasi
                 </p>
               </Col>
               <Col>
                 <p
                   style={{
-                    color: "#3C8065",
-                    marginBottom: "-10px",
-                    fontWeight: "bold",
-                  }}
-                >
+                    color: '#3C8065',
+                    marginBottom: '-10px',
+                    fontWeight: 'bold',
+                  }}>
                   : {tglSesi.tgl_show}
                 </p>
               </Col>
             </Row>
-            <Row style={{ marginTop: "-15px" }}>
+            <Row style={{ marginTop: '-15px' }}>
               <Col md={4}>
                 <p
                   style={{
-                    color: "#3C8065",
-                    fontWeight: "bold",
-                  }}
-                >
+                    color: '#3C8065',
+                    fontWeight: 'bold',
+                  }}>
                   Sesi Reservasi
                 </p>
               </Col>
               <Col>
                 <p
                   style={{
-                    color: "#3C8065",
-                    marginBottom: "-10px",
-                    fontWeight: "bold",
-                  }}
-                >
+                    color: '#3C8065',
+                    marginBottom: '-10px',
+                    fontWeight: 'bold',
+                  }}>
                   : {tglSesi.sesi_reservasi}
                 </p>
               </Col>
             </Row>
           </Card>
           <Modal
-            style={{ fontFamily: "poppins" }}
-            title="Tambah Reservasi Tidak Langsung"
+            style={{ fontFamily: 'poppins' }}
+            title='Tambah Reservasi Tidak Langsung'
             centered
             visible={modal}
             onCancel={onCancelModal}
             footer={[]}
-            width={400}
-          >
+            width={400}>
             <Form
-              name="nest-messages"
+              name='nest-messages'
               form={formReserv}
               initialValues={{ remember: false }}
               onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-            >
-              <div className="switcher" style={{ marginBottom: "10px" }}>
+              onFinishFailed={onFinishFailed}>
+              <div className='switcher' style={{ marginBottom: '10px' }}>
                 <Switch
-                  size="small"
+                  size='small'
                   onChange={togleCust}
-                  style={{ marginRight: "10px" }}
+                  style={{ marginRight: '10px' }}
                 />
                 {togle === true && (
                   <label>
@@ -604,11 +588,11 @@ const ReservasiTakLangsung = () => {
               {togle === true && (
                 <>
                   <Select
-                    style={{ width: "100%" }}
-                    autoComplete="off"
+                    style={{ width: '100%' }}
+                    autoComplete='off'
                     showSearch
-                    placeholder="Cari Pelanggan"
-                    optionFilterProp="children"
+                    placeholder='Cari Pelanggan'
+                    optionFilterProp='children'
                     onChange={onChange}
                     onFocus={onFocus}
                     onBlur={onBlur}
@@ -623,27 +607,24 @@ const ReservasiTakLangsung = () => {
                       <Option
                         key={val.id}
                         value={val.id}
-                        style={{ fontWeight: "bold" }}
-                      >
+                        style={{ fontWeight: 'bold' }}>
                         {val.nama_customer}
                         <div>
                           <p
                             style={{
-                              fontSize: "11px",
-                              marginTop: "-5px",
-                              fontWeight: "normal",
-                            }}
-                          >
+                              fontSize: '11px',
+                              marginTop: '-5px',
+                              fontWeight: 'normal',
+                            }}>
                             {val.email}
                           </p>
                           <p
                             style={{
-                              fontSize: "11px",
-                              marginTop: "-20px",
-                              marginBottom: "0",
-                              fontWeight: "normal",
-                            }}
-                          >
+                              fontSize: '11px',
+                              marginTop: '-20px',
+                              marginBottom: '0',
+                              fontWeight: 'normal',
+                            }}>
                             {val.telepon}
                           </p>
                         </div>
@@ -653,132 +634,125 @@ const ReservasiTakLangsung = () => {
                   <br /> <br />
                 </>
               )}
-              <Row justify="space-between">
+              <Row justify='space-between'>
                 <Col md={11}>
                   <label>Nomor Meja</label>
-                  <Form.Item name="nomor_meja" labelAlign="left">
+                  <Form.Item name='nomor_meja' labelAlign='left'>
                     <Input
                       disabled
-                      autoComplete="off"
-                      style={{ borderRadius: "5px" }}
+                      autoComplete='off'
+                      style={{ borderRadius: '5px' }}
                     />
                   </Form.Item>
                 </Col>
                 <Col md={1}></Col>
                 <Col md={12}>
                   <label>Tanggal Reservasi</label>
-                  <Form.Item name="tanggal" labelAlign="left">
+                  <Form.Item name='tanggal' labelAlign='left'>
                     <DatePicker
                       disabled
-                      name="tanggal"
-                      placeholder="Masukan Tanggal"
-                      style={{ borderRadius: "5px" }}
+                      name='tanggal'
+                      placeholder='Masukan Tanggal'
+                      style={{ borderRadius: '5px' }}
                     />
                   </Form.Item>
                 </Col>
               </Row>
               <label>Sesi Reservasi</label>
-              <Form.Item name="sesi_reservasi" labelAlign="left">
+              <Form.Item name='sesi_reservasi' labelAlign='left'>
                 <Input
                   disabled
-                  autoComplete="off"
-                  style={{ borderRadius: "5px" }}
+                  autoComplete='off'
+                  style={{ borderRadius: '5px' }}
                 />
               </Form.Item>
               <label>Nama Pelanggan</label>
               <Form.Item
-                name="nama_customer"
-                labelAlign="left"
+                name='nama_customer'
+                labelAlign='left'
                 rules={[
                   {
                     required: true,
-                    message: "Masukan Nama Pelanggan",
+                    message: 'Masukan Nama Pelanggan',
                   },
-                ]}
-              >
+                ]}>
                 <Input
-                  autoComplete="off"
-                  defaultValue=""
-                  style={{ borderRadius: "5px" }}
+                  autoComplete='off'
+                  defaultValue=''
+                  style={{ borderRadius: '5px' }}
                 />
               </Form.Item>
               <label>Nomor Telepon</label>
               <Form.Item
-                name="telepon"
-                labelAlign="left"
+                name='telepon'
+                labelAlign='left'
                 rules={[
                   {
                     required: true,
                     validator: checkActionCode,
                   },
-                ]}
-              >
+                ]}>
                 <Input
-                  autoComplete="off"
-                  defaultValue=""
-                  addonBefore="+62"
-                  style={{ borderRadius: "5px" }}
-                  type="number"
+                  autoComplete='off'
+                  defaultValue=''
+                  addonBefore='+62'
+                  style={{ borderRadius: '5px' }}
+                  type='number'
                 />
               </Form.Item>
               <label>Email</label>
               <Form.Item
-                name="email"
-                labelAlign="left"
+                name='email'
+                labelAlign='left'
                 rules={[
                   {
-                    message: "Masukan Email Pelanggan!",
-                    type: "email",
+                    message: 'Masukan Email Pelanggan!',
+                    type: 'email',
                   },
-                ]}
-              >
+                ]}>
                 <Input />
               </Form.Item>
               <Form.Item>
                 <Button
-                  type="primary"
+                  type='primary'
                   loading={loading}
-                  htmlType="submit"
+                  htmlType='submit'
                   style={{
-                    borderRadius: "5px",
-                    width: "100%",
-                    margin: "auto",
-                  }}
-                >
+                    borderRadius: '5px',
+                    width: '100%',
+                    margin: 'auto',
+                  }}>
                   Tambah Reservasi
                 </Button>
               </Form.Item>
             </Form>
           </Modal>
           <Modal
-            style={{ fontFamily: "poppins" }}
-            title="Tanggal Reservasi"
+            style={{ fontFamily: 'poppins' }}
+            title='Tanggal Reservasi'
             centered
             visible={modalTanggal}
             onCancel={onCancelModalTanggal}
             footer={[]}
-            width={400}
-          >
+            width={400}>
             <Form
-              name="nest-messages"
+              name='nest-messages'
               form={form}
               initialValues={{ remember: false }}
               onFinish={onFinishTanggalSesi}
-              onFinishFailed={onFinishFailed}
-            >
+              onFinishFailed={onFinishFailed}>
               <label>Tanggal Reservasi</label>
               <Form.Item
-                name="tanggal_reservasi"
-                labelAlign="left"
+                name='tanggal_reservasi'
+                labelAlign='left'
                 rules={[
-                  { required: true, message: "Masukan Tanggal Reservasi!" },
-                ]}
-              >
+                  { required: true, message: 'Masukan Tanggal Reservasi!' },
+                ]}>
                 <DatePicker
                   onChange={onChangeTgl}
-                  name="tanggal"
-                  placeholder="Masukan Tanggal"
-                  style={{ borderRadius: "5px" }}
+                  name='tanggal'
+                  placeholder='Masukan Tanggal'
+                  style={{ borderRadius: '5px' }}
                   disabledDate={(current) => {
                     return current < moment();
                   }}
@@ -786,45 +760,43 @@ const ReservasiTakLangsung = () => {
               </Form.Item>
               <label>Sesi Reservasi</label>
               <Form.Item
-                name="sesi"
-                labelAlign="left"
-                rules={[{ required: true, message: "Masukan Sesi Reservasi!" }]}
-              >
+                name='sesi'
+                labelAlign='left'
+                rules={[
+                  { required: true, message: 'Masukan Sesi Reservasi!' },
+                ]}>
                 <Select
-                  placeholder="Masukan Sesi Reservasi"
-                  onChange={onChangeSesi}
-                >
-                  <Select.Option value="Lunch">Lunch</Select.Option>
-                  <Select.Option value="Dinner">Dinner</Select.Option>
+                  placeholder='Masukan Sesi Reservasi'
+                  onChange={onChangeSesi}>
+                  <Select.Option value='Lunch'>Lunch</Select.Option>
+                  <Select.Option value='Dinner'>Dinner</Select.Option>
                 </Select>
               </Form.Item>
               <Form.Item>
                 <Row>
                   <Col md={12}>
                     <Button
-                      type="primary"
+                      type='primary'
                       loading={loading}
-                      onClick={() => history.push("/showReservasiTakLangsung")}
+                      onClick={() => history.push('/showReservasiTakLangsung')}
                       style={{
-                        borderRadius: "5px",
-                        width: "100%",
-                        margin: "auto",
-                      }}
-                    >
+                        borderRadius: '5px',
+                        width: '100%',
+                        margin: 'auto',
+                      }}>
                       Kembali
                     </Button>
                   </Col>
                   <Col md={12}>
                     <Button
-                      type="primary"
+                      type='primary'
                       loading={loading}
-                      htmlType="submit"
+                      htmlType='submit'
                       style={{
-                        borderRadius: "5px",
-                        width: "100%",
-                        margin: "auto",
-                      }}
-                    >
+                        borderRadius: '5px',
+                        width: '100%',
+                        margin: 'auto',
+                      }}>
                       Submit
                     </Button>
                   </Col>
@@ -836,32 +808,31 @@ const ReservasiTakLangsung = () => {
           {!meja && (
             <h1
               style={{
-                marginTop: "25px",
-                textAlign: "center",
-              }}
-            >
+                marginTop: '25px',
+                textAlign: 'center',
+              }}>
               <Spin />
-              <p style={{ color: "grey", fontSize: "15px" }}>
+              <p style={{ color: 'grey', fontSize: '15px' }}>
                 Mengambil data meja...
               </p>
             </h1>
           )}
           {meja && (
-            <Row justify="start">
+            <Row justify='start'>
               {meja.map((val, index) => {
                 return (
-                  <Col xs={12} md={4} style={{ marginTop: "10px" }}>
+                  <Col xs={12} md={4} style={{ marginTop: '10px' }}>
                     <div onClick={() => openReservasi(val)}>
-                      <div className="flip-card">
-                        <div className="flip-card-front">
-                          <h1 style={{ textAlign: "center" }}>
+                      <div className='flip-card'>
+                        <div className='flip-card-front'>
+                          <h1 style={{ textAlign: 'center' }}>
                             {val.nomor_meja}
                           </h1>
-                          {val.status !== "Kosong" && (
-                            <img src={TableMerah} alt="" />
+                          {val.status !== 'Kosong' && (
+                            <img src={TableMerah} alt='' />
                           )}
-                          {val.status === "Kosong" && (
-                            <img src={TableHijau} alt="" />
+                          {val.status === 'Kosong' && (
+                            <img src={TableHijau} alt='' />
                           )}
                         </div>
                       </div>

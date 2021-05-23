@@ -185,6 +185,8 @@ class Transaksi extends Component {
   };
 
   getMeja = () => {
+    this.setState({ loading: true });
+    console.log('loading ' + this.state.loading);
     myAxios
       .get(`showTransaksi`, {
         headers: {
@@ -204,6 +206,14 @@ class Transaksi extends Component {
         this.setState({
           meja: data,
           tempmeja: data,
+          loading: false,
+        });
+        console.log('loading2 ' + this.state.loading);
+      })
+      .catch((err) => {
+        message.info(err.response.data.message);
+        this.setState({
+          loading: false,
         });
       });
   };
@@ -222,7 +232,6 @@ class Transaksi extends Component {
   };
 
   componentDidMount() {
-    this.setState({ loading: true });
     const user = this.context;
     if (this.state.meja === null) {
       this.getMeja();
@@ -442,7 +451,9 @@ class Transaksi extends Component {
       })
       .then((res) => {
         let data = res.data.data;
-
+        this.setState({
+          loading: false,
+        });
         this.getMeja();
       })
       .catch((err) => {
@@ -451,6 +462,7 @@ class Transaksi extends Component {
           loading: false,
         });
       });
+
     let newWin = window.open('', 'STRUK', 'resizable,scrollbars');
     myAxios
       .get(`cetakNota/${idTransaksi}`, {
@@ -475,6 +487,8 @@ class Transaksi extends Component {
         // newWin.close();
         // document.body.appendChild(link);
         // link.click();
+        // this.getMeja();
+        window.location.pathname = `/showTransaksi`;
         this.setState({
           modalVisible: false,
           loading: false,
@@ -1038,7 +1052,7 @@ class Transaksi extends Component {
             </Col>
           </Row>
           {this.state.search && <Empty style={{ marginTop: '35px' }} />}
-          {!this.state.meja && (
+          {this.state.loading && (
             <h1
               style={{
                 marginTop: '25px',
@@ -1050,7 +1064,10 @@ class Transaksi extends Component {
               </p>
             </h1>
           )}
-          {this.state.meja && (
+          {!this.state.loading && !this.state.meja && (
+            <Empty style={{ marginTop: '35px' }} />
+          )}
+          {!this.state.loading && this.state.meja && (
             <Row justify='start'>
               {this.state.meja.map((val, index) => {
                 return (
