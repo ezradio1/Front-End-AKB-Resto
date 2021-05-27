@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Layout, Menu } from "antd";
+import { Menu } from "antd";
 import { Link } from "react-router-dom";
 import {
   IdcardOutlined,
@@ -15,7 +15,6 @@ import {
 } from "@ant-design/icons";
 import { UserContext } from "../context/UserContext";
 
-const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 
 class MenuCustom extends Component {

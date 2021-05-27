@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
-import ResizableAntdTable from 'resizable-antd-table';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { Component } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 import {
   Input,
   Table,
@@ -10,17 +9,11 @@ import {
   message,
   Tooltip,
   Spin,
-} from 'antd';
+} from "antd";
 
-import {
-  SearchOutlined,
-  DeleteTwoTone,
-  EditTwoTone,
-  LoadingOutlined,
-  CloudUploadOutlined,
-} from '@ant-design/icons';
-import { UserContext } from '../../context/UserContext';
-import myAxios from '../../myAxios';
+import { SearchOutlined, LoadingOutlined } from "@ant-design/icons";
+import { UserContext } from "../../context/UserContext";
+import myAxios from "../../myAxios";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const tableLoading = {
@@ -35,8 +28,8 @@ class DaftarPesanan extends Component {
       filteredInfo: null,
       sortedInfo: null,
       idEdit: null,
-      searchText: '',
-      searchedColumn: '',
+      searchText: "",
+      searchedColumn: "",
       loading: false,
       validated: false,
     };
@@ -45,7 +38,7 @@ class DaftarPesanan extends Component {
   static contextType = UserContext;
 
   onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+    console.log("Failed:", errorInfo);
   };
 
   handleChangeInput = (evt) => {
@@ -61,21 +54,21 @@ class DaftarPesanan extends Component {
       modalStokVisible: false,
       modalKeluarVisible: false,
       nama_bahan: null,
-      jumlah: '',
-      harga: '',
+      jumlah: "",
+      harga: "",
       tanggal: null,
-      unit: '',
+      unit: "",
     });
   };
 
   handleChange = (pagination, filters, sorter) => {
-    console.log('Various parameters', pagination, filters, sorter);
+    console.log("Various parameters", pagination, filters, sorter);
     this.setState({
       filteredInfo: filters,
       sortedInfo: null,
-      sortDirection: 'asc',
-      searchText: '',
-      searchedColumn: '',
+      sortDirection: "asc",
+      searchText: "",
+      searchedColumn: "",
     });
   };
 
@@ -90,7 +83,7 @@ class DaftarPesanan extends Component {
     myAxios
       .get(`showDetailPesananChef`, {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token'),
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
       })
       .then((res) => {
@@ -99,7 +92,7 @@ class DaftarPesanan extends Component {
           loading: false,
           pesanan: data,
         });
-        console.log('Data Pesanan Chef = ');
+        console.log("Data Pesanan Chef = ");
         console.log(res.data.data);
       })
       .catch((err) => {
@@ -114,22 +107,21 @@ class DaftarPesanan extends Component {
 
   componentDidMount() {
     this.setState({ loading: true });
-    const user = this.context;
     if (this.state.pesanan === null) {
       this.getPesanan();
     }
   }
 
   updateStatus(param) {
-    const mytoken = localStorage.getItem('token');
-    console.log('Delete Item ' + param + mytoken);
+    const mytoken = localStorage.getItem("token");
+    console.log("Delete Item " + param + mytoken);
     let newObj = {
-      status_pesanan: 'Ready to Serve',
+      status_pesanan: "Ready to Serve",
     };
     myAxios
       .put(`updateStatusPesanan/${param}`, newObj, {
         headers: {
-          Authorization: 'Bearer ' + mytoken,
+          Authorization: "Bearer " + mytoken,
         },
       })
       .then((res) => {
@@ -138,10 +130,10 @@ class DaftarPesanan extends Component {
         });
         this.setState({ pesanan: filter });
         console.log(res);
-        message.success('Pesanan berhasil diupdate!');
+        message.success("Pesanan berhasil diupdate!");
       })
       .catch((err) => {
-        message.error('Gagal Menghapus : ' + err.response.data.message);
+        message.error("Gagal Menghapus : " + err.response.data.message);
       });
   }
 
@@ -165,28 +157,30 @@ class DaftarPesanan extends Component {
           onPressEnter={() =>
             this.handleSearch(selectedKeys, confirm, dataIndex)
           }
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
         />
         <Space>
           <Button
-            type='primary'
+            type="primary"
             onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
-            size='small'
-            style={{ width: 90 }}>
+            size="small"
+            style={{ width: 90 }}
+          >
             Search
           </Button>
           <Button
             onClick={() => this.handleReset(clearFilters)}
-            size='small'
-            style={{ width: 90 }}>
+            size="small"
+            style={{ width: 90 }}
+          >
             Reset
           </Button>
         </Space>
       </div>
     ),
     filterIcon: (filtered) => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
@@ -194,7 +188,7 @@ class DaftarPesanan extends Component {
             .toString()
             .toLowerCase()
             .includes(value.toLowerCase())
-        : '',
+        : "",
     onFilterDropdownVisibleChange: (visible) => {
       if (visible) {
         setTimeout(() => this.searchInput.select(), 100);
@@ -205,11 +199,11 @@ class DaftarPesanan extends Component {
   handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     console.log(
-      'data:' +
+      "data:" +
         selectedKeys[0] +
-        'confirmnya : ' +
+        "confirmnya : " +
         confirm +
-        'datin :' +
+        "datin :" +
         dataIndex
     );
     this.setState({
@@ -220,84 +214,73 @@ class DaftarPesanan extends Component {
 
   handleReset = (clearFilters) => {
     clearFilters();
-    this.setState({ searchText: '' });
+    this.setState({ searchText: "" });
   };
 
   render() {
-    let { sortedInfo, filteredInfo } = this.state;
-    sortedInfo = sortedInfo || {};
+    let { filteredInfo } = this.state;
+    // sortedInfo = sortedInfo || {};
     filteredInfo = filteredInfo || {};
     const columns = [
       {
-        title: 'Nomor Transaksi',
-        dataIndex: 'nomor_transaksi',
-        key: 'nomor_transaksi',
-        ...this.getColumnSearchProps('nomor_transaksi'),
+        title: "Nomor Transaksi",
+        dataIndex: "nomor_transaksi",
+        key: "nomor_transaksi",
+        ...this.getColumnSearchProps("nomor_transaksi"),
         filteredValue: filteredInfo.nomor_transaksi || null,
         sorter: (a, b) => a.nomor_transaksi.length - b.nomor_transaksi.length,
         ellipsis: true,
       },
       {
-        title: 'Nama Menu',
-        dataIndex: 'nama_menu',
-        key: 'nama_menu',
+        title: "Nama Menu",
+        dataIndex: "nama_menu",
+        key: "nama_menu",
         filteredValue: filteredInfo.nama_menu || null,
-        onFilter: (value, record) => record.nama_menu == value,
+        onFilter: (value, record) => record.nama_menu === value,
         sorter: (a, b) => a.nama_menu.length - b.nama_menu.length,
         ellipsis: true,
       },
       {
-        title: 'Jumlah Menu',
-        dataIndex: 'jumlah',
-        key: 'jumlah',
+        title: "Jumlah Menu",
+        dataIndex: "jumlah",
+        key: "jumlah",
         filteredValue: filteredInfo.jumlah || null,
-        onFilter: (value, record) => record.jumlah == value,
+        onFilter: (value, record) => record.jumlah === value,
         sorter: (a, b) => a.jumlah.length - b.jumlah.length,
         ellipsis: true,
       },
       {
-        title: 'Nomor Meja',
-        dataIndex: 'nomor_meja',
-        key: 'nomor_meja',
-        ...this.getColumnSearchProps('nomor_meja'),
+        title: "Nomor Meja",
+        dataIndex: "nomor_meja",
+        key: "nomor_meja",
+        ...this.getColumnSearchProps("nomor_meja"),
         filteredValue: filteredInfo.nomor_meja || null,
-        onFilter: (value, record) => record.nomor_meja == value,
+        onFilter: (value, record) => record.nomor_meja === value,
         sorter: (a, b) => a.nomor_meja.length - b.nomor_meja.length,
         ellipsis: true,
       },
-      // {
-      //   title: 'Status Pesanan',
-      //   dataIndex: 'status_pesanan',
-      //   key: 'status_pesanan',
-      //   filters: [
-      //     { text: 'Gram', value: 'gram' },
-      //     { text: 'Mililiter', value: 'ml' },
-      //     { text: 'Botol', value: 'botol' },
-      //   ],
-      //   filteredValue: filteredInfo.status_pesanan || null,
-      //   onFilter: (value, record) => record.status_pesanan.includes(value),
-      //   sorter: (a, b) => a.status_pesanan.length - b.status_pesanan.length,
-      // },
       {
-        align: 'center',
+        align: "center",
 
-        dataIndex: 'id',
-        key: 'id',
+        dataIndex: "id",
+        key: "id",
 
         render: (dataIndex) => (
           <div>
             <Tooltip
-              placement='bottom'
-              title='Update Pesanan'
-              color='#1f1f1f'
-              key='white'>
+              placement="bottom"
+              title="Update Pesanan"
+              color="#1f1f1f"
+              key="white"
+            >
               <Popconfirm
-                placement='left'
-                title={'Ubah Status Pesanan ?'}
+                placement="left"
+                title={"Ubah Status Pesanan ?"}
                 onConfirm={() => this.updateStatus(dataIndex)}
-                okText='Yes'
-                cancelText='No'>
-                <Button type='primary'>Siap Dihidangkan</Button>
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button type="primary">Siap Dihidangkan</Button>
               </Popconfirm>
             </Tooltip>
           </div>
@@ -306,26 +289,29 @@ class DaftarPesanan extends Component {
     ];
 
     return (
-      <div style={{ padding: '25px 30px' }}>
+      <div style={{ padding: "25px 30px" }}>
         <h1
           style={{
-            fontSize: 'x-large',
-            color: '#001529',
-            textTransform: 'uppercase',
-          }}>
+            fontSize: "x-large",
+            color: "#001529",
+            textTransform: "uppercase",
+          }}
+        >
           <strong>pesanan antre masak</strong>
         </h1>
         <div
           style={{
-            border: '1px solid #8C98AD',
-            marginTop: '-10px',
-            marginBottom: '15px',
-          }}></div>
+            border: "1px solid #8C98AD",
+            marginTop: "-10px",
+            marginBottom: "15px",
+          }}
+        ></div>
         <Space style={{ marginBottom: 16 }}>
           <Button
-            type='primary'
-            style={{ width: 'auto', borderRadius: '7px' }}
-            onClick={this.clearFilters}>
+            type="primary"
+            style={{ width: "auto", borderRadius: "7px" }}
+            onClick={this.clearFilters}
+          >
             Hapus Filter
           </Button>
         </Space>

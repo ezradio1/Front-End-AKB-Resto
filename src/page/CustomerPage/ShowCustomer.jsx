@@ -66,17 +66,6 @@ class ShowCustomer extends Component {
     });
   };
 
-  onFinish = (values) => {
-    console.log("Success:", values.curr);
-    console.log("Masuk On Finish");
-
-    this.setState({ modalVisible: false });
-  };
-
-  onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
-
   handleChangeInput = (evt) => {
     console.log(evt.target.value);
     this.setState({
@@ -93,6 +82,7 @@ class ShowCustomer extends Component {
       email: "",
     });
   };
+
   handleCancelAdd = () => {
     this.setState({
       modalVisibleAdd: false,
@@ -183,7 +173,6 @@ class ShowCustomer extends Component {
 
   componentDidMount() {
     this.setState({ loading: true });
-    const user = this.context;
     if (this.state.customer === null) {
       this.getCustomer();
     }
@@ -296,7 +285,7 @@ class ShowCustomer extends Component {
 
   onChangeTak = (evt) => {
     const bahan = this.state.bahan.filter((i) => {
-      return i.nama_bahan == evt;
+      return i.nama_bahan === evt;
     });
     this.setState({
       nama_bahan: evt,
@@ -311,7 +300,7 @@ class ShowCustomer extends Component {
       message.error("Masukan input yang valid!");
     } else if (
       this.state.telepon !== "" &&
-      (this.state.telepon[0] == 0 || this.state.telepon[0] != 8)
+      (this.state.telepon[0] === "0" || this.state.telepon[0] !== "8")
     ) {
       message.error("Nomor telepon harus diawali dengan 8!");
     } else if (
@@ -329,7 +318,7 @@ class ShowCustomer extends Component {
         telepon = "0" + this.state.telepon;
       }
 
-      if (this.state.email === "" || this.state.email == "-") {
+      if (this.state.email === "" || this.state.email === "-") {
         email = "-";
       } else {
         email = this.state.email;
@@ -349,7 +338,6 @@ class ShowCustomer extends Component {
         })
         .then((res) => {
           message.success(newObj.nama_customer + " berhasil diubah!");
-          let data = res.data.data;
           this.setState({
             modalVisible: false,
             nama_customer: "",
@@ -389,8 +377,7 @@ class ShowCustomer extends Component {
       email: event.email,
       telepon: event.telepon,
     };
-    // console.log("newObj");
-    // console.log(newObj);
+
     myAxios
       .post(`customer`, newObj, {
         headers: {
@@ -418,17 +405,9 @@ class ShowCustomer extends Component {
   checkActionCode = async (rule, value, callback) => {
     console.log("value " + value);
     console.log(value === "");
-    // if (value === "" || value === undefined) {
-    //   rule.message = "Nomor Telepon Wajib diisi!";
-    //   this.formRef.setFields({
-    //     telepon: {
-    //       value: value,
-    //       errors: [new Error("forbid ha")],
-    //     },
-    //   });
-    // } else
+
     if (value !== "") {
-      if (value[0] == 0 || value[0] != 8) {
+      if (value[0] === "0" || value[0] !== "8") {
         rule.message = "Nomor Telepon Harus diawali dengan 8!";
         this.formRef.setFields({
           telepon: {
@@ -461,8 +440,8 @@ class ShowCustomer extends Component {
   };
 
   render() {
-    let { sortedInfo, filteredInfo } = this.state;
-    sortedInfo = sortedInfo || {};
+    let { filteredInfo } = this.state;
+    // sortedInfo = sortedInfo || {};
     filteredInfo = filteredInfo || {};
     const columns = [
       {

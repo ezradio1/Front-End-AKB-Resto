@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import ResizableAntdTable from "resizable-antd-table";
-
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
   Input,
@@ -28,21 +26,6 @@ import {
 import { UserContext } from "../../context/UserContext";
 import myAxios from "../../myAxios";
 
-const layout = {
-  labelCol: {
-    span: 8,
-  },
-  wrapperCol: {
-    span: 16,
-  },
-};
-const tailLayout = {
-  wrapperCol: {
-    offset: 8,
-    span: 16,
-  },
-};
-const { Option } = Select;
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const tableLoading = {
   indicator: <Spin indicator={antIcon} />,
@@ -54,7 +37,6 @@ class ShowBahan extends Component {
     this.state = {
       modalVisible: false,
       modalStokVisible: false,
-      modalVisible: false,
       modalEditVisible: false,
       bahan: null,
       bahanAll: null,
@@ -234,7 +216,6 @@ class ShowBahan extends Component {
 
   componentDidMount() {
     this.setState({ loading: tableLoading });
-    const user = this.context;
     if (this.state.bahan === null) {
       this.getDataAll();
     }
@@ -347,7 +328,7 @@ class ShowBahan extends Component {
 
   onChangeTak = (evt) => {
     const bahan = this.state.bahanAll.filter((i) => {
-      return i.id == evt;
+      return i.id === evt;
     });
     console.log("onchangetak");
     console.log(evt);
@@ -486,7 +467,7 @@ class ShowBahan extends Component {
       })
       .then((res) => {
         const temp = this.state.bahanAll.filter((i) => {
-          return i.id == event.id_bahan;
+          return i.id === event.id_bahan;
         });
 
         message.success(temp[0].nama_bahan + " berhasil tambah stok!");
@@ -524,7 +505,7 @@ class ShowBahan extends Component {
       })
       .then((res) => {
         const temp = this.state.bahanAll.filter((i) => {
-          return i.id == event.id_bahan;
+          return i.id === event.id_bahan;
         });
         message.success(temp[0].nama_bahan + " berhasil dibuang!");
         this.setState({
@@ -550,8 +531,8 @@ class ShowBahan extends Component {
     });
     console.log(this.state.nama_bahan);
     console.log("filter");
-    if (this.state.nama_bahan != "") {
-      if (value === 0 || value === "" || value === undefined) {
+    if (this.state.nama_bahan !== "") {
+      if (value <= 0 || value === "" || value === undefined) {
         rule.message = "Jumlah wajib diisi!";
         this.formRefKeluar.current.setFields({
           jumlah: {
@@ -572,39 +553,42 @@ class ShowBahan extends Component {
       await callback();
     }
   };
-  onGenderChange = (value) => {
-    switch (value) {
-      case "male":
-        this.formRef.current.setFieldsValue({
-          note: "Hi, man!",
-        });
-        return;
 
-      case "female":
-        this.formRef.current.setFieldsValue({
-          note: "Hi, lady!",
-        });
-        return;
-
-      case "other":
-        this.formRef.current.setFieldsValue({
-          note: "Hi there!",
-        });
+  checkActionCodeHarga = async (rule, value, callback) => {
+    console.log("value " + value);
+    console.log(value);
+    if (value < 0 || value === undefined || value === "" || value === null) {
+      rule.message = "Harga tidak boleh kurang dari 0!";
+      this.formRef.setFields({
+        masuk: {
+          value: value,
+          errors: [new Error("forbid ha")],
+        },
+      });
+    } else {
+      await callback();
     }
   };
-  onReset = () => {
-    this.formRef.current.resetFields();
-  };
-  onFill = () => {
-    this.formRef.current.setFieldsValue({
-      note: "Hello world!",
-      gender: "male",
-    });
+
+  checkActionCodeJmlMasuk = async (rule, value, callback) => {
+    console.log("value " + value);
+    console.log(value);
+    if (value < 0 || value === undefined || value === "" || value === null) {
+      rule.message = "Jumlah tidak boleh kurang dari 0!";
+      this.formRef.setFields({
+        masuk: {
+          value: value,
+          errors: [new Error("forbid ha")],
+        },
+      });
+    } else {
+      await callback();
+    }
   };
 
   render() {
-    let { sortedInfo, filteredInfo } = this.state;
-    sortedInfo = sortedInfo || {};
+    let { filteredInfo } = this.state;
+    // sortedInfo = sortedInfo || {};
     filteredInfo = filteredInfo || {};
     const columns = [
       {
@@ -622,12 +606,12 @@ class ShowBahan extends Component {
         key: "jumlah",
         filters: [{ text: "Bahan Habis", value: 0 }],
         filteredValue: filteredInfo.jumlah || null,
-        onFilter: (value, record) => record.jumlah == value,
+        onFilter: (value, record) => record.jumlah === value,
         sorter: (a, b) => a.jumlah - b.jumlah,
         ellipsis: true,
         render: (jumlah) => (
           <>
-            <Tag color={jumlah == 0 ? "#A90603" : "#00664B"}>{jumlah}</Tag>
+            <Tag color={jumlah === 0 ? "#A90603" : "#00664B"}>{jumlah}</Tag>
           </>
         ),
       },
@@ -842,7 +826,7 @@ class ShowBahan extends Component {
               rules={[
                 {
                   required: true,
-                  message: "Jumlah wajib diisi",
+                  validator: this.checkActionCodeJmlMasuk,
                 },
               ]}
             >
@@ -863,7 +847,7 @@ class ShowBahan extends Component {
               rules={[
                 {
                   required: true,
-                  message: "Harga wajib diisi",
+                  validator: this.checkActionCodeHarga,
                 },
               ]}
             >

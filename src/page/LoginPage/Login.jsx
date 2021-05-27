@@ -1,11 +1,9 @@
 import React, { useContext, useState } from "react";
-import { Form, Input, Button, useForm, Spin, Row, Col, message } from "antd";
+import { Form, Input, Button, Row, Col, message } from "antd";
 import { UserContext } from "../../context/UserContext";
-import axios from "axios";
 
 import { UserOutlined, KeyOutlined } from "@ant-design/icons";
 
-import LogoAkbNon from "../../asset/logo/logo-col.png";
 import LogoAkb from "../../asset/logo/logo-nav-1.png";
 import "./Login.css";
 import myAxios from "../../myAxios";
@@ -14,23 +12,12 @@ const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },
 };
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
 
 const Login = () => {
   const [, setUser] = useContext(UserContext);
   const [input, setInput] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-
-  const onReset = () => {
-    form.setFieldsValue({
-      email: undefined,
-      password: undefined,
-    });
-    message.warning("Reset Success!");
-  };
 
   const onFinish = (values) => {
     setLoading(true);
@@ -89,7 +76,7 @@ const Login = () => {
           >
             {/* <img src={LogoAkbNon} /> */}
             <br />
-            <img style={{ width: "250px" }} src={LogoAkb} />
+            <img alt="" style={{ width: "250px" }} src={LogoAkb} />
           </div>
           <Form
             {...layout}

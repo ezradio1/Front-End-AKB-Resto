@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
-import { useParams, useForm, useHistory } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { useParams, useHistory } from "react-router-dom";
 import {
   Form,
   Input,
@@ -8,14 +8,10 @@ import {
   Row,
   Col,
   Button,
-  InputNumber,
   Menu,
-  Empty,
   Dropdown,
   Spin,
   Card,
-  Switch,
-  Select,
   DatePicker,
   Result,
 } from "antd";
@@ -29,13 +25,10 @@ import { UserContext } from "../../context/UserContext";
 import Moment from "moment";
 import LogoQR from "../../asset/logo/akb-logo-full.png";
 
-const { Search } = Input;
-const { Option } = Select;
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const EditReservasiLangsung = () => {
   let history = useHistory();
   const mytoken = localStorage.getItem("token");
-  const wrapperRef = useRef(null);
 
   const [user, setUser] = useContext(UserContext);
 
@@ -49,11 +42,7 @@ const EditReservasiLangsung = () => {
 
   const [form] = Form.useForm();
 
-  const [togle, setTogle] = useState(false);
-  const [display, setDisplay] = useState(false);
-  const [options, setOptions] = useState([]);
   const [cust, setCust] = useState(null);
-  const [search, setSearch] = useState("");
 
   const [reservasi, setReservasi] = useState(null);
   //QR CODE
@@ -68,7 +57,7 @@ const EditReservasiLangsung = () => {
     console.log("TEMP MEJA = " + param);
     setMeja(
       tempmeja.filter((i) => {
-        return i.status == param;
+        return i.status === param;
       })
     );
   };
@@ -245,7 +234,6 @@ const EditReservasiLangsung = () => {
         },
       })
       .then((res) => {
-        const data = res.data.data;
         var temp = [];
         console.log("Data Customerku = ");
         console.log(temp);
@@ -280,7 +268,6 @@ const EditReservasiLangsung = () => {
       sesi_reservasi: "Langsung",
       id_meja: idMeja,
       id_karyawan: user.id_karyawan,
-      tipe: togle,
       id_customer: cust,
     };
     myAxios
@@ -333,7 +320,7 @@ const EditReservasiLangsung = () => {
     //   });
     // } else
     if (value !== "") {
-      if (value[0] == 0 || value[0] != 8) {
+      if (value[0] === "0" || value[0] !== "8") {
         rule.message = "Nomor Telepon Harus diawali dengan 8!";
         form.setFields({
           telepon: {
@@ -638,7 +625,6 @@ const EditReservasiLangsung = () => {
                     <DatePicker
                       disabled
                       name="tanggal"
-                      disabled
                       style={{ borderRadius: "5px", width: "160px" }}
                     />
                   </Form.Item>

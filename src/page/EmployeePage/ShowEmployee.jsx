@@ -47,10 +47,8 @@ class ShowEmployee extends Component {
   };
 
   componentDidMount() {
-    const user = this.context;
-    console.log("CEK " + user.object);
     this.setState({ token: localStorage.getItem("token"), loading: true });
-    console.log("SYALALA : " + localStorage.getItem("token"));
+
     if (this.state.karyawan === null) {
       this.setState({
         loading: tableLoading,
@@ -80,7 +78,6 @@ class ShowEmployee extends Component {
             loading: false,
           });
           message.error("Gagal Ambil : " + err);
-          console.log("error  : " + err);
         });
     }
   }
@@ -96,9 +93,6 @@ class ShowEmployee extends Component {
         },
       })
       .then((res) => {
-        let filter = this.state.karyawan.filter((el) => {
-          return el.id === param;
-        });
         console.log(res);
         message.success(res.data.data.nama + " berhasil dinonaktifkan!");
       })
@@ -188,8 +182,8 @@ class ShowEmployee extends Component {
   };
 
   render() {
-    let { sortedInfo, filteredInfo } = this.state;
-    sortedInfo = sortedInfo || {};
+    let { filteredInfo } = this.state;
+    // sortedInfo = sortedInfo || {};
     filteredInfo = filteredInfo || {};
     const columns = [
       {

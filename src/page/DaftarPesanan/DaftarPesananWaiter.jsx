@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import ResizableAntdTable from "resizable-antd-table";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
   Input,
@@ -12,25 +11,9 @@ import {
   Spin,
 } from "antd";
 
-import moment from "moment";
-import Moment from "moment";
-import {
-  SearchOutlined,
-  DeleteTwoTone,
-  EditTwoTone,
-  LoadingOutlined,
-  CloudUploadOutlined,
-} from "@ant-design/icons";
+import { SearchOutlined, LoadingOutlined } from "@ant-design/icons";
 import { UserContext } from "../../context/UserContext";
 import myAxios from "../../myAxios";
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const tableLoading = {
@@ -124,7 +107,7 @@ class DaftarPesananWaiter extends Component {
 
   componentDidMount() {
     this.setState({ loading: true });
-    const user = this.context;
+
     if (this.state.pesanan === null) {
       this.getPesanan();
     }
@@ -236,8 +219,8 @@ class DaftarPesananWaiter extends Component {
   };
 
   render() {
-    let { sortedInfo, filteredInfo } = this.state;
-    sortedInfo = sortedInfo || {};
+    let { filteredInfo } = this.state;
+    // sortedInfo = sortedInfo || {};
     filteredInfo = filteredInfo || {};
     const columns = [
       {
@@ -254,7 +237,7 @@ class DaftarPesananWaiter extends Component {
         dataIndex: "nama_menu",
         key: "nama_menu",
         filteredValue: filteredInfo.nama_menu || null,
-        onFilter: (value, record) => record.nama_menu == value,
+        onFilter: (value, record) => record.nama_menu === value,
         sorter: (a, b) => a.nama_menu.length - b.nama_menu.length,
         ellipsis: true,
       },
@@ -263,7 +246,7 @@ class DaftarPesananWaiter extends Component {
         dataIndex: "jumlah",
         key: "jumlah",
         filteredValue: filteredInfo.jumlah || null,
-        onFilter: (value, record) => record.jumlah == value,
+        onFilter: (value, record) => record.jumlah === value,
         sorter: (a, b) => a.jumlah.length - b.jumlah.length,
         ellipsis: true,
       },
@@ -273,7 +256,7 @@ class DaftarPesananWaiter extends Component {
         key: "nomor_meja",
         ...this.getColumnSearchProps("nomor_meja"),
         filteredValue: filteredInfo.nomor_meja || null,
-        onFilter: (value, record) => record.nomor_meja == value,
+        onFilter: (value, record) => record.nomor_meja === value,
         sorter: (a, b) => a.nomor_meja.length - b.nomor_meja.length,
         ellipsis: true,
       },

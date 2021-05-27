@@ -1,23 +1,10 @@
 import React, { Component } from "react";
 import axios from "axios";
-import {
-  Table,
-  Button,
-  Space,
-  Popconfirm,
-  Input,
-  message,
-  Tag,
-  Spin,
-} from "antd";
-import { Link } from "react-router-dom";
+import { Table, Button, Space, Input, message, Spin } from "antd";
+
 import moment from "moment";
 
-import {
-  SearchOutlined,
-  LoadingOutlined,
-  EditTwoTone,
-} from "@ant-design/icons";
+import { SearchOutlined, LoadingOutlined } from "@ant-design/icons";
 import { UserContext } from "../../context/UserContext";
 import myAxios from "../../myAxios";
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
@@ -123,9 +110,6 @@ class RiwayatMasuk extends Component {
         }
       )
       .then((res) => {
-        let filter = this.state.riwMasuk.filter((el) => {
-          return el.id === param;
-        });
         console.log(res);
         message.success(res.data.data.nama + " berhasil dinonaktifkan!");
       })
@@ -215,8 +199,8 @@ class RiwayatMasuk extends Component {
   };
 
   render() {
-    let { sortedInfo, filteredInfo } = this.state;
-    sortedInfo = sortedInfo || {};
+    let { filteredInfo } = this.state;
+    // sortedInfo = sortedInfo || {};
     filteredInfo = filteredInfo || {};
     const columns = [
       {

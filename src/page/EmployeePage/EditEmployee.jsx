@@ -17,7 +17,7 @@ import {
   Card,
   Popconfirm,
 } from "antd";
-import { useParams, useForm, useHistory } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import moment from "moment";
 
 const { Meta } = Card;
@@ -165,7 +165,7 @@ const EditEmployee = () => {
           errors: [new Error("forbid ha")],
         },
       });
-    } else if (value[0] == 0 || value[0] != 8) {
+    } else if (value[0] === "0" || value[0] !== "8") {
       rule.message = "Nomor Telepon Harus diawali dengan 8!";
       form.setFields({
         telepon: {
