@@ -31,11 +31,6 @@ import myAxios from '../../myAxios';
 import TableHijau from '../../asset/icon/tableHijau.png';
 import TableMerah from '../../asset/icon/tableMerah.png';
 
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const tableLoading = {
   indicator: <Spin indicator={antIcon} />,
@@ -224,15 +219,18 @@ class Transaksi extends Component {
 
   onFilter = (param) => {
     console.log('TEMP MEJA = ' + param);
-    this.setState({
-      meja: this.state.tempmeja.filter((i) => {
-        return i.status == param;
-      }),
-    });
+    if (this.state.meja !== null) {
+      this.setState({
+        meja: this.state.tempmeja.filter((i) => {
+          return i.status == param;
+        }),
+      });
+    } else {
+      message.info('Tidak ada data transaksi!');
+    }
   };
 
   componentDidMount() {
-    const user = this.context;
     if (this.state.meja === null) {
       this.getMeja();
     }
@@ -450,7 +448,6 @@ class Transaksi extends Component {
         },
       })
       .then((res) => {
-        let data = res.data.data;
         this.setState({
           loading: false,
         });
@@ -487,7 +484,7 @@ class Transaksi extends Component {
         // newWin.close();
         // document.body.appendChild(link);
         // link.click();
-        // this.getMeja();
+        this.getMeja();
         window.location.pathname = `/showTransaksi`;
         this.setState({
           modalVisible: false,
@@ -1071,7 +1068,12 @@ class Transaksi extends Component {
             <Row justify='start'>
               {this.state.meja.map((val, index) => {
                 return (
-                  <Col xs={12} md={4} style={{ marginTop: '10px' }}>
+                  <Col
+                    xs={24}
+                    sm={8}
+                    md={6}
+                    xl={4}
+                    style={{ marginTop: '20px' }}>
                     <Tooltip title={val.nomor_transaksi} placement='bottom'>
                       <div onClick={() => this.openTransaksi(val)}>
                         <div className='flip-card'>

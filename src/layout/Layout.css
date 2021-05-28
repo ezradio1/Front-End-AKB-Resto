@@ -25,6 +25,22 @@
   /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
 }
 
+.ant-drawer-body {
+  background-color: #1f1f1f;
+  padding: 0;
+  padding-top: 15px;
+}
+
+.ant-drawer-header {
+  background-color: #141414;
+  padding-bottom: 20px;
+}
+
+.ant-drawer-title {
+  padding-top: 5px;
+  color: #fff;
+}
+
 @media (min-width: 992px) {
   .menuOutline {
     display: none;

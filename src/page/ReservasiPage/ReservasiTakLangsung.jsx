@@ -821,7 +821,12 @@ const ReservasiTakLangsung = () => {
             <Row justify='start'>
               {meja.map((val, index) => {
                 return (
-                  <Col xs={12} md={4} style={{ marginTop: '10px' }}>
+                  <Col
+                    xs={24}
+                    sm={8}
+                    md={6}
+                    xl={4}
+                    style={{ marginTop: '10px' }}>
                     <div onClick={() => openReservasi(val)}>
                       <div className='flip-card'>
                         <div className='flip-card-front'>

@@ -1,0 +1,36 @@
+.mycard h1 {
+  right: 0;
+  font-size: 15px;
+  z-index: 1;
+  position: absolute;
+  color: #f1f1f1;
+  margin-right: 13px;
+  margin-top: 19px;
+  font-weight: bold;
+}
+
+.mycard {
+  margin: 10px auto;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+  transition: transform 0.3s;
+}
+
+.mycard:hover {
+  transform: scale(1.05);
+}
+
+.mycard,
+.mycard img {
+  width: 250px;
+}
+.mycard img {
+  box-shadow: 0 8px 6px -6px grey;
+}
+
+.card-reservasi {
+  box-shadow: 0 7px 6px -6px grey;
+}
